@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="slot" class="ability-slot">
+        <ui:VisualElement name="frame" class="ability-slot__frame">
+            <ui:VisualElement name="icon" class="ability-slot__icon" picking-mode="Ignore" />
+            <ui:VisualElement name="cooldown" class="ability-slot__cooldown" picking-mode="Ignore" />
+            <ui:Label name="cooldownText" class="ability-slot__cooldown-text" picking-mode="Ignore" />
+            <ui:Label name="key" class="ability-slot__key" text="Q" picking-mode="Ignore" />
+            <ui:Label name="cost" class="ability-slot__cost" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="pips" class="ability-slot__pips" picking-mode="Ignore" />
+        <ui:Button name="levelUp" class="ability-slot__level-up" text="+" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -30,6 +30,16 @@ namespace Moba
             if (hero != null) transform.position = hero.transform.position;
         }
 
+        // Unlocks the camera and jumps it to a world position (used by minimap clicks).
+        public void FocusOn(Vector3 worldPoint)
+        {
+            locked = false;
+            transform.position = new Vector3(
+                Mathf.Clamp(worldPoint.x, boundsMin.x, boundsMax.x),
+                transform.position.y,
+                Mathf.Clamp(worldPoint.z, boundsMin.y, boundsMax.y));
+        }
+
         void LateUpdate()
         {
             Keyboard keyboard = Keyboard.current;

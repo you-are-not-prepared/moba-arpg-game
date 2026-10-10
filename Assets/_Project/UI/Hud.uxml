@@ -1,0 +1,62 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="Hud.uss" />
+    <ui:Template name="AbilitySlot" src="AbilitySlot.uxml" />
+    <ui:VisualElement name="hudRoot" class="hud" picking-mode="Ignore">
+        <ui:VisualElement name="worldLayer" class="world-layer" picking-mode="Ignore" />
+
+        <ui:VisualElement name="topBar" class="top-bar" picking-mode="Ignore">
+            <ui:VisualElement name="statsPanel" class="panel stats-panel">
+                <ui:Label name="goldLabel" class="stat stat--gold" text="0g" />
+                <ui:Label name="csLabel" class="stat" text="CS 0" />
+                <ui:Label name="kdaLabel" class="stat" text="0 / 0" />
+                <ui:Label name="timeLabel" class="stat stat--time" text="00:00" />
+                <ui:Label name="waveLabel" class="stat" text="Next wave 0" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="bottomBar" class="bottom-bar" picking-mode="Ignore">
+            <ui:VisualElement name="heroPanel" class="panel hero-panel">
+                <ui:VisualElement name="portrait" class="portrait">
+                    <ui:Label name="portraitInitial" class="portrait__initial" text="H" picking-mode="Ignore" />
+                    <ui:Label name="levelLabel" class="portrait__level" text="1" picking-mode="Ignore" />
+                    <ui:Label name="skillPointsLabel" class="portrait__skill-points" text="+1" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="heroMain" class="hero-main">
+                    <ui:VisualElement name="abilityBar" class="ability-bar">
+                        <ui:Instance template="AbilitySlot" name="slotQ" class="ability-slot-container" />
+                        <ui:Instance template="AbilitySlot" name="slotW" class="ability-slot-container" />
+                        <ui:Instance template="AbilitySlot" name="slotE" class="ability-slot-container" />
+                        <ui:Instance template="AbilitySlot" name="slotR" class="ability-slot-container" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="healthBar" class="resource-bar resource-bar--health">
+                        <ui:VisualElement name="fill" class="resource-bar__fill" />
+                        <ui:Label name="text" class="resource-bar__text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="manaBar" class="resource-bar resource-bar--mana">
+                        <ui:VisualElement name="fill" class="resource-bar__fill" />
+                        <ui:Label name="text" class="resource-bar__text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="xpBar" class="xp-bar">
+                        <ui:VisualElement name="fill" class="xp-bar__fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="minimapFrame" class="panel minimap-frame" />
+
+        <ui:VisualElement name="tooltip" class="panel tooltip hidden" picking-mode="Ignore">
+            <ui:Label name="tooltipTitle" class="tooltip__title" picking-mode="Ignore" />
+            <ui:Label name="tooltipStats" class="tooltip__stats" picking-mode="Ignore" />
+            <ui:Label name="tooltipBody" class="tooltip__body" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <ui:Label name="targetingHint" class="targeting-hint hidden" picking-mode="Ignore" />
+        <ui:Label name="respawnLabel" class="respawn-label hidden" picking-mode="Ignore" />
+
+        <ui:VisualElement name="gameOverOverlay" class="game-over hidden">
+            <ui:Label name="gameOverTitle" class="game-over__title" text="VICTORY" />
+            <ui:Button name="restartButton" class="game-over__button" text="Play again" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

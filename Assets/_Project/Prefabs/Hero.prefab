@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8097045131628531155}
   - component: {fileID: 5983323459855730809}
   - component: {fileID: 6626646154180113897}
+  - component: {fileID: 4830721448136953}
+  - component: {fileID: 8327487650860014397}
   - component: {fileID: 4884322013270226302}
   m_Layer: 0
   m_Name: Hero
@@ -80,6 +82,8 @@ MonoBehaviour:
   barHeight: 2.6
   protectedBy: {fileID: 0}
   destroyOnDeath: 0
+  goldBounty: 0
+  xpBounty: 0
 --- !u!114 &5983323459855730809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,6 +126,44 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &4830721448136953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3659684666451775897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96f5092aa03dd6d41bc82638ac327ee5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.AbilityCaster
+  slots:
+  - ability: {fileID: 0}
+  - ability: {fileID: 0}
+  - ability: {fileID: 0}
+  - ability: {fileID: 0}
+  maxMana: 300
+  manaRegenPerSecond: 2
+--- !u!114 &8327487650860014397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3659684666451775897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 139ab9aeeef9a624eb9096399d501c1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroProgression
+  maxLevel: 18
+  startingGold: 500
+  xpToLevelBase: 280
+  xpToLevelPerLevel: 100
+  healthPerLevel: 80
+  manaPerLevel: 30
+  damagePerLevel: 3
 --- !u!114 &4884322013270226302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,6 +179,7 @@ MonoBehaviour:
   respawnSeconds: 5
   spawnPoint: {fileID: 0}
   moveMarkerMaterial: {fileID: 2100000, guid: 53870e2ab9916424dacb96a5bb69154e, type: 2}
+  rangeIndicatorMaterial: {fileID: 2100000, guid: 2b2116a78bdb6184b9c772370551e449, type: 2}
 --- !u!1 &4830350226088388873
 GameObject:
   m_ObjectHideFlags: 0

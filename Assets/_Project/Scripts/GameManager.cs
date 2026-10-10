@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 namespace Moba
 {
-    // Ends the match when a core dies; R restarts.
+    // Ends the match when a core dies; R (or the HUD button) restarts.
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -12,9 +12,11 @@ namespace Moba
         public Team playerTeam = Team.Blue;
         public HeroController hero;
         public CreepSpawner playerSpawner;
+        public MobaCamera cameraRig;
 
         public Team? Winner { get; private set; }
         public bool IsOver => Winner.HasValue;
+        public float MatchTime => Time.timeSinceLevelLoad;
 
         void Awake()
         {
@@ -30,7 +32,7 @@ namespace Moba
             if (Instance == this) Instance = null;
         }
 
-        void OnUnitDied(Unit unit)
+        void OnUnitDied(Unit unit, Unit killer)
         {
             if (unit.kind != UnitKind.Core || IsOver) return;
             Winner = unit.team == Team.Blue ? Team.Red : Team.Blue;
@@ -40,8 +42,9 @@ namespace Moba
         void Update()
         {
             Keyboard keyboard = Keyboard.current;
-            if (IsOver && keyboard != null && keyboard.rKey.wasPressedThisFrame)
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            if (IsOver && keyboard != null && keyboard.rKey.wasPressedThisFrame) Restart();
         }
+
+        public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

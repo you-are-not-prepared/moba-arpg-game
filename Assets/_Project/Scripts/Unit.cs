@@ -15,8 +15,9 @@ namespace Moba
         static readonly List<Unit> s_All = new();
         public static IReadOnlyList<Unit> All => s_All;
 
-        public static event Action<Unit> AnyDied;
-        public event Action<Unit> Died;
+        // (victim, killer). The killer is whoever landed the last hit and may be null.
+        public static event Action<Unit, Unit> AnyDied;
+        public event Action<Unit, Unit> Died;
 
         public Team team;
         public UnitKind kind;
@@ -28,6 +29,10 @@ namespace Moba
         [Tooltip("While this unit is alive, this one can't be damaged or targeted (e.g. outer tower protects inner tower).")]
         public Unit protectedBy;
         public bool destroyOnDeath = true;
+
+        [Header("Bounty (paid to the hero that lands the last hit)")]
+        public int goldBounty;
+        public float xpBounty;
 
         public float Health { get; private set; }
         public bool IsAlive => Health > 0f;
@@ -42,15 +47,27 @@ namespace Moba
         {
             if (!IsTargetable) return;
             Health = Mathf.Max(0f, Health - amount);
-            if (Health <= 0f) Die();
+            if (Health <= 0f) Die(source);
         }
 
         public void ResetHealth() => Health = maxHealth;
 
-        void Die()
+        public void Heal(float amount)
         {
-            Died?.Invoke(this);
-            AnyDied?.Invoke(this);
+            if (IsAlive) Health = Mathf.Min(maxHealth, Health + amount);
+        }
+
+        // Raises max health and grants the same amount of current health (e.g. on level-up).
+        public void AddMaxHealth(float amount)
+        {
+            maxHealth += amount;
+            if (IsAlive) Health += amount;
+        }
+
+        void Die(Unit killer)
+        {
+            Died?.Invoke(this, killer);
+            AnyDied?.Invoke(this, killer);
             if (destroyOnDeath) Destroy(gameObject);
         }
 

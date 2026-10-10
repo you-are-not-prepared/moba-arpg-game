@@ -2,11 +2,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.AI.Navigation;
+using Moba.Abilities;
+using Moba.UI;
 using Unity.Cinemachine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 namespace Moba.EditorTools
 {
@@ -20,6 +23,8 @@ namespace Moba.EditorTools
         const string ScenesDir = Root + "/Scenes";
         const string ScenePath = ScenesDir + "/Lane.unity";
         const string NavMeshPath = ScenesDir + "/Lane_NavMesh.asset";
+        const string UiDir = Root + "/UI";
+        const string PanelSettingsPath = UiDir + "/HudPanelSettings.asset";
 
         // The lane runs diagonally from the blue core (bottom-left) to the red core (top-right).
         static readonly Vector3 BlueCorePos = new(-45f, 0f, -45f);
@@ -29,7 +34,7 @@ namespace Moba.EditorTools
 
         class Mats
         {
-            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker;
+            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, RangeIndicator;
         }
 
         [MenuItem("MOBA/Rebuild Lane Slice Scene")]
@@ -100,9 +105,14 @@ namespace Moba.EditorTools
 
             // --- Game + HUD ---
             var game = new GameObject("Game").AddComponent<GameManager>();
-            game.gameObject.AddComponent<Hud>();
             game.hero = hero;
             game.playerSpawner = blueSpawner;
+
+            var hudGo = new GameObject("HUD");
+            var document = hudGo.AddComponent<UIDocument>();
+            document.panelSettings = CreatePanelSettings();
+            document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Hud.uxml");
+            hudGo.AddComponent<Hud>();
 
             // --- Camera ---
             Camera mainCam = Camera.main;
@@ -126,6 +136,7 @@ namespace Moba.EditorTools
             follow.TrackerSettings.PositionDamping = Vector3.zero;
             rig.hero = hero;
             rig.follow = follow;
+            game.cameraRig = rig;
 
             // --- Lighting ---
             var sun = Object.FindFirstObjectByType<Light>();
@@ -158,8 +169,13 @@ namespace Moba.EditorTools
             ConfigureAttacker(go, damage: 30f, range: 5.5f, aps: 1.2f, projectileSpeed: 28f, size: 0.35f,
                 origin: new Vector3(0f, 1.4f, 0.5f), mat: m.Hero);
             ConfigureAgent(go, radius: 0.5f, height: 2f, speed: 6.5f);
+            var abilities = go.AddComponent<AbilityCaster>();
+            abilities.maxMana = 300f;
+            abilities.manaRegenPerSecond = 2f;
+            go.AddComponent<HeroProgression>();
             var hero = go.AddComponent<HeroController>();
             hero.moveMarkerMaterial = m.Marker;
+            hero.rangeIndicatorMaterial = m.RangeIndicator;
 
             return SavePrefab(go, "Hero").GetComponent<HeroController>();
         }
@@ -172,7 +188,9 @@ namespace Moba.EditorTools
             Visual(ranged ? PrimitiveType.Cylinder : PrimitiveType.Capsule, go.transform,
                 new Vector3(0f, height * 0.5f, 0f), new Vector3(radius * 2f, height * 0.5f, radius * 2f), m.Blue);
 
-            ConfigureUnit(go, Team.Blue, UnitKind.Creep, health: ranged ? 80f : 130f, radius: radius, barHeight: height + 0.5f);
+            Unit unit = ConfigureUnit(go, Team.Blue, UnitKind.Creep, health: ranged ? 80f : 130f, radius: radius, barHeight: height + 0.5f);
+            unit.goldBounty = ranged ? 14 : 21;
+            unit.xpBounty = ranged ? 30f : 60f;
             if (ranged)
                 ConfigureAttacker(go, damage: 16f, range: 5f, aps: 0.8f, projectileSpeed: 18f, size: 0.2f,
                     origin: new Vector3(0f, height, 0.3f), mat: m.Blue);
@@ -200,6 +218,8 @@ namespace Moba.EditorTools
                 team == Team.Blue ? m.Blue : m.Red);
 
             Unit unit = ConfigureUnit(go, team, UnitKind.Tower, health: 1500f, radius: radius, barHeight: height + 1.6f);
+            unit.goldBounty = 150;
+            unit.xpBounty = 100f;
             unit.protectedBy = protectedBy;
             Attacker attacker = ConfigureAttacker(go, damage: 85f, range: 7.5f, aps: 0.9f, projectileSpeed: 22f, size: 0.45f,
                 origin: new Vector3(0f, height + 0.4f, 0f), mat: team == Team.Blue ? m.Blue : m.Red);
@@ -363,7 +383,40 @@ namespace Moba.EditorTools
             RedPad = Mat("Pad_Red", new Color(0.42f, 0.22f, 0.2f)),
             Hero = Mat("Hero", new Color(1f, 0.82f, 0.25f)),
             Marker = Mat("MoveMarker", new Color(0.3f, 1f, 0.4f)),
+            RangeIndicator = UnlitVertexColorMat("RangeIndicator"),
         };
+
+        // Line renderers tint through vertex colour, which the Lit shader ignores.
+        static Material UnlitVertexColorMat(string name)
+        {
+            string path = $"{MaterialsDir}/{name}.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null)
+            {
+                mat = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            mat.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(mat);
+            return mat;
+        }
+
+        static PanelSettings CreatePanelSettings()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
+            if (settings == null)
+            {
+                settings = ScriptableObject.CreateInstance<PanelSettings>();
+                AssetDatabase.CreateAsset(settings, PanelSettingsPath);
+            }
+            settings.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>(UiDir + "/MobaTheme.tss");
+            settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+            settings.referenceResolution = new Vector2Int(1920, 1080);
+            settings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
+            settings.match = 0.5f;
+            EditorUtility.SetDirty(settings);
+            return settings;
+        }
 
         static Material Mat(string name, Color color)
         {

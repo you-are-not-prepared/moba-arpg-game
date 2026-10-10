@@ -169,6 +169,8 @@ MonoBehaviour:
   barHeight: 1.7
   protectedBy: {fileID: 0}
   destroyOnDeath: 1
+  goldBounty: 21
+  xpBounty: 60
 --- !u!114 &6121554984815517817
 MonoBehaviour:
   m_ObjectHideFlags: 0
