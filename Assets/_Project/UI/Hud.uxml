@@ -40,12 +40,29 @@
                         <ui:VisualElement name="fill" class="xp-bar__fill" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement name="inventoryPanel" class="inventory">
+                    <ui:VisualElement name="inventoryGrid" class="inventory__grid" />
+                    <ui:VisualElement class="inventory__footer">
+                        <ui:Label name="inventoryGold" class="inventory__gold" text="0g" picking-mode="Ignore" />
+                        <ui:Button name="shopButton" class="inventory__shop-button" text="Shop" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 
         <ui:VisualElement name="minimapFrame" class="panel minimap-frame" />
 
         <ui:Button name="menuButton" class="menu-button" text="Options" />
+
+        <ui:VisualElement name="shopWindow" class="panel shop hidden">
+            <ui:VisualElement class="shop__header">
+                <ui:Label class="shop__title" text="Shop" />
+                <ui:Button name="shopClose" class="shop__close" text="Close" />
+            </ui:VisualElement>
+            <ui:Label name="shopStatus" class="shop__status" />
+            <ui:ScrollView name="shopList" class="shop__list" />
+            <ui:Label name="shopHint" class="shop__hint" />
+        </ui:VisualElement>
 
         <ui:VisualElement name="tooltip" class="panel tooltip hidden" picking-mode="Ignore">
             <ui:Label name="tooltipTitle" class="tooltip__title" picking-mode="Ignore" />
@@ -54,6 +71,7 @@
         </ui:VisualElement>
 
         <ui:Label name="targetingHint" class="targeting-hint hidden" picking-mode="Ignore" />
+        <ui:Label name="hudMessage" class="hud-message hidden" picking-mode="Ignore" />
         <ui:Label name="respawnLabel" class="respawn-label hidden" picking-mode="Ignore" />
 
         <ui:VisualElement name="gameOverOverlay" class="game-over hidden">

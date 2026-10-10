@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f9cdbb5b3345be49a06e642cd1931f9, type: 3}
+  m_Name: ItemCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Items.ItemCatalog
+  items:
+  - {fileID: 11400000, guid: 0ffd1ef61474d6a40b105592cca9cabc, type: 2}
+  - {fileID: 11400000, guid: ad52c467a6a98a441bf4f9bd8a0456b6, type: 2}
+  - {fileID: 11400000, guid: f7e12c7fdd9e49546b63d4c4db5f0ff7, type: 2}
+  - {fileID: 11400000, guid: 1d2d906e28a6c6147bb0570bbc7e6800, type: 2}
+  - {fileID: 11400000, guid: 1c5803a80c74a0943a384f9851ad4b54, type: 2}
+  - {fileID: 11400000, guid: 7683be3ed3cfd1e45abc0c81acea4cdc, type: 2}
+  - {fileID: 11400000, guid: d7e513e1844ae6a4a8d9a0086b2705f2, type: 2}
+  - {fileID: 11400000, guid: 3a28b507ee4d8ee48a57b46f0df7d988, type: 2}

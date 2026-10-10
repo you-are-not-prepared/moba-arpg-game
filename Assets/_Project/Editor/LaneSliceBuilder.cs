@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Unity.AI.Navigation;
 using Moba.Abilities;
+using Moba.Items;
 using Moba.UI;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -25,6 +26,7 @@ namespace Moba.EditorTools
         const string NavMeshPath = ScenesDir + "/Lane_NavMesh.asset";
         const string UiDir = Root + "/UI";
         const string PanelSettingsPath = UiDir + "/HudPanelSettings.asset";
+        const string ItemsDir = Root + "/Items";
 
         // The lane runs diagonally from the blue core (bottom-left) to the red core (top-right).
         static readonly Vector3 BlueCorePos = new(-45f, 0f, -45f);
@@ -34,7 +36,7 @@ namespace Moba.EditorTools
 
         class Mats
         {
-            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator;
+            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator, Fire, Explosion;
         }
 
         [MenuItem("MOBA/Rebuild Lane Slice Scene")]
@@ -49,9 +51,11 @@ namespace Moba.EditorTools
             EnsureFolder(MaterialsDir);
             EnsureFolder(PrefabsDir);
             EnsureFolder(ScenesDir);
+            EnsureFolder(ItemsDir);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             Mats m = CreateMaterials();
+            ItemCatalog catalog = CreateItems(m);
 
             HeroController heroPrefab = CreateHeroPrefab(m);
             CreepAI meleePrefab = CreateCreepPrefab("Creep_Melee", m, ranged: false);
@@ -103,10 +107,16 @@ namespace Moba.EditorTools
             hero.transform.SetPositionAndRotation(heroSpawn.position, Quaternion.LookRotation(laneDir));
             hero.spawnPoint = heroSpawn;
 
+            // --- Shops (buy/sell only inside the base) ---
+            Vector3 laneNormal = new(-laneDir.z, 0f, laneDir.x);
+            Shop blueShop = CreateShop("Shop_Blue", Team.Blue, BlueCorePos, BlueCorePos + laneNormal * 7f, catalog, m.Blue, m);
+            CreateShop("Shop_Red", Team.Red, RedCorePos, RedCorePos - laneNormal * 7f, catalog, m.Red, m);
+
             // --- Game + HUD ---
             var game = new GameObject("Game").AddComponent<GameManager>();
             game.hero = hero;
             game.playerSpawner = blueSpawner;
+            game.playerShop = blueShop;
 
             var hudGo = new GameObject("HUD");
             var document = hudGo.AddComponent<UIDocument>();
@@ -176,6 +186,10 @@ namespace Moba.EditorTools
             ConfigureAttacker(go, damage: 30f, range: 5.5f, aps: 1.2f, projectileSpeed: 28f, size: 0.35f,
                 origin: new Vector3(0f, 1.4f, 0.5f), mat: m.Hero);
             ConfigureAgent(go, radius: 0.5f, height: 2f, speed: 6.5f);
+            // No turn rate: instant facing plus near-instant velocity changes.
+            go.GetComponent<NavMeshAgent>().acceleration = 1000f;
+            go.AddComponent<InstantTurn>();
+            go.AddComponent<Inventory>();
             var abilities = go.AddComponent<AbilityCaster>();
             abilities.maxMana = 300f;
             abilities.manaRegenPerSecond = 2f;
@@ -251,6 +265,151 @@ namespace Moba.EditorTools
             Unit unit = ConfigureUnit(go, team, UnitKind.Core, health: 2500f, radius: radius, barHeight: height + 1f);
             AddObstacle(go, radius, height);
             return unit;
+        }
+
+        // Shop range is centred on the base; the stall is decoration (no colliders, so it never blocks clicks).
+        static Shop CreateShop(string name, Team team, Vector3 basePos, Vector3 stallPos, ItemCatalog catalog,
+            Material teamMat, Mats m)
+        {
+            var shop = new GameObject(name).AddComponent<Shop>();
+            shop.transform.position = basePos;
+            shop.team = team;
+            shop.catalog = catalog;
+            shop.radius = BaseRadius + 1f;
+
+            var stall = new GameObject("Stall").transform;
+            stall.SetParent(shop.transform, false);
+            stall.position = stallPos;
+            stall.rotation = Quaternion.LookRotation(basePos - stallPos);
+            Visual(PrimitiveType.Cube, stall, new Vector3(0f, 0.5f, 0f), new Vector3(2.6f, 1f, 1.2f), m.Stone);
+            Visual(PrimitiveType.Cube, stall, new Vector3(-1.1f, 1.4f, -0.4f), new Vector3(0.15f, 1.8f, 0.15f), m.Stone);
+            Visual(PrimitiveType.Cube, stall, new Vector3(1.1f, 1.4f, -0.4f), new Vector3(0.15f, 1.8f, 0.15f), m.Stone);
+            Visual(PrimitiveType.Cube, stall, new Vector3(0f, 2.4f, 0f), new Vector3(3f, 0.25f, 1.8f), teamMat);
+            Visual(PrimitiveType.Sphere, stall, new Vector3(0f, 1.25f, 0.1f), new Vector3(0.6f, 0.5f, 0.6f), m.Hero);
+            return shop;
+        }
+
+        // Placeholder catalog: AD items, one spell and three mods. Re-running keeps asset GUIDs (assets are updated in place).
+        static ItemCatalog CreateItems(Mats m)
+        {
+            var items = new List<InventoryItem>
+            {
+                Item("IronBlade", "Iron Blade", 350, 10f, "IB", new Color(0.55f, 0.6f, 0.68f),
+                    "A plain, dependable blade."),
+                Item("WarPick", "War Pick", 875, 25f, "WP", new Color(0.62f, 0.45f, 0.3f),
+                    "Heavy head, heavier hits."),
+                Item("Greatsword", "Greatsword", 1300, 40f, "GS", new Color(0.35f, 0.45f, 0.75f),
+                    "Two hands, no regrets."),
+                Item("Executioner", "Executioner", 3000, 70f, "EX", new Color(0.75f, 0.25f, 0.25f),
+                    "The finishing blow, sharpened."),
+                Fireball(m),
+                Mod("Mod_Volley", "Volley", 500, "VO", new Color(0.3f, 0.55f, 0.85f),
+                    "The spell fires 2 extra projectiles in a fan.",
+                    SpellTags.Projectile, mod => mod.extraProjectiles = 2),
+                Mod("Mod_Fork", "Fork", 450, "FK", new Color(0.35f, 0.7f, 0.45f),
+                    "Projectiles split in two when they hit a target, flying off at a fixed angle.",
+                    SpellTags.Projectile, mod =>
+                    {
+                        mod.forkCount = 1;
+                        mod.forkAngle = 30f;
+                    }),
+                Mod("Mod_Searing", "Searing", 550, "SE", new Color(0.85f, 0.4f, 0.15f),
+                    "Hits deal more damage and set targets on fire.",
+                    SpellTags.None, mod =>
+                    {
+                        mod.damageMultiplier = 1.3f;
+                        mod.burnFraction = 0.6f;
+                        mod.burnDuration = 3f;
+                    }),
+            };
+
+            string path = $"{ItemsDir}/ItemCatalog.asset";
+            var catalog = AssetDatabase.LoadAssetAtPath<ItemCatalog>(path);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<ItemCatalog>();
+                AssetDatabase.CreateAsset(catalog, path);
+            }
+            catalog.items = items;
+            EditorUtility.SetDirty(catalog);
+            return catalog;
+        }
+
+        static ItemDefinition Item(string id, string displayName, int cost, float attackDamage, string glyph, Color color,
+            string description)
+        {
+            string path = $"{ItemsDir}/{id}.asset";
+            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(path);
+            if (item == null)
+            {
+                item = ScriptableObject.CreateInstance<ItemDefinition>();
+                AssetDatabase.CreateAsset(item, path);
+            }
+            item.displayName = displayName;
+            item.cost = cost;
+            item.attackDamage = attackDamage;
+            item.glyph = glyph;
+            item.color = color;
+            item.description = description;
+            EditorUtility.SetDirty(item);
+            return item;
+        }
+
+        static ProjectileSpell Fireball(Mats m)
+        {
+            var spell = LoadOrCreate<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset");
+            spell.displayName = "Fireball";
+            spell.description = "Hurls a fireball that explodes on the first enemy it hits.";
+            spell.cost = 450;
+            spell.glyph = "FB";
+            spell.color = new Color(0.9f, 0.42f, 0.1f);
+            spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect | SpellTags.Fire;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 0f; // skillshot: fires immediately toward the clicked point
+            spell.cooldownByRank = new[] { 1.5f, 1.4f, 1.3f, 1.2f, 1f };
+            spell.manaCostByRank = new[] { 30f, 32f, 34f, 36f, 38f };
+            spell.baseDamage = 60f;
+            spell.damagePerRank = 25f;
+            spell.explosionRadius = 2.5f;
+            spell.projectileSpeed = 18f;
+            spell.maxDistance = 14f;
+            spell.projectileSize = 0.6f;
+            spell.spreadAngle = 15f;
+            spell.projectileMaterial = m.Fire;
+            spell.explosionMaterial = m.Explosion;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static ModDefinition Mod(string id, string displayName, int cost, string glyph, Color color, string description,
+            SpellTags requiredTags, System.Action<ModDefinition> configure)
+        {
+            var mod = LoadOrCreate<ModDefinition>($"{ItemsDir}/{id}.asset");
+            mod.displayName = displayName;
+            mod.description = description;
+            mod.cost = cost;
+            mod.glyph = glyph;
+            mod.color = color;
+            mod.requiredTags = requiredTags;
+            // Reset effect fields so re-running reflects only what `configure` sets.
+            mod.extraProjectiles = 0;
+            mod.forkCount = 0;
+            mod.forkAngle = 30f;
+            mod.damageMultiplier = 1f;
+            mod.burnFraction = 0f;
+            mod.burnDuration = 3f;
+            configure(mod);
+            EditorUtility.SetDirty(mod);
+            return mod;
+        }
+
+        static T LoadOrCreate<T>(string path) where T : ScriptableObject
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (asset != null) return asset;
+            asset = ScriptableObject.CreateInstance<T>();
+            AssetDatabase.CreateAsset(asset, path);
+            return asset;
         }
 
         static CreepSpawner CreateSpawner(string name, Team team, Vector3 pos, Vector3[] lane, Material teamMat,
@@ -392,6 +551,8 @@ namespace Moba.EditorTools
             Hero = Mat("Hero", new Color(1f, 0.82f, 0.25f)),
             Marker = Mat("MoveMarker", new Color(0.3f, 1f, 0.4f)),
             AttackMarker = Mat("AttackMoveMarker", new Color(1f, 0.3f, 0.25f)),
+            Fire = EmissiveMat("Fire", new Color(1f, 0.45f, 0.1f), 2.5f),
+            Explosion = EmissiveMat("FireExplosion", new Color(1f, 0.6f, 0.15f), 1.5f),
             RangeIndicator = UnlitVertexColorMat("RangeIndicator"),
         };
 
@@ -425,6 +586,16 @@ namespace Moba.EditorTools
             settings.match = 0.5f;
             EditorUtility.SetDirty(settings);
             return settings;
+        }
+
+        static Material EmissiveMat(string name, Color color, float intensity)
+        {
+            Material mat = Mat(name, color);
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", color * intensity);
+            mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            EditorUtility.SetDirty(mat);
+            return mat;
         }
 
         static Material Mat(string name, Color color)

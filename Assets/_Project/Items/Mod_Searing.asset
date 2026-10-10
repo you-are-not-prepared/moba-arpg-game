@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: affdfceb901c5034a87e2f9e794e1381, type: 3}
+  m_Name: Mod_Searing
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ModDefinition
+  displayName: Searing
+  description: Hits deal more damage and set targets on fire.
+  cost: 550
+  icon: {fileID: 0}
+  color: {r: 0.85, g: 0.4, b: 0.15, a: 1}
+  glyph: SE
+  requiredTags: 0
+  extraProjectiles: 0
+  forkCount: 0
+  forkAngle: 30
+  damageMultiplier: 1.3
+  burnFraction: 0.6
+  burnDuration: 3

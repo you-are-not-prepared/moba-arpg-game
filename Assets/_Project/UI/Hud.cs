@@ -7,8 +7,9 @@ namespace Moba.UI
 {
     // In-match HUD (UI Toolkit): stats bar, hero panel with Q/W/E/R slots, health bars over units,
     // bounty pop-ups, minimap, targeting hint, respawn timer and end-of-match screen.
+    // Inventory, shop and item drag-and-drop live in Hud.Inventory.cs.
     [RequireComponent(typeof(UIDocument))]
-    public class Hud : MonoBehaviour
+    public partial class Hud : MonoBehaviour
     {
         const float FloatingTextLifetime = 1.1f;
         const float FloatingTextRise = 45f;
@@ -16,6 +17,7 @@ namespace Moba.UI
         const float BottomMargin = 12f;
 
         static Hud s_Instance;
+        public static Hud Instance => s_Instance;
 
         UIDocument _document;
         VisualElement _root;
@@ -105,7 +107,6 @@ namespace Moba.UI
             {
                 int slot = i;
                 var view = new SlotView(_root.Q($"slot{AbilityCaster.SlotKeys[i]}"));
-                view.Frame.RegisterCallback<ClickEvent>(_ => _hero?.BeginCast(slot));
                 view.Frame.RegisterCallback<PointerEnterEvent>(_ => _hoveredSlot = slot);
                 view.Frame.RegisterCallback<PointerLeaveEvent>(_ =>
                 {
@@ -114,10 +115,12 @@ namespace Moba.UI
                 view.LevelUp.clicked += () => _abilities?.TryLevelUp(slot);
                 view.LevelUp.focusable = false;
                 _slots[i] = view;
+                RegisterSpellSlotDragAndDrop(view, slot);
             }
 
             _minimap = new Minimap();
             _minimapFrame.Add(_minimap);
+            SetUpInventoryAndShop();
 
             _bars.Clear();
             _barPool.Clear();
@@ -144,6 +147,7 @@ namespace Moba.UI
             _progression = _hero.GetComponent<HeroProgression>();
             _abilities = _hero.Abilities;
             if (_progression != null) _progression.BountyEarned += OnBountyEarned;
+            BindInventory();
         }
 
         void Unbind()
@@ -169,6 +173,8 @@ namespace Moba.UI
             _tooltip.style.scale = new Scale(Vector2.one * hud);
             _targetingHint.style.scale = new Scale(Vector2.one * hud);
             _respawn.style.scale = new Scale(Vector2.one * hud);
+            _shopWindow.style.scale = new Scale(Vector2.one * hud);
+            _hudMessage.style.scale = new Scale(Vector2.one * hud);
         }
 
         // Keeps the tooltip and targeting hint just above the (scaled) hero panel.
@@ -179,6 +185,7 @@ namespace Moba.UI
             float top = BottomMargin + panelHeight * _heroPanelScale + 36f * _heroPanelScale;
             _tooltip.style.bottom = top;
             _targetingHint.style.bottom = top;
+            _hudMessage.style.bottom = top + 30f * _heroPanelScale;
         }
 
         void LateUpdate()
@@ -191,6 +198,7 @@ namespace Moba.UI
             UpdateStats();
             UpdateHeroPanel();
             UpdateSlots();
+            UpdateInventoryAndShop();
             UpdateTooltip();
             UpdateUnitBars();
             UpdateFloatingText();
@@ -246,35 +254,55 @@ namespace Moba.UI
 
         void UpdateTooltip()
         {
-            if (_hoveredSlot < 0 || _abilities == null)
+            if (ShowSocketTooltip() || ShowItemTooltip()) return;
+            if (_hoveredSlot < 0 || _abilities == null || _dragFrom.Kind != DragKind.None)
             {
                 _tooltip.AddToClassList("hidden");
                 return;
             }
 
-            AbilityCaster.Slot slot = _abilities.GetSlot(_hoveredSlot);
+            int index = _hoveredSlot;
+            AbilityCaster.Slot slot = _abilities.GetSlot(index);
             AbilityDefinition a = slot.ability;
             GameInput input = GameInput.Instance;
-            string key = GameInput.Display(input.Abilities[_hoveredSlot]);
+            string key = GameInput.Display(input.Abilities[index]);
+            int maxRank = AbilityCaster.MaxRank(index);
             _tooltip.RemoveFromClassList("hidden");
+
+            string rankLine = $"Rank {slot.rank}/{maxRank}";
+            if (_abilities.CanLevelUp(index)) rankLine += $"   ·   {GameInput.Display(input.LevelUpModifier)}+{key} or + to level up";
+            else if (slot.rank < maxRank) rankLine += $"   ·   next rank at level {AbilityCaster.RequiredLevel(index, slot.rank + 1)}";
 
             if (a == null)
             {
-                SetText(_tooltipTitle, $"[{key}] Empty slot");
-                SetText(_tooltipStats, "No ability assigned.");
-                SetText(_tooltipBody, "");
+                SetText(_tooltipTitle, $"[{key}] Empty spell slot");
+                SetText(_tooltipStats, rankLine);
+                SetText(_tooltipBody, "Buy a spell in the shop, then drag it here from your inventory.\n" + DescribeMods(index));
                 return;
             }
 
             int shownRank = Mathf.Max(1, slot.rank);
-            string stats = $"Rank {slot.rank}/{a.maxRank}   Cooldown {a.Cooldown(shownRank):0.#}s   Cost {a.ManaCost(shownRank):0} mana";
-            if (a.range > 0f && a.targeting != AbilityTargeting.Instant) stats += $"   Range {a.range:0.#}";
-            if (_abilities.CanLevelUp(_hoveredSlot)) stats += $"\nCtrl+{key} or + to level up";
-            else if (slot.rank < a.maxRank) stats += $"\nNext rank at level {a.RequiredLevel(slot.rank + 1)}";
+            string effect = a.Describe(shownRank, _abilities.BuildModifiers(index));
+            string stats = $"{rankLine}\nCooldown {a.Cooldown(shownRank):0.#}s   ·   {a.ManaCost(shownRank):0} mana";
+            if (!string.IsNullOrEmpty(effect)) stats += $"\n{effect}";
 
             SetText(_tooltipTitle, $"[{key}] {a.displayName}");
             SetText(_tooltipStats, stats);
-            SetText(_tooltipBody, a.description ?? "");
+            SetText(_tooltipBody, string.IsNullOrEmpty(a.description) ? DescribeMods(index) : $"{a.description}\n{DescribeMods(index)}");
+        }
+
+        string DescribeMods(int index)
+        {
+            var parts = new List<string>();
+            int empty = 0;
+            for (int s = 0; s < AbilityCaster.ModSocketCount; s++)
+            {
+                ModDefinition mod = _abilities.GetMod(index, s);
+                if (mod == null) empty++;
+                else parts.Add(_abilities.IsModActive(index, s) ? mod.displayName : $"{mod.displayName} (inactive)");
+            }
+            string list = parts.Count > 0 ? string.Join(", ", parts) : "none";
+            return empty > 0 ? $"Mods: {list}  ({empty} free socket{(empty == 1 ? "" : "s")})" : $"Mods: {list}";
         }
 
         // ---------- World-space health bars ----------
@@ -434,8 +462,9 @@ namespace Moba.UI
         {
             public readonly VisualElement Frame;
             public readonly Button LevelUp;
+            public readonly VisualElement[] Sockets = new VisualElement[AbilityCaster.ModSocketCount];
             readonly VisualElement _root, _icon, _cooldown, _pips;
-            readonly Label _cooldownText, _cost;
+            readonly Label _cooldownText, _cost, _glyph;
             AbilityDefinition _shownAbility;
             int _shownMaxRank = -1, _shownRank = -1;
 
@@ -452,7 +481,13 @@ namespace Moba.UI
                 _cooldownText = _root.Q<Label>("cooldownText");
                 _cost = _root.Q<Label>("cost");
                 _key = _root.Q<Label>("key");
+                _glyph = _root.Q<Label>("glyph");
+                for (int i = 0; i < Sockets.Length; i++) Sockets[i] = _root.Q($"socket{i}");
             }
+
+            public VisualElement DropArea => _root;
+
+            public void SetDropTarget(bool on) => _root.EnableInClassList("ability-slot--drop-target", on);
 
             public void Refresh(AbilityCaster caster, int index, bool targeting, string keyLabel)
             {
@@ -463,10 +498,22 @@ namespace Moba.UI
                 if (a != _shownAbility)
                 {
                     _shownAbility = a;
-                    _icon.style.backgroundImage = a != null && a.icon != null ? new StyleBackground(a.icon) : new StyleBackground(StyleKeyword.None);
+                    bool hasIcon = a != null && a.icon != null;
+                    _icon.style.backgroundImage = hasIcon ? new StyleBackground(a.icon) : new StyleBackground(StyleKeyword.None);
+                    _glyph.text = a != null && !hasIcon ? a.glyph : "";
+                    // Per-spell colour is data; clearing it falls back to the USS slot colour.
+                    Frame.style.backgroundColor = a != null && !hasIcon ? new StyleColor(a.color) : new StyleColor(StyleKeyword.Null);
                 }
 
-                int maxRank = a != null ? a.maxRank : 0;
+                for (int s = 0; s < Sockets.Length; s++)
+                {
+                    bool filled = caster.GetMod(index, s) != null;
+                    bool active = caster.IsModActive(index, s);
+                    Sockets[s].EnableInClassList("mod-socket--filled", filled && active);
+                    Sockets[s].EnableInClassList("mod-socket--inactive", filled && !active);
+                }
+
+                int maxRank = AbilityCaster.MaxRank(index);
                 if (maxRank != _shownMaxRank || slot.rank != _shownRank) RebuildPips(maxRank, slot.rank);
 
                 CastBlock block = caster.GetCastBlock(index);
@@ -556,6 +603,7 @@ namespace Moba.UI
                 _root.style.top = panelPos.y;
                 _fill.style.width = Length.Percent(100f * unit.Health / unit.maxHealth);
                 _root.EnableInClassList("unit-bar--protected", !unit.IsTargetable);
+                _root.EnableInClassList("unit-bar--burning", Burning.IsBurning(unit));
                 if (level > 0 && level != _shownLevel)
                 {
                     _shownLevel = level;
