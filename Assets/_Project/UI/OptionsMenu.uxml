@@ -1,0 +1,35 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="OptionsMenu.uss" />
+    <ui:VisualElement name="optionsRoot" class="options hidden">
+        <ui:VisualElement name="window" class="options__window">
+            <ui:VisualElement class="options__header">
+                <ui:Label class="options__title" text="Options" />
+                <ui:Label class="options__paused" text="Game paused" />
+            </ui:VisualElement>
+            <ui:VisualElement class="options__tabs">
+                <ui:Button name="tabControls" class="options__tab options__tab--active" text="Controls" />
+                <ui:Button name="tabInterface" class="options__tab" text="Interface" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="controlsPage" class="options__page">
+                <ui:ScrollView name="bindingList" class="options__scroll" />
+                <ui:VisualElement class="options__page-footer">
+                    <ui:Label name="bindingStatus" class="options__status" />
+                    <ui:Button name="resetBindings" class="options__button" text="Reset all keys" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="interfacePage" class="options__page hidden">
+                <ui:ScrollView name="interfaceList" class="options__scroll" />
+                <ui:VisualElement class="options__page-footer">
+                    <ui:Label class="options__status" text="Changes apply live to the HUD behind this window." />
+                    <ui:Button name="resetInterface" class="options__button" text="Reset interface" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="options__footer">
+                <ui:Button name="resumeButton" class="options__button options__button--primary" text="Resume" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
