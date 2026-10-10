@@ -10,6 +10,8 @@ namespace Moba
     {
         public int maxLevel = 18;
         public int startingGold = 500;
+        [Tooltip("Gold earned every second regardless of last hits (also while dead).")]
+        public float passiveGoldPerSecond = 1f;
         [Tooltip("XP to go from level N to N+1 = base + perLevel * (N - 1).")]
         public float xpToLevelBase = 280f;
         public float xpToLevelPerLevel = 100f;
@@ -22,6 +24,7 @@ namespace Moba
         Unit _unit;
         Attacker _attacker;
         AbilityCaster _abilities;
+        float _passiveGoldRemainder;
 
         public int Level { get; private set; } = 1;
         // XP earned toward the next level (resets on level-up).
@@ -44,6 +47,15 @@ namespace Moba
             _abilities = GetComponent<AbilityCaster>();
             Gold = startingGold;
             if (_abilities != null) _abilities.SkillPoints = 1;
+        }
+
+        void Update()
+        {
+            _passiveGoldRemainder += passiveGoldPerSecond * Time.deltaTime;
+            if (_passiveGoldRemainder < 1f) return;
+            int whole = Mathf.FloorToInt(_passiveGoldRemainder);
+            _passiveGoldRemainder -= whole;
+            Gold += whole;
         }
 
         void OnEnable() => Unit.AnyDied += OnAnyDied;

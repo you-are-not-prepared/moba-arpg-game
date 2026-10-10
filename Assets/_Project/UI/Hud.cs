@@ -7,8 +7,9 @@ namespace Moba.UI
 {
     // In-match HUD (UI Toolkit): stats bar, hero panel with Q/W/E/R slots, health bars over units,
     // bounty pop-ups, minimap, targeting hint, respawn timer and end-of-match screen.
+    // Inventory, shop and item drag-and-drop live in Hud.Inventory.cs.
     [RequireComponent(typeof(UIDocument))]
-    public class Hud : MonoBehaviour
+    public partial class Hud : MonoBehaviour
     {
         const float FloatingTextLifetime = 1.1f;
         const float FloatingTextRise = 45f;
@@ -16,6 +17,7 @@ namespace Moba.UI
         const float BottomMargin = 12f;
 
         static Hud s_Instance;
+        public static Hud Instance => s_Instance;
 
         UIDocument _document;
         VisualElement _root;
@@ -118,6 +120,7 @@ namespace Moba.UI
 
             _minimap = new Minimap();
             _minimapFrame.Add(_minimap);
+            SetUpInventoryAndShop();
 
             _bars.Clear();
             _barPool.Clear();
@@ -144,6 +147,7 @@ namespace Moba.UI
             _progression = _hero.GetComponent<HeroProgression>();
             _abilities = _hero.Abilities;
             if (_progression != null) _progression.BountyEarned += OnBountyEarned;
+            BindInventory();
         }
 
         void Unbind()
@@ -169,6 +173,7 @@ namespace Moba.UI
             _tooltip.style.scale = new Scale(Vector2.one * hud);
             _targetingHint.style.scale = new Scale(Vector2.one * hud);
             _respawn.style.scale = new Scale(Vector2.one * hud);
+            _shopWindow.style.scale = new Scale(Vector2.one * hud);
         }
 
         // Keeps the tooltip and targeting hint just above the (scaled) hero panel.
@@ -191,6 +196,7 @@ namespace Moba.UI
             UpdateStats();
             UpdateHeroPanel();
             UpdateSlots();
+            UpdateInventoryAndShop();
             UpdateTooltip();
             UpdateUnitBars();
             UpdateFloatingText();
@@ -246,6 +252,7 @@ namespace Moba.UI
 
         void UpdateTooltip()
         {
+            if (ShowItemTooltip()) return;
             if (_hoveredSlot < 0 || _abilities == null)
             {
                 _tooltip.AddToClassList("hidden");

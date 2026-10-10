@@ -6,7 +6,10 @@ namespace Moba
     [RequireComponent(typeof(Unit))]
     public class Attacker : MonoBehaviour
     {
+        [Tooltip("Base damage per attack (grows with level for heroes).")]
         public float damage = 10f;
+        // Flat damage from items and other bonuses; set by Inventory.
+        [System.NonSerialized] public float bonusDamage;
         [Tooltip("Edge-to-edge distance at which the attack can be started.")]
         public float range = 1f;
         public float attacksPerSecond = 1f;
@@ -19,6 +22,8 @@ namespace Moba
 
         Unit _self;
         float _nextAttackTime;
+
+        public float TotalDamage => damage + bonusDamage;
 
         void Awake() => _self = GetComponent<Unit>();
 
@@ -39,9 +44,9 @@ namespace Moba
             _nextAttackTime = Time.time + 1f / attacksPerSecond;
 
             if (projectileSpeed <= 0f)
-                target.TakeDamage(damage, _self);
+                target.TakeDamage(TotalDamage, _self);
             else
-                Projectile.Launch(transform.TransformPoint(projectileOrigin), _self, target, damage,
+                Projectile.Launch(transform.TransformPoint(projectileOrigin), _self, target, TotalDamage,
                     projectileSpeed, projectileSize, projectileMaterial);
             return true;
         }

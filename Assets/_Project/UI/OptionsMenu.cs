@@ -100,7 +100,8 @@ namespace Moba.UI
                 Close();
                 return;
             }
-            // Esc first cancels any targeting mode; only an idle Esc opens the menu.
+            // Esc first closes the shop, then cancels any targeting mode; only an idle Esc opens the menu.
+            if (Hud.Instance != null && Hud.Instance.CloseShopIfOpen()) return;
             HeroController hero = GameManager.Instance != null ? GameManager.Instance.hero : null;
             if (hero != null && hero.CancelTargeting()) return;
             Open();

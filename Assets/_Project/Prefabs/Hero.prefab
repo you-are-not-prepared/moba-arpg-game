@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8097045131628531155}
   - component: {fileID: 5983323459855730809}
   - component: {fileID: 6626646154180113897}
+  - component: {fileID: 7414974512356350760}
+  - component: {fileID: 1946291923536101442}
   - component: {fileID: 4830721448136953}
   - component: {fileID: 8327487650860014397}
   - component: {fileID: 4884322013270226302}
@@ -115,7 +117,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 6.5
-  m_Acceleration: 40
+  m_Acceleration: 1000
   avoidancePriority: 50
   m_AngularSpeed: 900
   m_StoppingDistance: 0.1
@@ -126,6 +128,39 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &7414974512356350760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3659684666451775897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563c63ec6dddfed41a6adf07f6f88302, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.InstantTurn
+--- !u!114 &1946291923536101442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3659684666451775897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8c8f452d9385ee4f97b1b92560ab4b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Items.Inventory
+  slots:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &4830721448136953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,6 +194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroProgression
   maxLevel: 18
   startingGold: 500
+  passiveGoldPerSecond: 1
   xpToLevelBase: 280
   xpToLevelPerLevel: 100
   healthPerLevel: 80

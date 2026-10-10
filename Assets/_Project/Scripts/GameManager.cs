@@ -12,6 +12,7 @@ namespace Moba
         public HeroController hero;
         public CreepSpawner playerSpawner;
         public MobaCamera cameraRig;
+        public Items.Shop playerShop;
 
         bool _paused;
 

@@ -8,7 +8,7 @@ namespace Moba
     // Binding overrides persist in PlayerPrefs.
     public sealed class GameInput
     {
-        public enum Category { Abilities, Hero, Camera, Match }
+        public enum Category { Abilities, Hero, Camera, Interface, Match }
 
         public sealed class Entry
         {
@@ -33,7 +33,7 @@ namespace Moba
         // Controls that aren't rebindable, listed in the menu for reference.
         public static readonly (string label, string binding)[] FixedControls =
         {
-            ("Cancel targeting / Options menu", "Esc"),
+            ("Close shop / cancel targeting / options menu", "Esc"),
             ("Zoom camera", "Mouse wheel"),
             ("Pan camera (when unlocked)", "Screen edges"),
             ("Minimap: move camera / move hero", "LMB / RMB on minimap"),
@@ -57,6 +57,7 @@ namespace Moba
         public readonly InputAction CameraLock;
         public readonly InputAction CameraCenter;
         public readonly InputAction PanUp, PanDown, PanLeft, PanRight;
+        public readonly InputAction OpenShop;
         public readonly InputAction Restart;
         public readonly InputAction Menu;
 
@@ -88,6 +89,8 @@ namespace Moba
             PanDown = Add("panDown", "Pan camera down", Category.Camera, "<Keyboard>/downArrow");
             PanLeft = Add("panLeft", "Pan camera left", Category.Camera, "<Keyboard>/leftArrow");
             PanRight = Add("panRight", "Pan camera right", Category.Camera, "<Keyboard>/rightArrow");
+
+            OpenShop = Add("openShop", "Open / close shop", Category.Interface, "<Keyboard>/b");
 
             Restart = Add("restart", "Restart match (end screen)", Category.Match, "<Keyboard>/r", checkConflicts: false);
 
