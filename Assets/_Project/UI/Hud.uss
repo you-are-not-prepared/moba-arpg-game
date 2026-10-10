@@ -43,6 +43,7 @@
 
 .unit-bar {
     position: absolute;
+    transform-origin: center bottom;
     width: 36px;
     height: 6px;
     translate: -50% -100%;
@@ -105,6 +106,7 @@
 
 .floating-text {
     position: absolute;
+    transform-origin: center bottom;
     translate: -50% -100%;
     padding: 0;
     margin: 0;
@@ -133,6 +135,7 @@
 
 .stats-panel {
     flex-direction: row;
+    transform-origin: center top;
     padding: 6px 14px;
 }
 
@@ -165,6 +168,7 @@
 
 .hero-panel {
     flex-direction: row;
+    transform-origin: center bottom;
     align-items: center;
     padding: 12px 14px 10px 14px;
 }
@@ -452,6 +456,7 @@
 
 .tooltip {
     position: absolute;
+    transform-origin: center bottom;
     left: 50%;
     bottom: 200px;
     width: 340px;
@@ -484,6 +489,7 @@
 
 .targeting-hint {
     position: absolute;
+    transform-origin: center bottom;
     left: 0;
     right: 0;
     bottom: 205px;
@@ -549,5 +555,25 @@
 }
 
 .game-over__button:hover {
+    background-color: rgb(40, 46, 60);
+}
+
+.menu-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    height: 34px;
+    padding: 0 14px;
+    margin: 0;
+    font-size: 15px;
+    -unity-font-style: bold;
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: var(--panel-border);
+    background-color: var(--panel-bg);
+    color: var(--gold);
+}
+
+.menu-button:hover {
     background-color: rgb(40, 46, 60);
 }

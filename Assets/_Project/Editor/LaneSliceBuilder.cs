@@ -34,7 +34,7 @@ namespace Moba.EditorTools
 
         class Mats
         {
-            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, RangeIndicator;
+            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator;
         }
 
         [MenuItem("MOBA/Rebuild Lane Slice Scene")]
@@ -114,6 +114,13 @@ namespace Moba.EditorTools
             document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Hud.uxml");
             hudGo.AddComponent<Hud>();
 
+            var optionsGo = new GameObject("OptionsMenu");
+            var optionsDocument = optionsGo.AddComponent<UIDocument>();
+            optionsDocument.panelSettings = document.panelSettings;
+            optionsDocument.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/OptionsMenu.uxml");
+            optionsDocument.sortingOrder = 10f;
+            optionsGo.AddComponent<OptionsMenu>();
+
             // --- Camera ---
             Camera mainCam = Camera.main;
             mainCam.gameObject.AddComponent<CinemachineBrain>();
@@ -175,6 +182,7 @@ namespace Moba.EditorTools
             go.AddComponent<HeroProgression>();
             var hero = go.AddComponent<HeroController>();
             hero.moveMarkerMaterial = m.Marker;
+            hero.attackMoveMarkerMaterial = m.AttackMarker;
             hero.rangeIndicatorMaterial = m.RangeIndicator;
 
             return SavePrefab(go, "Hero").GetComponent<HeroController>();
@@ -383,6 +391,7 @@ namespace Moba.EditorTools
             RedPad = Mat("Pad_Red", new Color(0.42f, 0.22f, 0.2f)),
             Hero = Mat("Hero", new Color(1f, 0.82f, 0.25f)),
             Marker = Mat("MoveMarker", new Color(0.3f, 1f, 0.4f)),
+            AttackMarker = Mat("AttackMoveMarker", new Color(1f, 0.3f, 0.25f)),
             RangeIndicator = UnlitVertexColorMat("RangeIndicator"),
         };
 

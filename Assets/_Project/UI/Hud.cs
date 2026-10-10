@@ -12,6 +12,8 @@ namespace Moba.UI
     {
         const float FloatingTextLifetime = 1.1f;
         const float FloatingTextRise = 45f;
+        const float MinimapBaseSize = 250f;
+        const float BottomMargin = 12f;
 
         static Hud s_Instance;
 
@@ -19,6 +21,8 @@ namespace Moba.UI
         VisualElement _root;
         VisualElement _worldLayer;
         VisualElement _heroPanel;
+        VisualElement _statsPanel;
+        VisualElement _minimapFrame;
         Label _gold, _cs, _kda, _time, _wave;
         Label _level, _skillPoints;
         ResourceBar _health, _mana;
@@ -42,6 +46,10 @@ namespace Moba.UI
         readonly Stack<UnitBar> _barPool = new();
         readonly List<Unit> _staleBars = new();
         readonly List<FloatingText> _floating = new();
+
+        float _barScale = 1f;
+        float _popupScale = 1f;
+        float _heroPanelScale = 1f;
 
         // True when the screen position (Input System coordinates, origin bottom-left) is over HUD chrome,
         // so world clicks there should be ignored.
@@ -68,6 +76,8 @@ namespace Moba.UI
             _root = docRoot.Q("hudRoot");
             _worldLayer = _root.Q("worldLayer");
             _heroPanel = _root.Q("heroPanel");
+            _statsPanel = _root.Q("statsPanel");
+            _minimapFrame = _root.Q("minimapFrame");
             _gold = _root.Q<Label>("goldLabel");
             _cs = _root.Q<Label>("csLabel");
             _kda = _root.Q<Label>("kdaLabel");
@@ -87,11 +97,14 @@ namespace Moba.UI
             _gameOver = _root.Q("gameOverOverlay");
             _gameOverTitle = _root.Q<Label>("gameOverTitle");
             _root.Q<Button>("restartButton").clicked += () => _game?.Restart();
+            Button menuButton = _root.Q<Button>("menuButton");
+            menuButton.focusable = false;
+            menuButton.clicked += () => OptionsMenu.Instance?.Open();
 
             for (int i = 0; i < AbilityCaster.SlotCount; i++)
             {
                 int slot = i;
-                var view = new SlotView(_root.Q($"slot{AbilityCaster.SlotKeys[i]}"), AbilityCaster.SlotKeys[i]);
+                var view = new SlotView(_root.Q($"slot{AbilityCaster.SlotKeys[i]}"));
                 view.Frame.RegisterCallback<ClickEvent>(_ => _hero?.BeginCast(slot));
                 view.Frame.RegisterCallback<PointerEnterEvent>(_ => _hoveredSlot = slot);
                 view.Frame.RegisterCallback<PointerLeaveEvent>(_ =>
@@ -99,20 +112,25 @@ namespace Moba.UI
                     if (_hoveredSlot == slot) _hoveredSlot = -1;
                 });
                 view.LevelUp.clicked += () => _abilities?.TryLevelUp(slot);
+                view.LevelUp.focusable = false;
                 _slots[i] = view;
             }
 
             _minimap = new Minimap();
-            _root.Q("minimapFrame").Add(_minimap);
+            _minimapFrame.Add(_minimap);
 
             _bars.Clear();
             _barPool.Clear();
             _floating.Clear();
+
+            GameSettings.Changed += ApplySettings;
+            ApplySettings();
         }
 
         void OnDisable()
         {
             if (s_Instance == this) s_Instance = null;
+            GameSettings.Changed -= ApplySettings;
             Unbind();
         }
 
@@ -133,6 +151,36 @@ namespace Moba.UI
             if (_progression != null) _progression.BountyEarned -= OnBountyEarned;
         }
 
+        // Interface sizes from the options menu. The overall HUD scale multiplies every element.
+        void ApplySettings()
+        {
+            GameSettings s = GameSettings.Current;
+            float hud = s.hudScale;
+            _heroPanelScale = hud * s.heroPanelScale;
+            _heroPanel.style.scale = new Scale(Vector2.one * _heroPanelScale);
+            _statsPanel.style.scale = new Scale(Vector2.one * (hud * s.statsBarScale));
+            float minimap = MinimapBaseSize * hud * s.minimapScale;
+            _minimapFrame.style.width = minimap;
+            _minimapFrame.style.height = minimap;
+            _barScale = hud * s.healthBarScale;
+            _popupScale = hud * s.popupTextScale;
+            foreach (UnitBar bar in _bars.Values) bar.SetScale(_barScale);
+            foreach (UnitBar bar in _barPool) bar.SetScale(_barScale);
+            _tooltip.style.scale = new Scale(Vector2.one * hud);
+            _targetingHint.style.scale = new Scale(Vector2.one * hud);
+            _respawn.style.scale = new Scale(Vector2.one * hud);
+        }
+
+        // Keeps the tooltip and targeting hint just above the (scaled) hero panel.
+        void PositionAboveHeroPanel()
+        {
+            float panelHeight = _heroPanel.layout.height;
+            if (float.IsNaN(panelHeight)) return;
+            float top = BottomMargin + panelHeight * _heroPanelScale + 36f * _heroPanelScale;
+            _tooltip.style.bottom = top;
+            _targetingHint.style.bottom = top;
+        }
+
         void LateUpdate()
         {
             if (_root == null) return;
@@ -147,6 +195,7 @@ namespace Moba.UI
             UpdateUnitBars();
             UpdateFloatingText();
             UpdateOverlays();
+            PositionAboveHeroPanel();
             _minimap.MarkDirtyRepaint();
         }
 
@@ -190,7 +239,9 @@ namespace Moba.UI
         void UpdateSlots()
         {
             if (_abilities == null) return;
-            for (int i = 0; i < _slots.Length; i++) _slots[i].Refresh(_abilities, i, _hero.TargetingSlot == i);
+            GameInput input = GameInput.Instance;
+            for (int i = 0; i < _slots.Length; i++)
+                _slots[i].Refresh(_abilities, i, _hero.TargetingSlot == i, GameInput.Display(input.Abilities[i]));
         }
 
         void UpdateTooltip()
@@ -203,7 +254,8 @@ namespace Moba.UI
 
             AbilityCaster.Slot slot = _abilities.GetSlot(_hoveredSlot);
             AbilityDefinition a = slot.ability;
-            string key = AbilityCaster.SlotKeys[_hoveredSlot];
+            GameInput input = GameInput.Instance;
+            string key = GameInput.Display(input.Abilities[_hoveredSlot]);
             _tooltip.RemoveFromClassList("hidden");
 
             if (a == null)
@@ -238,7 +290,15 @@ namespace Moba.UI
             {
                 if (!_bars.TryGetValue(u, out UnitBar bar))
                 {
-                    bar = _barPool.Count > 0 ? _barPool.Pop() : new UnitBar(_worldLayer);
+                    if (_barPool.Count > 0)
+                    {
+                        bar = _barPool.Pop();
+                    }
+                    else
+                    {
+                        bar = new UnitBar(_worldLayer);
+                        bar.SetScale(_barScale);
+                    }
                     bar.Bind(u, u == self, u.team == _game.playerTeam);
                     _bars.Add(u, bar);
                 }
@@ -278,6 +338,7 @@ namespace Moba.UI
             var label = new Label(text) { pickingMode = PickingMode.Ignore };
             label.AddToClassList("floating-text");
             label.EnableInClassList("floating-text--xp", xp);
+            label.style.scale = new Scale(Vector2.one * _popupScale);
             _worldLayer.Add(label);
             _floating.Add(new FloatingText { Label = label, World = worldPos });
         }
@@ -312,13 +373,21 @@ namespace Moba.UI
             _respawn.EnableInClassList("hidden", !dead || _game.IsOver);
             if (dead) SetText(_respawn, $"Respawning in {Mathf.CeilToInt(_hero.RespawnRemaining)}");
 
+            GameInput input = GameInput.Instance;
+            string confirm = GameInput.Display(input.Select);
+            string cancel = $"{GameInput.Display(input.MoveOrAttack)} / Esc to cancel";
             int targeting = _hero.TargetingSlot;
-            _targetingHint.EnableInClassList("hidden", targeting < 0);
+            bool attackMove = _hero.IsAttackMoveTargeting;
+            _targetingHint.EnableInClassList("hidden", targeting < 0 && !attackMove);
             if (targeting >= 0 && _abilities != null)
             {
                 AbilityDefinition a = _abilities.GetSlot(targeting).ability;
                 string what = a.targeting == AbilityTargeting.Unit ? "a target" : "a location";
-                SetText(_targetingHint, $"{a.displayName}: left-click {what}   ·   right-click / Esc to cancel");
+                SetText(_targetingHint, $"{a.displayName}: {confirm} {what}   ·   {cancel}");
+            }
+            else if (attackMove)
+            {
+                SetText(_targetingHint, $"Attack move: {confirm} near an enemy or a location   ·   {cancel}");
             }
 
             _gameOver.EnableInClassList("hidden", !_game.IsOver);
@@ -370,7 +439,9 @@ namespace Moba.UI
             AbilityDefinition _shownAbility;
             int _shownMaxRank = -1, _shownRank = -1;
 
-            public SlotView(VisualElement container, string key)
+            readonly Label _key;
+
+            public SlotView(VisualElement container)
             {
                 _root = container.Q("slot");
                 Frame = _root.Q("frame");
@@ -380,11 +451,12 @@ namespace Moba.UI
                 _pips = _root.Q("pips");
                 _cooldownText = _root.Q<Label>("cooldownText");
                 _cost = _root.Q<Label>("cost");
-                _root.Q<Label>("key").text = key;
+                _key = _root.Q<Label>("key");
             }
 
-            public void Refresh(AbilityCaster caster, int index, bool targeting)
+            public void Refresh(AbilityCaster caster, int index, bool targeting, string keyLabel)
             {
+                SetText(_key, keyLabel);
                 AbilityCaster.Slot slot = caster.GetSlot(index);
                 AbilityDefinition a = slot.ability;
 
@@ -468,6 +540,8 @@ namespace Moba.UI
                 _level.EnableInClassList("hidden", unit.kind != UnitKind.Hero);
                 _shownLevel = -1;
             }
+
+            public void SetScale(float scale) => _root.style.scale = new Scale(Vector2.one * scale);
 
             public void SetVisible(bool visible)
             {

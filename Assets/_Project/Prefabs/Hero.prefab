@@ -179,7 +179,10 @@ MonoBehaviour:
   respawnSeconds: 5
   spawnPoint: {fileID: 0}
   moveMarkerMaterial: {fileID: 2100000, guid: 53870e2ab9916424dacb96a5bb69154e, type: 2}
+  attackMoveMarkerMaterial: {fileID: 2100000, guid: 90b0c8c5360cd5f45a279884af986df4, type: 2}
   rangeIndicatorMaterial: {fileID: 2100000, guid: 2b2116a78bdb6184b9c772370551e449, type: 2}
+  attackMoveCursorRadius: 3
+  attackMoveAcquireBonus: 2
 --- !u!1 &4830350226088388873
 GameObject:
   m_ObjectHideFlags: 0

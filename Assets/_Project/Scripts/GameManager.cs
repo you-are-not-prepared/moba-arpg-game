@@ -1,10 +1,9 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace Moba
 {
-    // Ends the match when a core dies; R (or the HUD button) restarts.
+    // Ends the match when a core dies; the Restart key (or the HUD button) restarts. Owns pausing.
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -14,14 +13,17 @@ namespace Moba
         public CreepSpawner playerSpawner;
         public MobaCamera cameraRig;
 
+        bool _paused;
+
         public Team? Winner { get; private set; }
         public bool IsOver => Winner.HasValue;
+        public bool IsPaused => _paused;
         public float MatchTime => Time.timeSinceLevelLoad;
 
         void Awake()
         {
             Instance = this;
-            Time.timeScale = 1f;
+            ApplyTimeScale();
         }
 
         void OnEnable() => Unit.AnyDied += OnUnitDied;
@@ -36,15 +38,26 @@ namespace Moba
         {
             if (unit.kind != UnitKind.Core || IsOver) return;
             Winner = unit.team == Team.Blue ? Team.Red : Team.Blue;
-            Time.timeScale = 0f;
+            ApplyTimeScale();
         }
 
         void Update()
         {
-            Keyboard keyboard = Keyboard.current;
-            if (IsOver && keyboard != null && keyboard.rKey.wasPressedThisFrame) Restart();
+            if (IsOver && !_paused && GameInput.Instance.Restart.WasPressedThisFrame()) Restart();
         }
 
-        public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        public void SetPaused(bool paused)
+        {
+            _paused = paused;
+            ApplyTimeScale();
+        }
+
+        public void Restart()
+        {
+            _paused = false;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        void ApplyTimeScale() => Time.timeScale = _paused || IsOver ? 0f : 1f;
     }
 }

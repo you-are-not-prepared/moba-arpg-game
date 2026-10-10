@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 namespace Moba
 {
     // Moves the rig that the Cinemachine camera follows.
-    // Y toggles hero lock, hold Space to centre on the hero, edge-pan / arrow keys when unlocked, scroll to zoom.
+    // Lock toggle, hold-to-centre, edge-pan / pan keys when unlocked, scroll to zoom (keys from GameInput).
     [DefaultExecutionOrder(-100)]
     public class MobaCamera : MonoBehaviour
     {
@@ -42,16 +42,17 @@ namespace Moba
 
         void LateUpdate()
         {
-            Keyboard keyboard = Keyboard.current;
+            if (UI.OptionsMenu.IsMenuOpen) return;
+            GameInput input = GameInput.Instance;
             Mouse mouse = Mouse.current;
 
-            if (keyboard != null && keyboard.yKey.wasPressedThisFrame) locked = !locked;
-            bool centering = keyboard != null && keyboard.spaceKey.isPressed;
+            if (input.CameraLock.WasPressedThisFrame()) locked = !locked;
+            bool centering = input.CameraCenter.IsPressed();
 
             if ((locked || centering) && hero != null)
                 transform.position = hero.transform.position;
             else
-                Pan(keyboard, mouse);
+                Pan(input, mouse);
 
             if (mouse != null && follow != null)
             {
@@ -64,17 +65,14 @@ namespace Moba
             }
         }
 
-        void Pan(Keyboard keyboard, Mouse mouse)
+        void Pan(GameInput input, Mouse mouse)
         {
             Vector2 dir = Vector2.zero;
 
-            if (keyboard != null)
-            {
-                if (keyboard.leftArrowKey.isPressed) dir.x -= 1f;
-                if (keyboard.rightArrowKey.isPressed) dir.x += 1f;
-                if (keyboard.downArrowKey.isPressed) dir.y -= 1f;
-                if (keyboard.upArrowKey.isPressed) dir.y += 1f;
-            }
+            if (input.PanLeft.IsPressed()) dir.x -= 1f;
+            if (input.PanRight.IsPressed()) dir.x += 1f;
+            if (input.PanDown.IsPressed()) dir.y -= 1f;
+            if (input.PanUp.IsPressed()) dir.y += 1f;
 
             if (mouse != null && Application.isFocused)
             {
