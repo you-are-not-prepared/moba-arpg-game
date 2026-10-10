@@ -3,13 +3,14 @@ using UnityEngine;
 
 namespace Moba.Items
 {
-    // Eight item slots (2x4 on the HUD). Item stats are summed into the unit's other components.
+    // Eight slots (2x4 on the HUD) holding items, spells and mods. Equipment stats are summed into the unit's
+    // other components; spells and mods only do something once equipped in a spell slot (see Loadout).
     [RequireComponent(typeof(Unit))]
     public class Inventory : MonoBehaviour
     {
         public const int SlotCount = 8;
 
-        [SerializeField] ItemDefinition[] slots = new ItemDefinition[SlotCount];
+        [SerializeField] InventoryItem[] slots = new InventoryItem[SlotCount];
 
         Attacker _attacker;
 
@@ -25,7 +26,7 @@ namespace Moba.Items
 
         void OnValidate() => EnsureSlots();
 
-        public ItemDefinition Get(int slot) => slots[slot];
+        public InventoryItem Get(int slot) => slots[slot];
 
         public bool IsFull => FirstEmptySlot() < 0;
 
@@ -36,7 +37,7 @@ namespace Moba.Items
             return -1;
         }
 
-        public bool TryAdd(ItemDefinition item, out int slot)
+        public bool TryAdd(InventoryItem item, out int slot)
         {
             slot = FirstEmptySlot();
             if (item == null || slot < 0) return false;
@@ -45,13 +46,22 @@ namespace Moba.Items
             return true;
         }
 
-        public ItemDefinition RemoveAt(int slot)
+        public InventoryItem RemoveAt(int slot)
         {
-            ItemDefinition item = slots[slot];
+            InventoryItem item = slots[slot];
             if (item == null) return null;
             slots[slot] = null;
             Recalculate();
             return item;
+        }
+
+        // Replaces a slot's content (null clears it) and returns what was there.
+        public InventoryItem Set(int slot, InventoryItem item)
+        {
+            InventoryItem previous = slots[slot];
+            slots[slot] = item;
+            Recalculate();
+            return previous;
         }
 
         // Moves an item to another slot, swapping with whatever is there.
@@ -65,8 +75,8 @@ namespace Moba.Items
         void Recalculate()
         {
             float attackDamage = 0f;
-            foreach (ItemDefinition item in slots)
-                if (item != null) attackDamage += item.attackDamage;
+            foreach (InventoryItem item in slots)
+                if (item is ItemDefinition equipment) attackDamage += equipment.attackDamage;
 
             BonusAttackDamage = attackDamage;
             if (_attacker != null) _attacker.bonusDamage = attackDamage;

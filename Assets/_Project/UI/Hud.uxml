@@ -71,6 +71,7 @@
         </ui:VisualElement>
 
         <ui:Label name="targetingHint" class="targeting-hint hidden" picking-mode="Ignore" />
+        <ui:Label name="hudMessage" class="hud-message hidden" picking-mode="Ignore" />
         <ui:Label name="respawnLabel" class="respawn-label hidden" picking-mode="Ignore" />
 
         <ui:VisualElement name="gameOverOverlay" class="game-over hidden">

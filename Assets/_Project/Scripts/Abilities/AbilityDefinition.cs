@@ -1,3 +1,4 @@
+using Moba.Items;
 using UnityEngine;
 
 namespace Moba.Abilities
@@ -14,42 +15,37 @@ namespace Moba.Abilities
 
     public enum UnitTargetFilter { Enemy, Ally, Any }
 
-    // Data + behaviour for one ability. Create a subclass per ability type, implement Execute,
-    // then make assets from it (CreateAssetMenu on the subclass) and drop them into an AbilityCaster slot.
-    public abstract class AbilityDefinition : ScriptableObject
+    // A spell: bought in the shop, then equipped in a Q/W/E/R slot. Create a subclass per spell type,
+    // implement Execute, then make assets from it. Ranks, level gates and mod sockets belong to the slot
+    // (see AbilityCaster); the spell provides per-rank numbers and behaviour.
+    public abstract class AbilityDefinition : InventoryItem
     {
-        public string displayName = "Ability";
-        [TextArea] public string description;
-        public Sprite icon;
+        public SpellTags tags;
 
         [Header("Targeting")]
         public AbilityTargeting targeting = AbilityTargeting.Instant;
         public UnitTargetFilter unitFilter = UnitTargetFilter.Enemy;
-        [Tooltip("Cast range (edge-to-edge for unit targets). 0 = unlimited.")]
+        [Tooltip("Cast range (edge-to-edge for unit targets). 0 = unlimited: cast immediately toward the target.")]
         public float range = 6f;
         [Tooltip("Radius of the area-of-effect preview drawn at the cursor for Point abilities. 0 = none.")]
         public float areaRadius;
 
-        [Header("Ranks")]
-        public bool isUltimate;
-        [Min(1)] public int maxRank = 5;
+        [Header("Per rank")]
         [Tooltip("Cooldown in seconds per rank (last entry repeats).")]
         public float[] cooldownByRank = { 8f };
         [Tooltip("Mana cost per rank (last entry repeats).")]
         public float[] manaCostByRank = { 50f };
-        [Tooltip("Hero level required to learn each rank. Leave empty for the defaults: " +
-                 "basic abilities 1/3/5/7/9, ultimates 6/11/16.")]
-        public int[] requiredLevelByRank;
+
+        public override string KindLabel => "Spell";
 
         public float Cooldown(int rank) => ByRank(cooldownByRank, rank);
         public float ManaCost(int rank) => ByRank(manaCostByRank, rank);
 
-        public int RequiredLevel(int rank)
-        {
-            if (requiredLevelByRank != null && requiredLevelByRank.Length > 0)
-                return requiredLevelByRank[Mathf.Clamp(rank - 1, 0, requiredLevelByRank.Length - 1)];
-            return isUltimate ? 6 + (rank - 1) * 5 : rank * 2 - 1;
-        }
+        // Radius of the ring shown around the caster while targeting (defaults to cast range).
+        public virtual float IndicatorRange => range;
+
+        // Rank- and mod-aware summary for tooltips, e.g. "85 fire damage in a 2.5m radius".
+        public virtual string Describe(int rank, in SpellModifiers modifiers) => "";
 
         public virtual bool IsValidTarget(Unit caster, Unit target)
         {
@@ -82,8 +78,11 @@ namespace Moba.Abilities
         public readonly Vector3 Point;
         // Target unit for Unit abilities; otherwise null.
         public readonly Unit Target;
+        // Combined effect of the mods socketed with this spell.
+        public readonly SpellModifiers Modifiers;
 
-        public AbilityCastContext(Unit caster, AbilityCaster abilities, int slot, int rank, Vector3 point, Unit target)
+        public AbilityCastContext(Unit caster, AbilityCaster abilities, int slot, int rank, Vector3 point, Unit target,
+            SpellModifiers modifiers)
         {
             Caster = caster;
             Abilities = abilities;
@@ -91,6 +90,7 @@ namespace Moba.Abilities
             Rank = rank;
             Point = point;
             Target = target;
+            Modifiers = modifiers;
         }
     }
 }

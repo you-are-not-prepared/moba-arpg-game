@@ -441,9 +441,9 @@ namespace Moba
             }
 
             AbilityDefinition ability = _abilities.GetSlot(_targetingSlot).ability;
-            if (ability.range > 0f)
+            if (ability.IndicatorRange > 0f)
             {
-                float radius = ability.range + (ability.targeting == AbilityTargeting.Unit ? _unit.radius : 0f);
+                float radius = ability.IndicatorRange + (ability.targeting == AbilityTargeting.Unit ? _unit.radius : 0f);
                 _rangeRing.Show(transform.position, radius);
             }
             else

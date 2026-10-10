@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Greatsword
   description: Two hands, no regrets.
   cost: 1300
-  attackDamage: 40
   icon: {fileID: 0}
   color: {r: 0.35, g: 0.45, b: 0.75, a: 1}
   glyph: GS
+  attackDamage: 40

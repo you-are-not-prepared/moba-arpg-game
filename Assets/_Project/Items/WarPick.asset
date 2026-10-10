@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: War Pick
   description: Heavy head, heavier hits.
   cost: 875
-  attackDamage: 25
   icon: {fileID: 0}
   color: {r: 0.62, g: 0.45, b: 0.3, a: 1}
   glyph: WP
+  attackDamage: 25

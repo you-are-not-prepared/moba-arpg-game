@@ -36,7 +36,7 @@ namespace Moba.EditorTools
 
         class Mats
         {
-            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator;
+            public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator, Fire, Explosion;
         }
 
         [MenuItem("MOBA/Rebuild Lane Slice Scene")]
@@ -55,7 +55,7 @@ namespace Moba.EditorTools
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             Mats m = CreateMaterials();
-            ItemCatalog catalog = CreateItems();
+            ItemCatalog catalog = CreateItems(m);
 
             HeroController heroPrefab = CreateHeroPrefab(m);
             CreepAI meleePrefab = CreateCreepPrefab("Creep_Melee", m, ranged: false);
@@ -289,10 +289,10 @@ namespace Moba.EditorTools
             return shop;
         }
 
-        // Placeholder catalog: attack damage only for now. Re-running keeps asset GUIDs (assets are updated in place).
-        static ItemCatalog CreateItems()
+        // Placeholder catalog: AD items, one spell and three mods. Re-running keeps asset GUIDs (assets are updated in place).
+        static ItemCatalog CreateItems(Mats m)
         {
-            var items = new List<ItemDefinition>
+            var items = new List<InventoryItem>
             {
                 Item("IronBlade", "Iron Blade", 350, 10f, "IB", new Color(0.55f, 0.6f, 0.68f),
                     "A plain, dependable blade."),
@@ -302,6 +302,25 @@ namespace Moba.EditorTools
                     "Two hands, no regrets."),
                 Item("Executioner", "Executioner", 3000, 70f, "EX", new Color(0.75f, 0.25f, 0.25f),
                     "The finishing blow, sharpened."),
+                Fireball(m),
+                Mod("Mod_Volley", "Volley", 500, "VO", new Color(0.3f, 0.55f, 0.85f),
+                    "The spell fires 2 extra projectiles in a fan.",
+                    SpellTags.Projectile, mod => mod.extraProjectiles = 2),
+                Mod("Mod_Fork", "Fork", 450, "FK", new Color(0.35f, 0.7f, 0.45f),
+                    "Projectiles split in two when they hit a target, flying off at a fixed angle.",
+                    SpellTags.Projectile, mod =>
+                    {
+                        mod.forkCount = 1;
+                        mod.forkAngle = 30f;
+                    }),
+                Mod("Mod_Searing", "Searing", 550, "SE", new Color(0.85f, 0.4f, 0.15f),
+                    "Hits deal more damage and set targets on fire.",
+                    SpellTags.None, mod =>
+                    {
+                        mod.damageMultiplier = 1.3f;
+                        mod.burnFraction = 0.6f;
+                        mod.burnDuration = 3f;
+                    }),
             };
 
             string path = $"{ItemsDir}/ItemCatalog.asset";
@@ -334,6 +353,63 @@ namespace Moba.EditorTools
             item.description = description;
             EditorUtility.SetDirty(item);
             return item;
+        }
+
+        static ProjectileSpell Fireball(Mats m)
+        {
+            var spell = LoadOrCreate<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset");
+            spell.displayName = "Fireball";
+            spell.description = "Hurls a fireball that explodes on the first enemy it hits.";
+            spell.cost = 450;
+            spell.glyph = "FB";
+            spell.color = new Color(0.9f, 0.42f, 0.1f);
+            spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect | SpellTags.Fire;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 0f; // skillshot: fires immediately toward the clicked point
+            spell.cooldownByRank = new[] { 1.5f, 1.4f, 1.3f, 1.2f, 1f };
+            spell.manaCostByRank = new[] { 30f, 32f, 34f, 36f, 38f };
+            spell.baseDamage = 60f;
+            spell.damagePerRank = 25f;
+            spell.explosionRadius = 2.5f;
+            spell.projectileSpeed = 18f;
+            spell.maxDistance = 14f;
+            spell.projectileSize = 0.6f;
+            spell.spreadAngle = 15f;
+            spell.projectileMaterial = m.Fire;
+            spell.explosionMaterial = m.Explosion;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static ModDefinition Mod(string id, string displayName, int cost, string glyph, Color color, string description,
+            SpellTags requiredTags, System.Action<ModDefinition> configure)
+        {
+            var mod = LoadOrCreate<ModDefinition>($"{ItemsDir}/{id}.asset");
+            mod.displayName = displayName;
+            mod.description = description;
+            mod.cost = cost;
+            mod.glyph = glyph;
+            mod.color = color;
+            mod.requiredTags = requiredTags;
+            // Reset effect fields so re-running reflects only what `configure` sets.
+            mod.extraProjectiles = 0;
+            mod.forkCount = 0;
+            mod.forkAngle = 30f;
+            mod.damageMultiplier = 1f;
+            mod.burnFraction = 0f;
+            mod.burnDuration = 3f;
+            configure(mod);
+            EditorUtility.SetDirty(mod);
+            return mod;
+        }
+
+        static T LoadOrCreate<T>(string path) where T : ScriptableObject
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (asset != null) return asset;
+            asset = ScriptableObject.CreateInstance<T>();
+            AssetDatabase.CreateAsset(asset, path);
+            return asset;
         }
 
         static CreepSpawner CreateSpawner(string name, Team team, Vector3 pos, Vector3[] lane, Material teamMat,
@@ -475,6 +551,8 @@ namespace Moba.EditorTools
             Hero = Mat("Hero", new Color(1f, 0.82f, 0.25f)),
             Marker = Mat("MoveMarker", new Color(0.3f, 1f, 0.4f)),
             AttackMarker = Mat("AttackMoveMarker", new Color(1f, 0.3f, 0.25f)),
+            Fire = EmissiveMat("Fire", new Color(1f, 0.45f, 0.1f), 2.5f),
+            Explosion = EmissiveMat("FireExplosion", new Color(1f, 0.6f, 0.15f), 1.5f),
             RangeIndicator = UnlitVertexColorMat("RangeIndicator"),
         };
 
@@ -508,6 +586,16 @@ namespace Moba.EditorTools
             settings.match = 0.5f;
             EditorUtility.SetDirty(settings);
             return settings;
+        }
+
+        static Material EmissiveMat(string name, Color color, float intensity)
+        {
+            Material mat = Mat(name, color);
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", color * intensity);
+            mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            EditorUtility.SetDirty(mat);
+            return mat;
         }
 
         static Material Mat(string name, Color color)

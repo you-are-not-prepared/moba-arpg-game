@@ -175,9 +175,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.AbilityCaster
   slots:
   - ability: {fileID: 0}
+    mods:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
   - ability: {fileID: 0}
+    mods:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
   - ability: {fileID: 0}
+    mods:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
   - ability: {fileID: 0}
+    mods:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
   maxMana: 300
   manaRegenPerSecond: 2
 --- !u!114 &8327487650860014397

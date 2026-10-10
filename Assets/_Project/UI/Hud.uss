@@ -334,7 +334,7 @@
     display: none;
     position: absolute;
     left: 18px;
-    top: -28px;
+    top: -30px;
     width: 28px;
     height: 24px;
     padding: 0;
@@ -813,4 +813,89 @@
     font-size: 12px;
     white-space: normal;
     color: var(--text-dim);
+}
+
+/* ---------- Spell slot: mod sockets, glyph, drop target ---------- */
+
+.ability-slot__sockets {
+    flex-direction: row;
+    justify-content: center;
+    height: 16px;
+    margin-bottom: 3px;
+}
+
+.mod-socket {
+    width: 12px;
+    height: 12px;
+    margin: 2px 3px;
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: rgb(110, 110, 120);
+    background-color: rgb(20, 22, 28);
+}
+
+.mod-socket:hover {
+    border-color: rgb(235, 235, 235);
+}
+
+.mod-socket--filled {
+    border-color: rgb(150, 115, 30);
+    background-color: var(--gold);
+}
+
+.mod-socket--inactive {
+    border-color: rgb(120, 50, 45);
+    background-color: rgb(170, 70, 60);
+}
+
+.ability-slot__glyph {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.ability-slot--drop-target > .ability-slot__frame {
+    border-color: rgb(120, 220, 255);
+}
+
+.ability-slot--unlearned > .ability-slot__frame > .ability-slot__glyph {
+    color: rgb(150, 150, 150);
+}
+
+/* ---------- Shop sections, HUD messages ---------- */
+
+.shop__section {
+    margin: 10px 0 4px 2px;
+    padding: 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    color: var(--gold);
+}
+
+.hud-message {
+    position: absolute;
+    left: 0;
+    right: 0;
+    transform-origin: center bottom;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 190, 120);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.unit-bar--burning {
+    border-color: rgb(255, 140, 30);
 }

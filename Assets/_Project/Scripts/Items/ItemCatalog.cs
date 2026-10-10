@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace Moba.Items
 {
-    // The list of items a shop sells, in display order.
+    // Everything a shop sells (items, spells, mods). The shop groups them by kind, keeping this order within a kind.
     [CreateAssetMenu(menuName = "MOBA/Item Catalog", fileName = "ItemCatalog")]
     public class ItemCatalog : ScriptableObject
     {
-        public List<ItemDefinition> items = new();
+        public List<InventoryItem> items = new();
     }
 }

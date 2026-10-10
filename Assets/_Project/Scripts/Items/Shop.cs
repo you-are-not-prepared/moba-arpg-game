@@ -35,9 +35,9 @@ namespace Moba.Items
             return d.magnitude <= radius;
         }
 
-        public int SellPrice(ItemDefinition item) => item != null ? Mathf.FloorToInt(item.cost * sellRefund) : 0;
+        public int SellPrice(InventoryItem item) => item != null ? Mathf.FloorToInt(item.cost * sellRefund) : 0;
 
-        public ShopResult CanBuy(Unit hero, HeroProgression wallet, Inventory inventory, ItemDefinition item)
+        public ShopResult CanBuy(Unit hero, HeroProgression wallet, Inventory inventory, InventoryItem item)
         {
             if (item == null) return ShopResult.NoItem;
             if (!CanUse(hero)) return ShopResult.NotInShopRange;
@@ -46,7 +46,7 @@ namespace Moba.Items
             return ShopResult.Ok;
         }
 
-        public ShopResult TryBuy(Unit hero, HeroProgression wallet, Inventory inventory, ItemDefinition item)
+        public ShopResult TryBuy(Unit hero, HeroProgression wallet, Inventory inventory, InventoryItem item)
         {
             ShopResult result = CanBuy(hero, wallet, inventory, item);
             if (result != ShopResult.Ok) return result;
@@ -57,7 +57,7 @@ namespace Moba.Items
 
         public ShopResult TrySell(Unit hero, HeroProgression wallet, Inventory inventory, int slot)
         {
-            ItemDefinition item = inventory.Get(slot);
+            InventoryItem item = inventory.Get(slot);
             if (item == null) return ShopResult.NoItem;
             if (!CanUse(hero)) return ShopResult.NotInShopRange;
             inventory.RemoveAt(slot);
