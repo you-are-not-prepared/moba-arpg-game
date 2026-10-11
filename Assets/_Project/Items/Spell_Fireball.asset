@@ -16,7 +16,7 @@ MonoBehaviour:
   description: Hurls a fireball that explodes on the first enemy it hits.
   cost: 1
   icon: {fileID: 0}
-  color: {r: 0.9, g: 0.42, b: 0.1, a: 1}
+  color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
   glyph: FB
   tags: 7
   targeting: 1

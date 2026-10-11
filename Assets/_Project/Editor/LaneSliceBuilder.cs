@@ -44,6 +44,13 @@ namespace Moba.EditorTools
         const bool TestPrices = true;
         static int Price(int realCost) => TestPrices ? 1 : realCost;
 
+        // TEMPORARY for testing: colour inventory tiles by kind (items orange, spells blue, mods green).
+        // Set to false to restore each asset's own colour below.
+        const bool TestKindColors = true;
+        static readonly Color TestItemColor = new(1f, 0.55f, 0.1f);
+        static readonly Color TestSpellColor = new(0.2f, 0.45f, 0.95f);
+        static readonly Color TestModColor = new(0.25f, 0.75f, 0.3f);
+
         class Mats
         {
             public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator, Fire, Explosion;
@@ -401,7 +408,7 @@ namespace Moba.EditorTools
             item.cost = Price(cost);
             item.attackDamage = attackDamage;
             item.glyph = glyph;
-            item.color = color;
+            item.color = TestKindColors ? TestItemColor : color;
             item.description = description;
             EditorUtility.SetDirty(item);
             return item;
@@ -414,7 +421,7 @@ namespace Moba.EditorTools
             spell.description = "Hurls a fireball that explodes on the first enemy it hits.";
             spell.cost = Price(450);
             spell.glyph = "FB";
-            spell.color = new Color(0.9f, 0.42f, 0.1f);
+            spell.color = TestKindColors ? TestSpellColor : new Color(0.9f, 0.42f, 0.1f);
             spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect | SpellTags.Fire;
             spell.targeting = AbilityTargeting.Point;
             spell.range = 0f; // skillshot: fires immediately toward the clicked point
@@ -441,7 +448,7 @@ namespace Moba.EditorTools
             mod.description = description;
             mod.cost = Price(cost);
             mod.glyph = glyph;
-            mod.color = color;
+            mod.color = TestKindColors ? TestModColor : color;
             mod.requiredTags = requiredTags;
             // Reset effect fields so re-running reflects only what `configure` sets.
             mod.extraProjectiles = 0;

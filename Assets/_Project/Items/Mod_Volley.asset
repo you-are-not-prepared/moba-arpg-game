@@ -16,7 +16,7 @@ MonoBehaviour:
   description: The spell fires 2 extra projectiles in a fan.
   cost: 1
   icon: {fileID: 0}
-  color: {r: 0.3, g: 0.55, b: 0.85, a: 1}
+  color: {r: 0.25, g: 0.75, b: 0.3, a: 1}
   glyph: VO
   requiredTags: 1
   extraProjectiles: 2

@@ -16,6 +16,6 @@ MonoBehaviour:
   description: The finishing blow, sharpened.
   cost: 1
   icon: {fileID: 0}
-  color: {r: 0.75, g: 0.25, b: 0.25, a: 1}
+  color: {r: 1, g: 0.55, b: 0.1, a: 1}
   glyph: EX
   attackDamage: 70
