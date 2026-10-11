@@ -57,7 +57,8 @@ namespace Moba
             if (mouse != null && follow != null)
             {
                 float scroll = mouse.scroll.ReadValue().y;
-                if (scroll != 0f)
+                // Scrolling over HUD panels (shop list, etc.) belongs to the UI, not the camera.
+                if (scroll != 0f && !UI.Hud.IsPointerOverHud(mouse.position.ReadValue()))
                 {
                     _zoom = Mathf.Clamp(_zoom - Mathf.Sign(scroll) * zoomStep, minZoom, maxZoom);
                     follow.FollowOffset = _baseOffset * _zoom;
