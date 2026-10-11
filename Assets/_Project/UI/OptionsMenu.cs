@@ -34,7 +34,7 @@ namespace Moba.UI
         VisualElement _controlsPage, _interfacePage;
         ScrollView _bindingList, _interfaceList;
         Label _status;
-        Toggle _quickCast;
+        readonly List<(Toggle toggle, Func<bool> get)> _toggles = new();
         readonly List<BindingRow> _bindingRows = new();
         readonly List<SliderRow> _sliderRows = new();
 
@@ -153,18 +153,13 @@ namespace Moba.UI
             _bindingRows.Clear();
 
             AddSection(_bindingList, "GAMEPLAY");
-            _quickCast = new Toggle { focusable = false };
-            _quickCast.AddToClassList("setting-row__toggle");
-            _quickCast.RegisterValueChangedCallback(evt =>
-            {
-                GameSettings.Current.attackMoveQuickCast = evt.newValue;
-                GameSettings.NotifyChanged();
-            });
-            VisualElement quickRow = SettingRow("Attack move: quick cast at cursor");
-            quickRow.Q<Label>().AddToClassList("setting-row__label--grow");
-            quickRow.tooltip = "On: attack move fires the moment its key is pressed.\nOff: press the key, then confirm with a click.";
-            quickRow.Add(_quickCast);
-            _bindingList.Add(quickRow);
+            _toggles.Clear();
+            AddToggle("Spells: quick cast at cursor",
+                "On: spell keys cast instantly at the cursor, with no indicator.\nOff: press the key, then confirm with a click.",
+                () => GameSettings.Current.spellQuickCast, v => GameSettings.Current.spellQuickCast = v);
+            AddToggle("Attack move: quick cast at cursor",
+                "On: attack move fires the moment its key is pressed.\nOff: press the key, then confirm with a click.",
+                () => GameSettings.Current.attackMoveQuickCast, v => GameSettings.Current.attackMoveQuickCast = v);
 
             foreach (GameInput.Category category in Enum.GetValues(typeof(GameInput.Category)))
             {
@@ -206,9 +201,26 @@ namespace Moba.UI
             }
         }
 
+        void AddToggle(string label, string tooltip, Func<bool> get, Action<bool> set)
+        {
+            var toggle = new Toggle { focusable = false };
+            toggle.AddToClassList("setting-row__toggle");
+            toggle.RegisterValueChangedCallback(evt =>
+            {
+                set(evt.newValue);
+                GameSettings.NotifyChanged();
+            });
+            VisualElement row = SettingRow(label);
+            row.Q<Label>().AddToClassList("setting-row__label--grow");
+            row.tooltip = tooltip;
+            row.Add(toggle);
+            _bindingList.Add(row);
+            _toggles.Add((toggle, get));
+        }
+
         void RefreshBindings()
         {
-            _quickCast.SetValueWithoutNotify(GameSettings.Current.attackMoveQuickCast);
+            foreach ((Toggle toggle, Func<bool> get) in _toggles) toggle.SetValueWithoutNotify(get());
             foreach (BindingRow row in _bindingRows)
             {
                 bool listening = row == _rebindRow;

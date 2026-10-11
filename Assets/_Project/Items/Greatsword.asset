@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.Items.ItemDefinition
   displayName: Greatsword
   description: Two hands, no regrets.
-  cost: 1300
+  cost: 1
   icon: {fileID: 0}
-  color: {r: 0.35, g: 0.45, b: 0.75, a: 1}
+  color: {r: 1, g: 0.55, b: 0.1, a: 1}
   glyph: GS
   attackDamage: 40

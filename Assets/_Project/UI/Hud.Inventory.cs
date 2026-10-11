@@ -112,7 +112,7 @@ namespace Moba.UI
         void RegisterSpellSlotDragAndDrop(SlotView view, int slot)
         {
             view.Frame.AddManipulator(new DragManipulator(this, new DragSource { Kind = DragKind.Spell, Index = slot },
-                () => _hero?.BeginCast(slot)));
+                () => _hero?.BeginCast(slot, fromHud: true)));
 
             for (int s = 0; s < view.Sockets.Length; s++)
             {
@@ -161,7 +161,7 @@ namespace Moba.UI
             }
         }
 
-        void ShowHudMessage(string message)
+        public void ShowHudMessage(string message)
         {
             if (string.IsNullOrEmpty(message)) return;
             _hudMessage.text = message;

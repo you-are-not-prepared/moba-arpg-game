@@ -143,14 +143,41 @@ namespace Moba
             return had;
         }
 
-        // Entry point for an ability key or a HUD click on an ability slot.
-        public void BeginCast(int slot)
+        // Entry point for an ability key or a HUD click on an ability slot. With spell quick cast on, key presses
+        // cast straight at the cursor (no indicator); HUD clicks always use normal targeting.
+        public void BeginCast(int slot, bool fromHud = false)
         {
             if (_abilities.GetCastBlock(slot) != CastBlock.None) return;
             AbilityDefinition ability = _abilities.GetSlot(slot).ability;
             CancelTargeting();
             if (ability.targeting == AbilityTargeting.Instant) _abilities.TryCast(slot, transform.position, null);
+            else if (GameSettings.Current.spellQuickCast && !fromHud && Mouse.current != null)
+                QuickCast(slot, ability, Mouse.current.position.ReadValue());
             else _targetingSlot = slot;
+        }
+
+        // Casts at whatever is under `screen`: a valid unit for Unit spells, the ground for Point spells.
+        void QuickCast(int slot, AbilityDefinition ability, Vector2 screen)
+        {
+            if (_camera == null) return;
+            int count = Raycast(screen);
+
+            if (ability.targeting == AbilityTargeting.Unit)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    Unit u = _hits[i].collider.GetComponentInParent<Unit>();
+                    if (u != null && u.IsVisibleToPlayer && ability.IsValidTarget(_unit, u))
+                    {
+                        QueueCast(slot, u.transform.position, u);
+                        return;
+                    }
+                }
+                Hud.Instance?.ShowHudMessage($"{ability.displayName}: no valid target under the cursor.");
+                return;
+            }
+
+            if (TryGetGroundPoint(count, out Vector3 point)) QueueCast(slot, point, null);
         }
 
         void ClearOrders()
@@ -315,7 +342,7 @@ namespace Moba
             float bestDist = float.MaxValue;
             foreach (Unit u in Unit.All)
             {
-                if (!u.IsEnemyOf(_unit) || !u.IsTargetable) continue;
+                if (!u.IsEnemyOf(_unit) || !u.IsTargetable || !u.IsVisibleToPlayer) continue;
                 Vector3 d = u.transform.position - point;
                 d.y = 0f;
                 float dist = d.magnitude - u.radius;
@@ -355,7 +382,8 @@ namespace Moba
         {
             int slot = _pendingCastSlot;
             AbilityDefinition ability = _abilities.GetSlot(slot).ability;
-            if (ability == null || (ability.targeting == AbilityTargeting.Unit && !ability.IsValidTarget(_unit, _pendingCastTarget)))
+            if (ability == null || (ability.targeting == AbilityTargeting.Unit
+                    && (!ability.IsValidTarget(_unit, _pendingCastTarget) || !_pendingCastTarget.IsVisibleToPlayer)))
             {
                 _pendingCastSlot = NoSlot;
                 return;
@@ -376,7 +404,8 @@ namespace Moba
 
         void UpdateAttack()
         {
-            if (_attackTarget != null && !_attackTarget.IsTargetable)
+            // Targets that die, become untargetable or slip into the fog are dropped.
+            if (_attackTarget != null && (!_attackTarget.IsTargetable || !_attackTarget.IsVisibleToPlayer))
             {
                 _attackTarget = null;
                 if (!_attackMoving)
@@ -400,7 +429,7 @@ namespace Moba
                 if (Time.time >= _nextAcquire)
                 {
                     _nextAcquire = Time.time + AcquireInterval;
-                    _attackTarget = _unit.FindClosestEnemy(_attacker.range + attackMoveAcquireBonus);
+                    _attackTarget = _unit.FindClosestEnemy(_attacker.range + attackMoveAcquireBonus, u => u.IsVisibleToPlayer);
                     _targetAutoAcquired = true;
                 }
                 if (_attackTarget == null)

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.Items.ItemDefinition
   displayName: War Pick
   description: Heavy head, heavier hits.
-  cost: 875
+  cost: 1
   icon: {fileID: 0}
-  color: {r: 0.62, g: 0.45, b: 0.3, a: 1}
+  color: {r: 1, g: 0.55, b: 0.1, a: 1}
   glyph: WP
   attackDamage: 25

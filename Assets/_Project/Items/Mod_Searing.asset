@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ModDefinition
   displayName: Searing
   description: Hits deal more damage and set targets on fire.
-  cost: 550
+  cost: 1
   icon: {fileID: 0}
-  color: {r: 0.85, g: 0.4, b: 0.15, a: 1}
+  color: {r: 0.25, g: 0.75, b: 0.3, a: 1}
   glyph: SE
   requiredTags: 0
   extraProjectiles: 0

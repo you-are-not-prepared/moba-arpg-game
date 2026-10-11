@@ -31,6 +31,7 @@ namespace Moba.Abilities
         Vector3 _dir;
         float _travelled;
         Unit _ignore;
+        Renderer _renderer;
 
         // `ignore` can't be hit by this projectile (forks never hit the target they split from).
         public static void Launch(Vector3 groundOrigin, Vector3 direction, in Payload payload, Unit ignore)
@@ -46,6 +47,8 @@ namespace Moba.Abilities
             p._p = payload;
             p._dir = direction.normalized;
             p._ignore = ignore;
+            p._renderer = go.GetComponent<Renderer>();
+            p._renderer.enabled = FogOfWar.ShouldShow(payload.Team, go.transform.position);
         }
 
         void Update()
@@ -63,6 +66,7 @@ namespace Moba.Abilities
             }
 
             transform.position = to;
+            _renderer.enabled = FogOfWar.ShouldShow(_p.Team, to);
             _travelled += step;
             if (_travelled >= _p.MaxDistance) Destroy(gameObject);
         }

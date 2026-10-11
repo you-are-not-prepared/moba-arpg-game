@@ -7,6 +7,8 @@ namespace Moba
     {
         Unit _source;
         Unit _target;
+        Team _team;
+        Renderer _renderer;
         float _damage;
         float _speed;
 
@@ -22,6 +24,8 @@ namespace Moba
 
             Projectile p = go.AddComponent<Projectile>();
             p._source = source;
+            p._team = source != null ? source.team : Team.Red;
+            p._renderer = go.GetComponent<Renderer>();
             p._target = target;
             p._damage = damage;
             p._speed = speed;
@@ -37,6 +41,7 @@ namespace Moba
 
             Vector3 aim = _target.AimPoint;
             transform.position = Vector3.MoveTowards(transform.position, aim, _speed * Time.deltaTime);
+            _renderer.enabled = FogOfWar.ShouldShow(_team, transform.position);
             if ((transform.position - aim).sqrMagnitude < 0.04f)
             {
                 _target.TakeDamage(_damage, _source);

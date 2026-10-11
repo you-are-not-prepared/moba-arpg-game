@@ -21,6 +21,8 @@ namespace Moba
         [Header("Gameplay")]
         [Tooltip("Attack move fires instantly at the cursor when its key is pressed (otherwise press, then left-click).")]
         public bool attackMoveQuickCast = true;
+        [Tooltip("Spell keys cast instantly at the cursor (no indicator) instead of press-then-click.")]
+        public bool spellQuickCast;
 
         const string PrefsKey = "moba.settings";
 
