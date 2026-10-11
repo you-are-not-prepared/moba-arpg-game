@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ModDefinition
   displayName: Volley
   description: The spell fires 2 extra projectiles in a fan.
-  cost: 500
+  cost: 1
   icon: {fileID: 0}
   color: {r: 0.3, g: 0.55, b: 0.85, a: 1}
   glyph: VO

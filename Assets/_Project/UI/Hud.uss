@@ -899,3 +899,11 @@
 .unit-bar--burning {
     border-color: rgb(255, 140, 30);
 }
+
+.minimap__layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}

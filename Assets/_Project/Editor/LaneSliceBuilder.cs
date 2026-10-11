@@ -34,6 +34,16 @@ namespace Moba.EditorTools
         const float LaneHalfWidth = 5f;
         const float BaseRadius = 13f;
 
+        // Vision radii (fog of war), already including the +20% bump over the original 12 / 7.5 / 10 / 12.
+        const float HeroSight = 14.4f;
+        const float CreepSight = 9f;
+        const float TowerSight = 12f;
+        const float CoreSight = 14.4f;
+
+        // TEMPORARY for testing: every item, spell and mod costs 1g. Set to false to restore the real prices below.
+        const bool TestPrices = true;
+        static int Price(int realCost) => TestPrices ? 1 : realCost;
+
         class Mats
         {
             public Material Ground, Lane, Rock, Stone, Blue, Red, BluePad, RedPad, Hero, Marker, AttackMarker, RangeIndicator, Fire, Explosion;
@@ -110,13 +120,15 @@ namespace Moba.EditorTools
             // --- Shops (buy/sell only inside the base) ---
             Vector3 laneNormal = new(-laneDir.z, 0f, laneDir.x);
             Shop blueShop = CreateShop("Shop_Blue", Team.Blue, BlueCorePos, BlueCorePos + laneNormal * 7f, catalog, m.Blue, m);
-            CreateShop("Shop_Red", Team.Red, RedCorePos, RedCorePos - laneNormal * 7f, catalog, m.Red, m);
+            Shop redShop = CreateShop("Shop_Red", Team.Red, RedCorePos, RedCorePos - laneNormal * 7f, catalog, m.Red, m);
 
             // --- Game + HUD ---
             var game = new GameObject("Game").AddComponent<GameManager>();
             game.hero = hero;
             game.playerSpawner = blueSpawner;
             game.playerShop = blueShop;
+
+            CreateFogOfWar(new[] { map.transform.Find("Rocks"), structures, blueShop.transform, redShop.transform });
 
             var hudGo = new GameObject("HUD");
             var document = hudGo.AddComponent<UIDocument>();
@@ -182,7 +194,7 @@ namespace Moba.EditorTools
             Visual(PrimitiveType.Capsule, go.transform, new Vector3(0f, 1f, 0f), new Vector3(1f, 1f, 1f), m.Hero);
             Visual(PrimitiveType.Cube, go.transform, new Vector3(0f, 1.4f, 0.45f), new Vector3(0.3f, 0.2f, 0.3f), m.Stone);
 
-            ConfigureUnit(go, Team.Blue, UnitKind.Hero, health: 600f, radius: 0.5f, barHeight: 2.6f);
+            ConfigureUnit(go, Team.Blue, UnitKind.Hero, health: 600f, radius: 0.5f, barHeight: 2.6f).sightRadius = HeroSight;
             ConfigureAttacker(go, damage: 30f, range: 5.5f, aps: 1.2f, projectileSpeed: 28f, size: 0.35f,
                 origin: new Vector3(0f, 1.4f, 0.5f), mat: m.Hero);
             ConfigureAgent(go, radius: 0.5f, height: 2f, speed: 6.5f);
@@ -211,6 +223,7 @@ namespace Moba.EditorTools
                 new Vector3(0f, height * 0.5f, 0f), new Vector3(radius * 2f, height * 0.5f, radius * 2f), m.Blue);
 
             Unit unit = ConfigureUnit(go, Team.Blue, UnitKind.Creep, health: ranged ? 80f : 130f, radius: radius, barHeight: height + 0.5f);
+            unit.sightRadius = CreepSight;
             unit.goldBounty = ranged ? 14 : 21;
             unit.xpBounty = ranged ? 30f : 60f;
             if (ranged)
@@ -240,6 +253,7 @@ namespace Moba.EditorTools
                 team == Team.Blue ? m.Blue : m.Red);
 
             Unit unit = ConfigureUnit(go, team, UnitKind.Tower, health: 1500f, radius: radius, barHeight: height + 1.6f);
+            unit.sightRadius = TowerSight;
             unit.goldBounty = 150;
             unit.xpBounty = 100f;
             unit.protectedBy = protectedBy;
@@ -263,8 +277,46 @@ namespace Moba.EditorTools
                 team == Team.Blue ? m.Blue : m.Red);
 
             Unit unit = ConfigureUnit(go, team, UnitKind.Core, health: 2500f, radius: radius, barHeight: height + 1f);
+            unit.sightRadius = CoreSight;
             AddObstacle(go, radius, height);
             return unit;
+        }
+
+        // Ground overlay just above the lane/pads; tall props (rocks, structures, shops) are dimmed instead.
+        static FogOfWar CreateFogOfWar(Transform[] tintRoots)
+        {
+            var fog = new GameObject("FogOfWar").AddComponent<FogOfWar>();
+            fog.worldMin = new Vector2(-70f, -70f);
+            fog.worldMax = new Vector2(70f, 70f);
+            fog.tintRoots = tintRoots;
+
+            GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            quad.name = "FogOverlay";
+            Object.DestroyImmediate(quad.GetComponent<Collider>());
+            quad.transform.SetParent(fog.transform, false);
+            quad.transform.SetPositionAndRotation(new Vector3(0f, 0.12f, 0f), Quaternion.Euler(90f, 0f, 0f));
+            quad.transform.localScale = new Vector3(140f, 140f, 1f);
+            var renderer = quad.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = FogMaterial();
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            renderer.enabled = false; // FogOfWar enables it at runtime, so the scene isn't fogged while editing
+            fog.overlay = renderer;
+            return fog;
+        }
+
+        static Material FogMaterial()
+        {
+            string path = $"{MaterialsDir}/FogOverlay.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null)
+            {
+                mat = new Material(Shader.Find("Moba/FogOverlay"));
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            mat.shader = Shader.Find("Moba/FogOverlay");
+            EditorUtility.SetDirty(mat);
+            return mat;
         }
 
         // Shop range is centred on the base; the stall is decoration (no colliders, so it never blocks clicks).
@@ -346,7 +398,7 @@ namespace Moba.EditorTools
                 AssetDatabase.CreateAsset(item, path);
             }
             item.displayName = displayName;
-            item.cost = cost;
+            item.cost = Price(cost);
             item.attackDamage = attackDamage;
             item.glyph = glyph;
             item.color = color;
@@ -360,7 +412,7 @@ namespace Moba.EditorTools
             var spell = LoadOrCreate<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset");
             spell.displayName = "Fireball";
             spell.description = "Hurls a fireball that explodes on the first enemy it hits.";
-            spell.cost = 450;
+            spell.cost = Price(450);
             spell.glyph = "FB";
             spell.color = new Color(0.9f, 0.42f, 0.1f);
             spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect | SpellTags.Fire;
@@ -387,7 +439,7 @@ namespace Moba.EditorTools
             var mod = LoadOrCreate<ModDefinition>($"{ItemsDir}/{id}.asset");
             mod.displayName = displayName;
             mod.description = description;
-            mod.cost = cost;
+            mod.cost = Price(cost);
             mod.glyph = glyph;
             mod.color = color;
             mod.requiredTags = requiredTags;

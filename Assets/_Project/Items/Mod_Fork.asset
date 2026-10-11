@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Fork
   description: Projectiles split in two when they hit a target, flying off at a fixed
     angle.
-  cost: 450
+  cost: 1
   icon: {fileID: 0}
   color: {r: 0.35, g: 0.7, b: 0.45, a: 1}
   glyph: FK

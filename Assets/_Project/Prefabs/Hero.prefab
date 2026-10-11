@@ -84,6 +84,7 @@ MonoBehaviour:
   barHeight: 2.6
   protectedBy: {fileID: 0}
   destroyOnDeath: 0
+  sightRadius: 14.4
   goldBounty: 0
   xpBounty: 0
 --- !u!114 &5983323459855730809

@@ -204,7 +204,7 @@ namespace Moba.UI
             UpdateFloatingText();
             UpdateOverlays();
             PositionAboveHeroPanel();
-            _minimap.MarkDirtyRepaint();
+            _minimap.Refresh();
         }
 
         // ---------- Top bar ----------
@@ -332,7 +332,7 @@ namespace Moba.UI
                 }
 
                 Vector3 world = u.transform.position + Vector3.up * u.barHeight;
-                bool visible = u.IsAlive && _camera.WorldToViewportPoint(world).z > 0f;
+                bool visible = u.IsAlive && u.IsVisibleToPlayer && _camera.WorldToViewportPoint(world).z > 0f;
                 bar.SetVisible(visible);
                 if (!visible) continue;
 

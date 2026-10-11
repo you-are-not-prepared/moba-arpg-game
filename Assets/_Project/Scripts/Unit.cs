@@ -29,6 +29,8 @@ namespace Moba
         [Tooltip("While this unit is alive, this one can't be damaged or targeted (e.g. outer tower protects inner tower).")]
         public Unit protectedBy;
         public bool destroyOnDeath = true;
+        [Tooltip("Vision radius this unit gives its team (fog of war). 0 = none.")]
+        public float sightRadius;
 
         [Header("Bounty (paid to the hero that lands the last hit)")]
         public int goldBounty;
@@ -36,6 +38,8 @@ namespace Moba
 
         public float Health { get; private set; }
         public bool IsAlive => Health > 0f;
+        // False while the unit is hidden in the local player's fog of war (set by FogOfWar).
+        public bool IsVisibleToPlayer { get; set; } = true;
         public bool IsTargetable => IsAlive && (protectedBy == null || !protectedBy.IsAlive);
         public Vector3 AimPoint => transform.position + Vector3.up * (barHeight * 0.5f);
 

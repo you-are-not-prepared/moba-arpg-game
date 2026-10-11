@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Moba.UI
 {
-    // Top-down map of the play area: lane, units, and the camera's view.
+    // Top-down map of the play area, drawn in layers: lane, fog of war, then units and the camera's view.
     // LMB (click or drag) moves the camera there; RMB orders the hero to move there.
     public class Minimap : VisualElement
     {
@@ -18,15 +18,47 @@ namespace Moba.UI
 
         static readonly Vector2[] ViewportCorners = { new(0f, 0f), new(1f, 0f), new(1f, 1f), new(0f, 1f) };
         readonly Vector2[] _view = new Vector2[4];
+        readonly VisualElement _terrain;
+        readonly VisualElement _fog;
+        readonly VisualElement _overlay;
+        Texture2D _fogTexture;
         bool _dragging;
 
         public Minimap()
         {
             AddToClassList("minimap");
-            generateVisualContent += Draw;
+
+            _terrain = Layer();
+            _terrain.generateVisualContent += DrawTerrain;
+            _fog = Layer();
+            _overlay = Layer();
+            _overlay.generateVisualContent += DrawOverlay;
+
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<PointerMoveEvent>(OnPointerMove);
             RegisterCallback<PointerUpEvent>(OnPointerUp);
+        }
+
+        VisualElement Layer()
+        {
+            var layer = new VisualElement { pickingMode = PickingMode.Ignore };
+            layer.AddToClassList("minimap__layer");
+            Add(layer);
+            return layer;
+        }
+
+        // Called every frame by the HUD: redraws units/camera and picks up the fog texture once it exists.
+        public void Refresh()
+        {
+            Texture2D fog = FogOfWar.Instance != null && FogOfWar.Instance.isActiveAndEnabled ? FogOfWar.Instance.Texture : null;
+            if (fog != _fogTexture)
+            {
+                _fogTexture = fog;
+                // The fog texture is runtime data, so it's assigned here rather than in USS.
+                _fog.style.backgroundImage = fog != null ? new StyleBackground(fog) : new StyleBackground(StyleKeyword.None);
+            }
+            _terrain.MarkDirtyRepaint();
+            _overlay.MarkDirtyRepaint();
         }
 
         public Vector2 WorldToLocal(Vector3 world)
@@ -46,19 +78,39 @@ namespace Moba.UI
                 Mathf.Lerp(worldMin.y, worldMax.y, 1f - local.y / r.height));
         }
 
-        void Draw(MeshGenerationContext ctx)
+        void DrawTerrain(MeshGenerationContext ctx)
+        {
+            if (contentRect.width < 1f || contentRect.height < 1f) return;
+            Unit blue = null, red = null;
+            foreach (Unit u in Unit.All)
+            {
+                if (u.kind != UnitKind.Core) continue;
+                if (u.team == Team.Blue) blue = u;
+                else red = u;
+            }
+            if (blue == null || red == null) return;
+
+            Painter2D p = ctx.painter2D;
+            p.strokeColor = LaneColor;
+            p.lineWidth = 12f;
+            p.lineCap = LineCap.Round;
+            p.BeginPath();
+            p.MoveTo(WorldToLocal(blue.transform.position));
+            p.LineTo(WorldToLocal(red.transform.position));
+            p.Stroke();
+        }
+
+        void DrawOverlay(MeshGenerationContext ctx)
         {
             if (contentRect.width < 1f || contentRect.height < 1f) return;
             GameManager game = GameManager.Instance;
             if (game == null) return;
             Painter2D p = ctx.painter2D;
 
-            DrawLane(p);
-
             Unit self = game.hero != null ? game.hero.Unit : null;
             foreach (Unit u in Unit.All)
             {
-                if (!u.IsAlive || u == self) continue;
+                if (!u.IsAlive || u == self || !u.IsVisibleToPlayer) continue;
                 Color c = u.team == game.playerTeam ? AllyColor : EnemyColor;
                 float radius = u.kind switch
                 {
@@ -79,26 +131,6 @@ namespace Moba.UI
             }
 
             DrawCameraView(p);
-        }
-
-        void DrawLane(Painter2D p)
-        {
-            Unit blue = null, red = null;
-            foreach (Unit u in Unit.All)
-            {
-                if (u.kind != UnitKind.Core) continue;
-                if (u.team == Team.Blue) blue = u;
-                else red = u;
-            }
-            if (blue == null || red == null) return;
-
-            p.strokeColor = LaneColor;
-            p.lineWidth = 12f;
-            p.lineCap = LineCap.Round;
-            p.BeginPath();
-            p.MoveTo(WorldToLocal(blue.transform.position));
-            p.LineTo(WorldToLocal(red.transform.position));
-            p.Stroke();
         }
 
         void DrawCameraView(Painter2D p)
