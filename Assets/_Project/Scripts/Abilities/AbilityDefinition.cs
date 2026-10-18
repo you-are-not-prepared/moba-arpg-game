@@ -41,6 +41,12 @@ namespace Moba.Abilities
         public float Cooldown(int rank) => ByRank(cooldownByRank, rank);
         public float ManaCost(int rank) => ByRank(manaCostByRank, rank);
 
+        // Passive abilities (e.g. an ultimate that only grants an effect while learned) can't be cast.
+        public virtual bool IsPassive => false;
+
+        // Extra mod sockets this ability gives the basic slots while it's learned (for ultimates).
+        public virtual int BonusBasicSockets(int rank) => 0;
+
         // Radius of the ring shown around the caster while targeting (defaults to cast range).
         public virtual float IndicatorRange => range;
 

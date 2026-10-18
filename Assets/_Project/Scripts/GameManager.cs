@@ -3,7 +3,8 @@ using UnityEngine.SceneManagement;
 
 namespace Moba
 {
-    // Ends the match when a core dies; the Restart key (or the HUD button) restarts. Owns pausing.
+    // Ends the match when a core dies; the Restart key (or the HUD button) goes back to champion select for a new
+    // match on a freshly rolled map. Owns pausing.
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -53,10 +54,19 @@ namespace Moba
             ApplyTimeScale();
         }
 
+        // "Play again": champion select with a new map roll.
         public void Restart()
         {
             _paused = false;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            MatchSettings.OpenChampionSelect = true;
+            SceneManager.LoadScene(MatchSettings.FrontendScene);
+        }
+
+        public void LeaveToMenu()
+        {
+            _paused = false;
+            MatchSettings.OpenChampionSelect = false;
+            SceneManager.LoadScene(MatchSettings.FrontendScene);
         }
 
         void ApplyTimeScale() => Time.timeScale = _paused || IsOver ? 0f : 1f;

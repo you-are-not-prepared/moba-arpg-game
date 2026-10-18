@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55224470eb2f97458b7a9126a49ec1e, type: 3}
+  m_Name: Hero_Vesh
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroDefinition
+  id: vesh
+  displayName: Vesh
+  title: Chronomancer
+  description: Casts more often than anyone, then does it all again.
+  color: {r: 0.65, g: 0.45, b: 0.95, a: 1}
+  glyph: V
+  prefab: {fileID: 3486567018637327865, guid: 76166ca2d0148e544b0a231e173a9325, type: 3}
+  passiveName: Quickened Mind
+  passiveDescription: All your cooldowns are 20% shorter.
+  extraProjectiles: 0
+  cooldownMultiplier: 0.8
+  itemStatMultiplier: 1
+  ultimate: {fileID: 11400000, guid: 8deedc423caf0c74e950a697aa570909, type: 2}

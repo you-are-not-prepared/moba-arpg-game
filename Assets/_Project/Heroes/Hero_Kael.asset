@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55224470eb2f97458b7a9126a49ec1e, type: 3}
+  m_Name: Hero_Kael
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroDefinition
+  id: kael
+  displayName: Kael
+  title: Ranger
+  description: Floods the lane with projectiles and pins enemies down from long range.
+  color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
+  glyph: K
+  prefab: {fileID: 2743056027716994260, guid: f72166844e96afa46b5e89a06b1b8bd2, type: 3}
+  passiveName: Split Shot
+  passiveDescription: Your projectile spells fire 1 extra projectile.
+  extraProjectiles: 1
+  cooldownMultiplier: 1
+  itemStatMultiplier: 1
+  ultimate: {fileID: 11400000, guid: 7bd2db61be6dec244ba12523ec7649a7, type: 2}

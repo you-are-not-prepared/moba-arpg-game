@@ -4,6 +4,7 @@
             <ui:VisualElement name="socket0" class="mod-socket" />
             <ui:VisualElement name="socket1" class="mod-socket" />
             <ui:VisualElement name="socket2" class="mod-socket" />
+            <ui:VisualElement name="socket3" class="mod-socket hidden" />
         </ui:VisualElement>
         <ui:VisualElement name="frame" class="ability-slot__frame">
             <ui:VisualElement name="icon" class="ability-slot__icon" picking-mode="Ignore" />

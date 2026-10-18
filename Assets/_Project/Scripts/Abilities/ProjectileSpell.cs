@@ -14,6 +14,10 @@ namespace Moba.Abilities
         public float damagePerRank = 25f;
         [Tooltip("Explosion radius on hit. 0 = damages only the unit hit.")]
         public float explosionRadius = 2.5f;
+        [Tooltip("Keep flying through enemies, hitting each one once.")]
+        public bool pierce;
+        [Tooltip("Seconds each enemy hit is stunned. 0 = no stun.")]
+        public float stunDuration;
 
         [Header("Projectile")]
         public float projectileSpeed = 18f;
@@ -56,6 +60,8 @@ namespace Moba.Abilities
                 BurnDuration = m.burnDuration,
                 ForksRemaining = m.forkCount,
                 ForkAngle = m.forkAngle,
+                Pierce = pierce,
+                StunDuration = stunDuration,
                 Speed = projectileSpeed,
                 MaxDistance = maxDistance,
                 Size = projectileSize,
@@ -86,6 +92,8 @@ namespace Moba.Abilities
             };
             int count = 1 + Mathf.Max(0, m.extraProjectiles);
             if (count > 1) parts.Add($"{count} projectiles");
+            if (pierce) parts.Add("pierces");
+            if (stunDuration > 0f) parts.Add($"stuns for {stunDuration:0.#}s");
             if (m.forkCount > 0) parts.Add(m.forkCount == 1 ? "forks once" : $"forks {m.forkCount} times");
             if (m.burnFraction > 0f) parts.Add($"burns for {damage * m.burnFraction:0} over {m.burnDuration:0.#}s");
             return string.Join(" · ", parts);

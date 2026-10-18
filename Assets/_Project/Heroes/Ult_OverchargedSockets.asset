@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae74b121f9b5e749bf6abb9ce97631a, type: 3}
+  m_Name: Ult_OverchargedSockets
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ExtraSocketUltimate
+  displayName: Overcharged Sockets
+  description: 'Passive once learned: Q, W and E each get a 4th mod socket.'
+  cost: 0
+  icon: {fileID: 0}
+  color: {r: 0.85, g: 0.55, b: 0.25, a: 1}
+  glyph: OS
+  tags: 0
+  targeting: 0
+  unitFilter: 0
+  range: 6
+  areaRadius: 0
+  cooldownByRank:
+  - 0
+  manaCostByRank:
+  - 0
+  bonusSockets: 1

@@ -38,6 +38,8 @@ MonoBehaviour:
   baseDamage: 60
   damagePerRank: 25
   explosionRadius: 2.5
+  pierce: 0
+  stunDuration: 0
   projectileSpeed: 18
   maxDistance: 14
   projectileSize: 0.6

@@ -11,10 +11,13 @@ namespace Moba.Items
         public const int SlotCount = 8;
 
         [SerializeField] InventoryItem[] slots = new InventoryItem[SlotCount];
+        [Tooltip("Multiplies all stats from equipment (1.1 = items give 10% more). Set by a hero passive.")]
+        [SerializeField] float statMultiplier = 1f;
 
         Attacker _attacker;
 
         public float BonusAttackDamage { get; private set; }
+        public float StatMultiplier => statMultiplier;
         public event Action Changed;
 
         void Awake()
@@ -55,6 +58,12 @@ namespace Moba.Items
             return item;
         }
 
+        public void SetStatMultiplier(float multiplier)
+        {
+            statMultiplier = multiplier;
+            Recalculate();
+        }
+
         // Replaces a slot's content (null clears it) and returns what was there.
         public InventoryItem Set(int slot, InventoryItem item)
         {
@@ -77,6 +86,7 @@ namespace Moba.Items
             float attackDamage = 0f;
             foreach (InventoryItem item in slots)
                 if (item is ItemDefinition equipment) attackDamage += equipment.attackDamage;
+            attackDamage *= statMultiplier;
 
             BonusAttackDamage = attackDamage;
             if (_attacker != null) _attacker.bonusDamage = attackDamage;

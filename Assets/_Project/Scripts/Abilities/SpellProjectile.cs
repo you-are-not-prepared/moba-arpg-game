@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace Moba.Abilities
 {
-    // A straight-flying spell projectile. On the first enemy it touches it explodes (area damage + burn),
+    // A straight-flying spell projectile. On the first enemy it touches it explodes (area damage + burn + stun),
     // then, if it has forks left, splits into two projectiles leaving the target at ±ForkAngle.
+    // A piercing projectile keeps flying, hitting each enemy along its path once (forks only on the first hit).
     public class SpellProjectile : MonoBehaviour
     {
         public struct Payload
@@ -17,6 +18,8 @@ namespace Moba.Abilities
             public float BurnDuration;
             public int ForksRemaining;
             public float ForkAngle;
+            public bool Pierce;
+            public float StunDuration;
             public float Speed;
             public float MaxDistance;
             public float Size;
@@ -32,6 +35,7 @@ namespace Moba.Abilities
         float _travelled;
         Unit _ignore;
         Renderer _renderer;
+        HashSet<Unit> _pierced;
 
         // `ignore` can't be hit by this projectile (forks never hit the target they split from).
         public static void Launch(Vector3 groundOrigin, Vector3 direction, in Payload payload, Unit ignore)
@@ -84,6 +88,7 @@ namespace Moba.Abilities
             foreach (Unit u in Unit.All)
             {
                 if (u.team == _p.Team || u == _ignore || !u.IsTargetable) continue;
+                if (_pierced != null && _pierced.Contains(u)) continue;
                 var c = new Vector2(u.transform.position.x, u.transform.position.z);
                 float t = len2 > 0f ? Mathf.Clamp01(Vector2.Dot(c - a, ab) / len2) : 0f;
                 if ((c - (a + ab * t)).magnitude > u.radius + radius) continue;
@@ -101,7 +106,8 @@ namespace Moba.Abilities
             Vector3 hitGround = hit.transform.position;
             Explode(new Vector3(transform.position.x, hitGround.y, transform.position.z), hit);
 
-            if (_p.ForksRemaining > 0)
+            bool firstHit = _pierced == null || _pierced.Count == 0;
+            if (_p.ForksRemaining > 0 && firstHit)
             {
                 Payload child = _p;
                 child.ForksRemaining--;
@@ -112,6 +118,11 @@ namespace Moba.Abilities
                 }
             }
 
+            if (_p.Pierce)
+            {
+                (_pierced ??= new HashSet<Unit>()).Add(hit);
+                return;
+            }
             Destroy(gameObject);
         }
 
@@ -137,6 +148,7 @@ namespace Moba.Abilities
             {
                 u.TakeDamage(_p.Damage, _p.Caster);
                 if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster);
+                if (_p.StunDuration > 0f && u.IsAlive) Stun.Apply(u, _p.StunDuration);
             }
             s_Targets.Clear();
 

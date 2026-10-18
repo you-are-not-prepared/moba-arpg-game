@@ -81,23 +81,22 @@ namespace Moba.UI
         void DrawTerrain(MeshGenerationContext ctx)
         {
             if (contentRect.width < 1f || contentRect.height < 1f) return;
-            Unit blue = null, red = null;
-            foreach (Unit u in Unit.All)
-            {
-                if (u.kind != UnitKind.Core) continue;
-                if (u.team == Team.Blue) blue = u;
-                else red = u;
-            }
-            if (blue == null || red == null) return;
+            MapLayout layout = MapLayout.Current;
+            if (layout == null || layout.info?.lanes == null) return;
 
             Painter2D p = ctx.painter2D;
             p.strokeColor = LaneColor;
-            p.lineWidth = 12f;
+            p.lineWidth = 8f;
             p.lineCap = LineCap.Round;
-            p.BeginPath();
-            p.MoveTo(WorldToLocal(blue.transform.position));
-            p.LineTo(WorldToLocal(red.transform.position));
-            p.Stroke();
+            p.lineJoin = LineJoin.Round;
+            foreach (LanePath lane in layout.info.lanes)
+            {
+                if (lane.points == null || lane.points.Length < 2) continue;
+                p.BeginPath();
+                p.MoveTo(WorldToLocal(lane.points[0]));
+                for (int i = 1; i < lane.points.Length; i++) p.LineTo(WorldToLocal(lane.points[i]));
+                p.Stroke();
+            }
         }
 
         void DrawOverlay(MeshGenerationContext ctx)

@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="Frontend.uss" />
+    <ui:VisualElement name="frontendRoot" class="frontend">
+        <ui:VisualElement name="startScreen" class="screen start">
+            <ui:Label class="start__title" text="Project MOBA" />
+            <ui:Label class="start__subtitle" text="A MOBA with ARPG builds · prototype" />
+            <ui:Button name="playButton" class="fe-button fe-button--primary start__button" text="Play" />
+            <ui:Button name="quitButton" class="fe-button start__button" text="Quit" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="selectScreen" class="screen select hidden">
+            <ui:VisualElement class="select__header">
+                <ui:VisualElement class="select__heading">
+                    <ui:Label class="select__title" text="Choose your hero" />
+                    <ui:Label class="select__subtitle" text="Your ultimate is locked to R. Buy spells and mods in the shop for Q, W and E." />
+                </ui:VisualElement>
+                <ui:VisualElement name="mapCard" class="map-card">
+                    <ui:VisualElement name="mapPreview" class="map-card__preview" />
+                    <ui:VisualElement class="map-card__info">
+                        <ui:Label class="map-card__label" text="MAP THIS MATCH" />
+                        <ui:Label name="mapName" class="map-card__name" />
+                        <ui:Label name="mapDescription" class="map-card__description" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="heroList" class="hero-list" />
+
+            <ui:VisualElement class="select__footer">
+                <ui:Button name="backButton" class="fe-button" text="Back" />
+                <ui:Label name="selectStatus" class="select__status" />
+                <ui:Button name="lockButton" class="fe-button fe-button--primary" text="Lock in" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

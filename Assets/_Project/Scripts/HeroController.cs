@@ -17,6 +17,8 @@ namespace Moba
     [RequireComponent(typeof(AbilityCaster))]
     public class HeroController : MonoBehaviour
     {
+        [Tooltip("Set on spawn by MatchBootstrap.")]
+        public HeroDefinition definition;
         public float respawnSeconds = 5f;
         public Transform spawnPoint;
         public Material moveMarkerMaterial;
@@ -98,6 +100,15 @@ namespace Moba
             {
                 RespawnRemaining -= Time.deltaTime;
                 if (RespawnRemaining <= 0f) Respawn();
+                return;
+            }
+
+            // Stunned: frozen in place, input ignored; orders resume when it wears off.
+            bool stunned = Stun.IsStunned(_unit);
+            if (_agent.isOnNavMesh) _agent.isStopped = stunned;
+            if (stunned)
+            {
+                UpdateIndicators();
                 return;
             }
 

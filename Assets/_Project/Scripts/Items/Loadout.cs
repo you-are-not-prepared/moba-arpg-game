@@ -15,6 +15,7 @@ namespace Moba.Items
                 case null:
                     return null;
                 case AbilityDefinition spell:
+                    if (caster.IsSlotLocked(spellSlot)) return "That slot holds your hero's ultimate.";
                     inventory.Set(inventorySlot, caster.SetAbility(spellSlot, spell));
                     return null;
                 case ModDefinition mod:
@@ -33,6 +34,7 @@ namespace Moba.Items
         {
             AbilityDefinition spell = caster.GetSlot(spellSlot).ability;
             if (spell == null) return null;
+            if (caster.IsSlotLocked(spellSlot)) return "Your ultimate can't be unequipped.";
 
             InventoryItem occupant = inventorySlot >= 0 ? inventory.Get(inventorySlot) : null;
             if (inventorySlot >= 0 && (occupant == null || occupant is AbilityDefinition))
@@ -53,6 +55,7 @@ namespace Moba.Items
         public static string MoveSpell(AbilityCaster caster, int fromSlot, int toSlot)
         {
             if (fromSlot == toSlot) return null;
+            if (caster.IsSlotLocked(fromSlot) || caster.IsSlotLocked(toSlot)) return "Your ultimate stays in its slot.";
             AbilityDefinition moving = caster.GetSlot(fromSlot).ability;
             caster.SetAbility(fromSlot, caster.SetAbility(toSlot, moving));
             return null;
@@ -88,7 +91,8 @@ namespace Moba.Items
             AbilityDefinition spell = caster.GetSlot(spellSlot).ability;
             if (spell == null) return "Equip a spell in that slot first.";
             if (!mod.Supports(spell)) return $"{mod.displayName} doesn't work with {spell.displayName} (needs a {mod.requiredTags} spell).";
-            if (caster.FirstFreeSocket(spellSlot) < 0) return "All 3 mod sockets are full. Drag a mod out first.";
+            if (caster.FirstFreeSocket(spellSlot) < 0)
+                return $"All {caster.SocketCount(spellSlot)} mod sockets are full. Drag a mod out first.";
             return null;
         }
     }

@@ -907,3 +907,12 @@
     right: 0;
     bottom: 0;
 }
+
+.unit-bar--stunned {
+    border-width: 2px;
+    border-color: rgb(255, 230, 80);
+}
+
+.portrait:hover {
+    border-color: rgb(255, 235, 150);
+}
