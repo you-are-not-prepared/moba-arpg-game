@@ -242,6 +242,8 @@ namespace Moba.Abilities
 
         public void RestoreMana() => Mana = maxMana;
 
+        public void RestoreMana(float amount) => Mana = Mathf.Min(maxMana, Mana + amount);
+
         public void SpendMana(float amount) => Mana = Mathf.Max(0f, Mana - amount);
 
         public void AddMaxMana(float amount)

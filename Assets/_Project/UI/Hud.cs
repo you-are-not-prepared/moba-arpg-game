@@ -342,6 +342,7 @@ namespace Moba.UI
             IPanel panel = _worldLayer.panel;
             if (panel == null) return;
             Unit self = _hero.Unit;
+            _hero.TryGetComponent(out IsolationPassive isolation);
 
             foreach (Unit u in Unit.All)
             {
@@ -366,7 +367,10 @@ namespace Moba.UI
                 if (!visible) continue;
 
                 Vector2 p = RuntimePanelUtils.CameraTransformWorldToPanel(panel, world, _camera);
-                bar.Update(p, u, u == self && _progression != null ? _progression.Level : 0);
+                int level = u.kind == UnitKind.Hero && u.TryGetComponent(out HeroProgression progression) ? progression.Level : 0;
+                // An isolation passive marks enemy heroes it would deal bonus damage to.
+                bool isolated = isolation != null && u.kind == UnitKind.Hero && u.IsEnemyOf(self) && isolation.IsIsolated(u);
+                bar.Update(p, u, level, isolated);
             }
 
             // Release bars whose units were destroyed or disabled.
@@ -628,8 +632,9 @@ namespace Moba.UI
                 _root.EnableInClassList("hidden", !visible);
             }
 
-            public void Update(Vector2 panelPos, Unit unit, int level)
+            public void Update(Vector2 panelPos, Unit unit, int level, bool isolated)
             {
+                _root.EnableInClassList("unit-bar--isolated", isolated);
                 _root.style.left = panelPos.x;
                 _root.style.top = panelPos.y;
                 _fill.style.width = Length.Percent(100f * unit.Health / unit.maxHealth);

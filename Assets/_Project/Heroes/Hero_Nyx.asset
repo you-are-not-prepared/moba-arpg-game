@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55224470eb2f97458b7a9126a49ec1e, type: 3}
+  m_Name: Hero_Nyx
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroDefinition
+  id: nyx
+  displayName: Nyx
+  title: Stalker
+  description: A melee hunter who picks off lone targets and snowballs from kill
+    to kill.
+  color: {r: 0.85, g: 0.25, b: 0.4, a: 1}
+  glyph: N
+  prefab: {fileID: 723370757552622355, guid: f4b646396f898584ea93dc24d69b3328, type: 3}
+  passiveName: Lone Prey
+  passiveDescription: Deal 15% more damage to targets with no allied hero within
+    7m of them.
+  extraProjectiles: 0
+  cooldownMultiplier: 1
+  itemStatMultiplier: 1
+  healthPerLevelBonus: 0
+  moveSpeedMultiplier: 1
+  isolationDamageBonus: 0.15
+  isolationRadius: 7
+  ultimate: {fileID: 11400000, guid: 6868062af2eb1b3489a088ddbd33aff8, type: 2}

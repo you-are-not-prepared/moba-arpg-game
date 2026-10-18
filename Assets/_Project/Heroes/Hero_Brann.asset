@@ -24,4 +24,8 @@ MonoBehaviour:
   extraProjectiles: 0
   cooldownMultiplier: 1
   itemStatMultiplier: 1.1
+  healthPerLevelBonus: 0
+  moveSpeedMultiplier: 1
+  isolationDamageBonus: 0
+  isolationRadius: 7
   ultimate: {fileID: 11400000, guid: bae89fe7b40dd634b9c21c569170aa15, type: 2}

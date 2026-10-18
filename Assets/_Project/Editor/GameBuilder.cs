@@ -55,7 +55,8 @@ namespace Moba.EditorTools
 
         class Mats
         {
-            public Material Rock, Stone, Blue, Red, BluePad, RedPad, Marker, AttackMarker, RangeIndicator, Fire, Explosion, Arrow;
+            public Material Rock, Stone, Blue, Red, BluePad, RedPad, Marker, AttackMarker, RangeIndicator, Fire, Explosion, Arrow,
+                ShieldWall, ShieldFlash, HasteAura;
         }
 
         // ---------- Map layouts ----------
@@ -153,6 +154,8 @@ namespace Moba.EditorTools
             public string PassiveName, PassiveDescription;
             public int ExtraProjectiles;
             public float CooldownMultiplier = 1f, ItemStatMultiplier = 1f;
+            public float HealthPerLevelBonus, MoveSpeedMultiplier = 1f, IsolationDamageBonus, IsolationRadius = 7f;
+            public bool Melee;
             public System.Func<Mats, AbilityDefinition> Ultimate;
         }
 
@@ -184,6 +187,24 @@ namespace Moba.EditorTools
                 PassiveName = "Masterwork Gear", PassiveDescription = "Items give 10% more stats.",
                 ItemStatMultiplier = 1.1f,
                 Ultimate = _ => OverchargedSockets(),
+            },
+            new HeroSpec
+            {
+                Id = "torvald", Name = "Torvald", Title = "Bulwark", Glyph = "T", Color = new Color(0.55f, 0.68f, 0.85f),
+                Description = "A slow, unbreakable melee tank who walls off enemy projectiles.",
+                Health = 720f, Damage = 30f, Range = 1f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 300f, Melee = true,
+                PassiveName = "Iron Hide", PassiveDescription = "+50 max health per level, but moves 15% slower.",
+                HealthPerLevelBonus = 50f, MoveSpeedMultiplier = 0.85f,
+                Ultimate = m => AegisWall(m),
+            },
+            new HeroSpec
+            {
+                Id = "nyx", Name = "Nyx", Title = "Stalker", Glyph = "N", Color = new Color(0.85f, 0.25f, 0.4f),
+                Description = "A melee hunter who picks off lone targets and snowballs from kill to kill.",
+                Health = 590f, Damage = 34f, Range = 1f, AttacksPerSecond = 1.2f, Speed = 6.7f, Mana = 300f, Melee = true,
+                PassiveName = "Lone Prey", PassiveDescription = "Deal 15% more damage to targets with no allied hero within 7m of them.",
+                IsolationDamageBonus = 0.15f, IsolationRadius = 7f,
+                Ultimate = m => Bloodrush(m),
             },
         };
 
@@ -227,6 +248,51 @@ namespace Moba.EditorTools
             spell.range = 0f;
             spell.cooldownByRank = new[] { 70f, 60f, 50f };
             spell.manaCostByRank = new[] { 80f };
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition AegisWall(Mats m)
+        {
+            var spell = LoadOrCreate<ShieldWallSpell>($"{HeroesDir}/Ult_AegisWall.asset");
+            spell.displayName = "Aegis Wall";
+            spell.description = "Raises a shield wall in front of you for 5 seconds that destroys every enemy projectile " +
+                                "flying into it. You can move and turn; the wall stays with you. Tower shots pass through.";
+            spell.cost = 0;
+            spell.glyph = "AW";
+            spell.color = new Color(0.55f, 0.68f, 0.85f);
+            spell.targeting = AbilityTargeting.Instant;
+            spell.range = 0f;
+            spell.cooldownByRank = new[] { 60f, 50f, 40f };
+            spell.manaCostByRank = new[] { 100f };
+            spell.duration = 5f;
+            spell.radius = 2.4f;
+            spell.arcDegrees = 150f;
+            spell.height = 2.6f;
+            spell.wallMaterial = m.ShieldWall;
+            spell.blockFlashMaterial = m.ShieldFlash;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition Bloodrush(Mats m)
+        {
+            var spell = LoadOrCreate<HasteSpell>($"{HeroesDir}/Ult_Bloodrush.asset");
+            spell.displayName = "Bloodrush";
+            spell.description = "For 7 seconds: 60% more movement speed and 20% more attack speed. " +
+                                "Killing an enemy hero refreshes the duration.";
+            spell.cost = 0;
+            spell.glyph = "BR";
+            spell.color = new Color(0.85f, 0.25f, 0.4f);
+            spell.targeting = AbilityTargeting.Instant;
+            spell.range = 0f;
+            spell.cooldownByRank = new[] { 80f, 70f, 60f };
+            spell.manaCostByRank = new[] { 75f };
+            spell.duration = 7f;
+            spell.moveSpeedBonus = 0.6f;
+            spell.attackSpeedBonus = 0.2f;
+            spell.refreshOnHeroKill = true;
+            spell.auraMaterial = m.HasteAura;
             EditorUtility.SetDirty(spell);
             return spell;
         }
@@ -581,6 +647,10 @@ namespace Moba.EditorTools
                 def.extraProjectiles = spec.ExtraProjectiles;
                 def.cooldownMultiplier = spec.CooldownMultiplier;
                 def.itemStatMultiplier = spec.ItemStatMultiplier;
+                def.healthPerLevelBonus = spec.HealthPerLevelBonus;
+                def.moveSpeedMultiplier = spec.MoveSpeedMultiplier;
+                def.isolationDamageBonus = spec.IsolationDamageBonus;
+                def.isolationRadius = spec.IsolationRadius;
                 def.ultimate = spec.Ultimate(m);
                 def.prefab = CreateHeroPrefab(spec, m);
                 EditorUtility.SetDirty(def);
@@ -597,9 +667,12 @@ namespace Moba.EditorTools
             Visual(PrimitiveType.Capsule, go.transform, new Vector3(0f, 1f, 0f), new Vector3(1f, 1f, 1f), body);
             Visual(PrimitiveType.Cube, go.transform, new Vector3(0f, 1.4f, 0.45f), new Vector3(0.3f, 0.2f, 0.3f), m.Stone);
 
-            ConfigureUnit(go, Team.Blue, UnitKind.Hero, health: spec.Health, radius: 0.5f, barHeight: 2.6f).sightRadius = HeroSight;
-            ConfigureAttacker(go, damage: spec.Damage, range: spec.Range, aps: spec.AttacksPerSecond, projectileSpeed: 28f,
-                size: 0.35f, origin: new Vector3(0f, 1.4f, 0.5f), mat: body);
+            Unit unit = ConfigureUnit(go, Team.Blue, UnitKind.Hero, health: spec.Health, radius: 0.5f, barHeight: 2.6f);
+            unit.sightRadius = HeroSight;
+            unit.goldBounty = 300;
+            unit.xpBounty = 200f;
+            ConfigureAttacker(go, damage: spec.Damage, range: spec.Range, aps: spec.AttacksPerSecond,
+                projectileSpeed: spec.Melee ? 0f : 28f, size: 0.35f, origin: new Vector3(0f, 1.4f, 0.5f), mat: body);
             ConfigureAgent(go, radius: 0.5f, height: 2f, speed: spec.Speed);
             // No turn rate: instant facing plus near-instant velocity changes.
             go.GetComponent<NavMeshAgent>().acceleration = 1000f;
@@ -980,7 +1053,27 @@ namespace Moba.EditorTools
             Explosion = EmissiveMat("FireExplosion", new Color(1f, 0.6f, 0.15f), 1.5f),
             Arrow = EmissiveMat("Arrow", new Color(0.5f, 1f, 0.6f), 2f),
             RangeIndicator = UnlitVertexColorMat("RangeIndicator"),
+            ShieldWall = ShaderMat("ShieldWall", "Moba/ShieldWall"),
+            ShieldFlash = EmissiveMat("ShieldFlash", new Color(0.6f, 0.85f, 1f), 2f),
+            HasteAura = ShaderMat("HasteAura", "Moba/GroundRing", new Color(1f, 0.25f, 0.35f, 1f)),
         };
+
+        // A material on one of the project's own shaders; `color` (if given) sets its _Color.
+        static Material ShaderMat(string name, string shaderName, Color? color = null)
+        {
+            string path = $"{MaterialsDir}/{name}.mat";
+            Shader shader = Shader.Find(shaderName);
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null)
+            {
+                mat = new Material(shader);
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            mat.shader = shader;
+            if (color.HasValue) mat.SetColor("_Color", color.Value);
+            EditorUtility.SetDirty(mat);
+            return mat;
+        }
 
         // Line renderers tint through vertex colour, which the Lit shader ignores.
         static Material UnlitVertexColorMat(string name)

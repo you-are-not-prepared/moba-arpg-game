@@ -13,6 +13,8 @@ namespace Moba
         [Tooltip("Edge-to-edge distance at which the attack can be started.")]
         public float range = 1f;
         public float attacksPerSecond = 1f;
+        // Multiplies attacksPerSecond (1.2 = 20% faster); changed by buffs.
+        [System.NonSerialized] public float attackSpeedMultiplier = 1f;
         [Tooltip("0 = melee (instant hit). Otherwise the speed of a homing projectile.")]
         public float projectileSpeed;
         public float projectileSize = 0.3f;
@@ -41,7 +43,7 @@ namespace Moba
             }
 
             if (Time.time < _nextAttackTime) return false;
-            _nextAttackTime = Time.time + 1f / attacksPerSecond;
+            _nextAttackTime = Time.time + 1f / (attacksPerSecond * attackSpeedMultiplier);
 
             if (projectileSpeed <= 0f)
                 target.TakeDamage(TotalDamage, _self);

@@ -4,14 +4,33 @@
         <ui:VisualElement name="startScreen" class="screen start">
             <ui:Label class="start__title" text="Project MOBA" />
             <ui:Label class="start__subtitle" text="A MOBA with ARPG builds · prototype" />
-            <ui:Button name="playButton" class="fe-button fe-button--primary start__button" text="Play" />
-            <ui:Button name="quitButton" class="fe-button start__button" text="Quit" />
+
+            <ui:VisualElement name="startMenu" class="start__menu">
+                <ui:Button name="findMatchButton" class="fe-button fe-button--primary start__button" text="Find a match" />
+                <ui:Button name="quitButton" class="fe-button start__button" text="Quit" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="modeMenu" class="start__menu hidden">
+                <ui:Label class="mode__heading" text="Choose a mode" />
+                <ui:VisualElement class="mode__row">
+                    <ui:VisualElement name="pveCard" class="mode-card">
+                        <ui:Label class="mode-card__title" text="PvE" picking-mode="Ignore" />
+                        <ui:Label class="mode-card__text" text="3v3 against bots. Your teammates are bots too; every bot plays a random hero." picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="pvpCard" class="mode-card">
+                        <ui:Label class="mode-card__title" text="PvP" picking-mode="Ignore" />
+                        <ui:Label class="mode-card__text" text="Against other players. Online play isn't available yet, so this starts a match with no other players." picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="modeBackButton" class="fe-button start__button" text="Back" />
+            </ui:VisualElement>
         </ui:VisualElement>
 
         <ui:VisualElement name="selectScreen" class="screen select hidden">
             <ui:VisualElement class="select__header">
                 <ui:VisualElement class="select__heading">
                     <ui:Label class="select__title" text="Choose your hero" />
+                    <ui:Label name="modeLabel" class="select__mode" />
                     <ui:Label class="select__subtitle" text="Your ultimate is locked to R. Buy spells and mods in the shop for Q, W and E." />
                 </ui:VisualElement>
                 <ui:VisualElement name="mapCard" class="map-card">
@@ -24,7 +43,22 @@
                 </ui:VisualElement>
             </ui:VisualElement>
 
-            <ui:VisualElement name="heroList" class="hero-list" />
+            <ui:VisualElement class="select__body">
+                <ui:VisualElement class="team-column">
+                    <ui:Label class="team-column__label team-column__label--ally" text="YOUR TEAM" />
+                    <ui:VisualElement name="allyList" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="select__center">
+                    <ui:VisualElement name="heroGrid" class="hero-grid" />
+                    <ui:VisualElement name="heroDetail" class="hero-detail" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="team-column">
+                    <ui:Label class="team-column__label team-column__label--enemy" text="ENEMY TEAM" />
+                    <ui:VisualElement name="enemyList" />
+                </ui:VisualElement>
+            </ui:VisualElement>
 
             <ui:VisualElement class="select__footer">
                 <ui:Button name="backButton" class="fe-button" text="Back" />

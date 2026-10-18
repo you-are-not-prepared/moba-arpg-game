@@ -972,6 +972,12 @@
     border-color: rgb(255, 230, 80);
 }
 
+/* Isolated enemy hero (the local hero's isolation passive deals bonus damage to it). */
+.unit-bar--isolated {
+    border-width: 2px;
+    border-color: rgb(200, 90, 255);
+}
+
 .portrait:hover {
     border-color: rgb(255, 235, 150);
 }

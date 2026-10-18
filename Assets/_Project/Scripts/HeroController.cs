@@ -13,12 +13,15 @@ namespace Moba
     //   Abilities (Q/W/E/R): Instant casts at once; Point/Unit enter targeting (LMB confirms, RMB cancels).
     //   Level-up modifier (Ctrl) + ability key spends a skill point.
     // Out-of-range casts walk into range first. Respawns at its spawn point after dying.
+    // Bots use the same controller with input off (isPlayer = false); BotBrain gives orders through the public API.
     [RequireComponent(typeof(Unit), typeof(Attacker), typeof(NavMeshAgent))]
     [RequireComponent(typeof(AbilityCaster))]
     public class HeroController : MonoBehaviour
     {
         [Tooltip("Set on spawn by MatchBootstrap.")]
         public HeroDefinition definition;
+        [Tooltip("Reads mouse/keyboard input and shows targeting indicators. Off for bots.")]
+        public bool isPlayer = true;
         public float respawnSeconds = 5f;
         public Transform spawnPoint;
         public Material moveMarkerMaterial;
@@ -68,6 +71,8 @@ namespace Moba
         public int TargetingSlot => _targetingSlot;
         public bool IsAttackMoveTargeting => _attackMoveTargeting;
         public bool IsAttackMoving => _attackMoving;
+        public Unit AttackTarget => _attackTarget;
+        public bool HasPendingCast => _pendingCastSlot != NoSlot;
 
         void Awake()
         {
@@ -82,6 +87,7 @@ namespace Moba
         void Start()
         {
             _camera = Camera.main;
+            if (!isPlayer) return;
             _rangeRing = RangeIndicator.Create("CastRange", rangeIndicatorMaterial, new Color(0.4f, 0.8f, 1f, 1f), 0.12f);
             _areaRing = RangeIndicator.Create("CastArea", rangeIndicatorMaterial, new Color(1f, 0.85f, 0.3f, 1f), 0.1f);
             _attackRing = RangeIndicator.Create("AttackRange", rangeIndicatorMaterial, new Color(1f, 0.35f, 0.3f, 1f), 0.12f);
@@ -112,13 +118,13 @@ namespace Moba
                 return;
             }
 
-            bool inputBlocked = GameManager.Instance != null && (GameManager.Instance.IsOver || GameManager.Instance.IsPaused);
+            bool inputBlocked = !isPlayer || (GameManager.Instance != null && (GameManager.Instance.IsOver || GameManager.Instance.IsPaused));
             if (!inputBlocked)
             {
                 HandleKeys();
                 HandleMouse();
             }
-            else if (GameManager.Instance.IsOver)
+            else if (GameManager.Instance != null && GameManager.Instance.IsOver)
             {
                 CancelTargeting();
             }
@@ -136,7 +142,7 @@ namespace Moba
             if (!NavMesh.SamplePosition(worldPoint, out NavMeshHit navHit, 4f, NavMesh.AllAreas)) return;
             ClearOrders();
             _agent.SetDestination(navHit.position);
-            if (showMarker) MoveMarker.Spawn(navHit.position, moveMarkerMaterial);
+            if (showMarker && isPlayer) MoveMarker.Spawn(navHit.position, moveMarkerMaterial);
         }
 
         public void Stop()
@@ -190,6 +196,28 @@ namespace Moba
 
             if (TryGetGroundPoint(count, out Vector3 point)) QueueCast(slot, point, null);
         }
+
+        // Attack one unit until it dies or can't be seen (bots; the player uses the mouse).
+        public void OrderAttack(Unit target)
+        {
+            if (!_unit.IsAlive || target == null || !target.IsTargetable) return;
+            if (_attackTarget == target && !_attackMoving && _pendingCastSlot == NoSlot) return;
+            ClearOrders();
+            _attackTarget = target;
+        }
+
+        // Cast a slot at a point or unit, walking into range first (bots; the player uses BeginCast).
+        public bool OrderCast(int slot, Vector3 point, Unit target)
+        {
+            if (!_unit.IsAlive || _abilities.GetCastBlock(slot) != CastBlock.None) return false;
+            if (_abilities.GetSlot(slot).ability.targeting == AbilityTargeting.Instant)
+                return _abilities.TryCast(slot, transform.position, null);
+            QueueCast(slot, point, target);
+            return true;
+        }
+
+        // The player only acts on what their team can see; bots don't use fog of war.
+        bool CanSee(Unit u) => !isPlayer || u.IsVisibleToPlayer;
 
         void ClearOrders()
         {
@@ -344,7 +372,7 @@ namespace Moba
             _attackTarget = target;
             _targetAutoAcquired = false;
             _nextAcquire = 0f;
-            MoveMarker.Spawn(destination, attackMoveMarkerMaterial != null ? attackMoveMarkerMaterial : moveMarkerMaterial);
+            if (isPlayer) MoveMarker.Spawn(destination, attackMoveMarkerMaterial != null ? attackMoveMarkerMaterial : moveMarkerMaterial);
         }
 
         Unit FindEnemyNear(Vector3 point, float radius)
@@ -353,7 +381,7 @@ namespace Moba
             float bestDist = float.MaxValue;
             foreach (Unit u in Unit.All)
             {
-                if (!u.IsEnemyOf(_unit) || !u.IsTargetable || !u.IsVisibleToPlayer) continue;
+                if (!u.IsEnemyOf(_unit) || !u.IsTargetable || !CanSee(u)) continue;
                 Vector3 d = u.transform.position - point;
                 d.y = 0f;
                 float dist = d.magnitude - u.radius;
@@ -394,7 +422,7 @@ namespace Moba
             int slot = _pendingCastSlot;
             AbilityDefinition ability = _abilities.GetSlot(slot).ability;
             if (ability == null || (ability.targeting == AbilityTargeting.Unit
-                    && (!ability.IsValidTarget(_unit, _pendingCastTarget) || !_pendingCastTarget.IsVisibleToPlayer)))
+                    && (!ability.IsValidTarget(_unit, _pendingCastTarget) || !CanSee(_pendingCastTarget))))
             {
                 _pendingCastSlot = NoSlot;
                 return;
@@ -416,7 +444,7 @@ namespace Moba
         void UpdateAttack()
         {
             // Targets that die, become untargetable or slip into the fog are dropped.
-            if (_attackTarget != null && (!_attackTarget.IsTargetable || !_attackTarget.IsVisibleToPlayer))
+            if (_attackTarget != null && (!_attackTarget.IsTargetable || !CanSee(_attackTarget)))
             {
                 _attackTarget = null;
                 if (!_attackMoving)
@@ -440,7 +468,7 @@ namespace Moba
                 if (Time.time >= _nextAcquire)
                 {
                     _nextAcquire = Time.time + AcquireInterval;
-                    _attackTarget = _unit.FindClosestEnemy(_attacker.range + attackMoveAcquireBonus, u => u.IsVisibleToPlayer);
+                    _attackTarget = _unit.FindClosestEnemy(_attacker.range + attackMoveAcquireBonus, CanSee);
                     _targetAutoAcquired = true;
                 }
                 if (_attackTarget == null)
