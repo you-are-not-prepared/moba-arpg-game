@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Moba.Abilities
 {
-    public enum CastBlock { None, Dead, Empty, NotLearned, OnCooldown, NotEnoughMana }
+    public enum CastBlock { None, Dead, Stunned, Empty, NotLearned, Passive, OnCooldown, NotEnoughMana }
 
     // Four spell slots (Q/W/E/R), mana and cooldowns for one unit. Each slot holds an equipped spell and
     // three mod sockets. Ranks belong to the slot (learned with skill points from HeroProgression), so
@@ -12,7 +12,9 @@ namespace Moba.Abilities
     public class AbilityCaster : MonoBehaviour
     {
         public const int SlotCount = 4;
+        // Every slot has 3 mod sockets; a hero ultimate can add one more to the basic slots (up to MaxModSockets).
         public const int ModSocketCount = 3;
+        public const int MaxModSockets = 4;
         public const int UltimateSlot = 3;
         public static readonly string[] SlotKeys = { "Q", "W", "E", "R" };
 
@@ -20,7 +22,7 @@ namespace Moba.Abilities
         public class Slot
         {
             public AbilityDefinition ability;
-            public ModDefinition[] mods = new ModDefinition[ModSocketCount];
+            public ModDefinition[] mods = new ModDefinition[MaxModSockets];
             [NonSerialized] public int rank;
             [NonSerialized] public float cooldownRemaining;
             [NonSerialized] public float cooldownTotal;
@@ -30,10 +32,34 @@ namespace Moba.Abilities
         public float maxMana = 300f;
         public float manaRegenPerSecond = 2f;
 
+        [Header("Hero passive (set by MatchBootstrap from the HeroDefinition)")]
+        [Tooltip("Multiplies every cooldown (0.8 = 20% cooldown reduction).")]
+        public float cooldownMultiplier = 1f;
+        [Tooltip("Extra projectiles added to every projectile spell.")]
+        public int passiveExtraProjectiles;
+        [Tooltip("The ultimate slot holds the hero's own ultimate: it can't be swapped or unequipped.")]
+        public bool ultimateLocked;
+
         Unit _unit;
         HeroProgression _progression;
+        bool _noCooldowns;
 
         public float Mana { get; private set; }
+
+        // Cheat menu: casts cost no mana.
+        public bool NoManaCost { get; set; }
+
+        // Cheat menu: casts start no cooldown. Turning it on also ends the cooldowns already running.
+        public bool NoCooldowns
+        {
+            get => _noCooldowns;
+            set
+            {
+                _noCooldowns = value;
+                if (value)
+                    foreach (Slot s in slots) s.cooldownRemaining = 0f;
+            }
+        }
         public int SkillPoints { get; set; }
         public Unit Unit => _unit;
         int HeroLevel => _progression != null ? _progression.Level : 1;
@@ -109,10 +135,29 @@ namespace Moba.Abilities
             return previous;
         }
 
+        // Sockets usable in this slot: 3, plus any bonus the learned ultimate grants to basic slots.
+        public int SocketCount(int index)
+        {
+            if (index == UltimateSlot) return ModSocketCount;
+            Slot ult = slots[UltimateSlot];
+            int bonus = ult.ability != null && ult.rank > 0 ? ult.ability.BonusBasicSockets(ult.rank) : 0;
+            return Mathf.Clamp(ModSocketCount + bonus, 0, MaxModSockets);
+        }
+
+        public bool IsSlotLocked(int index) => ultimateLocked && index == UltimateSlot;
+
+        // Ends the cooldowns of the basic (non-ultimate) slots.
+        public void ResetBasicCooldowns()
+        {
+            for (int i = 0; i < SlotCount; i++)
+                if (i != UltimateSlot) slots[i].cooldownRemaining = 0f;
+        }
+
         public int FirstFreeSocket(int index)
         {
             ModDefinition[] mods = slots[index].mods;
-            for (int i = 0; i < mods.Length; i++)
+            int count = SocketCount(index);
+            for (int i = 0; i < count; i++)
                 if (mods[i] == null) return i;
             return -1;
         }
@@ -121,13 +166,14 @@ namespace Moba.Abilities
         public bool IsModActive(int index, int socket)
         {
             ModDefinition mod = slots[index].mods[socket];
-            return mod != null && mod.Supports(slots[index].ability);
+            return mod != null && socket < SocketCount(index) && mod.Supports(slots[index].ability);
         }
 
         public SpellModifiers BuildModifiers(int index)
         {
             SpellModifiers m = SpellModifiers.None;
-            for (int i = 0; i < ModSocketCount; i++)
+            m.extraProjectiles += passiveExtraProjectiles;
+            for (int i = 0; i < MaxModSockets; i++)
                 if (IsModActive(index, i)) slots[index].mods[i].Apply(ref m);
             return m;
         }
@@ -138,10 +184,12 @@ namespace Moba.Abilities
         {
             Slot s = slots[index];
             if (!_unit.IsAlive) return CastBlock.Dead;
+            if (Stun.IsStunned(_unit)) return CastBlock.Stunned;
             if (s.ability == null) return CastBlock.Empty;
             if (s.rank <= 0) return CastBlock.NotLearned;
+            if (s.ability.IsPassive) return CastBlock.Passive;
             if (s.cooldownRemaining > 0f) return CastBlock.OnCooldown;
-            if (Mana < s.ability.ManaCost(s.rank)) return CastBlock.NotEnoughMana;
+            if (!NoManaCost && Mana < s.ability.ManaCost(s.rank)) return CastBlock.NotEnoughMana;
             return CastBlock.None;
         }
 
@@ -179,8 +227,8 @@ namespace Moba.Abilities
             }
             if (!InCastRange(index, point, target)) return false;
 
-            Mana -= a.ManaCost(s.rank);
-            s.cooldownTotal = a.Cooldown(s.rank);
+            if (!NoManaCost) Mana -= a.ManaCost(s.rank);
+            s.cooldownTotal = NoCooldowns ? 0f : a.Cooldown(s.rank) * cooldownMultiplier;
             s.cooldownRemaining = s.cooldownTotal;
 
             Vector3 facing = point - transform.position;
@@ -208,8 +256,8 @@ namespace Moba.Abilities
             for (int i = 0; i < SlotCount; i++)
             {
                 slots[i] ??= new Slot();
-                if (slots[i].mods == null || slots[i].mods.Length != ModSocketCount)
-                    Array.Resize(ref slots[i].mods, ModSocketCount);
+                if (slots[i].mods == null || slots[i].mods.Length != MaxModSockets)
+                    Array.Resize(ref slots[i].mods, MaxModSockets);
             }
         }
     }

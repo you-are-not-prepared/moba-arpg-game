@@ -26,8 +26,9 @@ namespace Moba
         public float radius = 0.5f;
         [Tooltip("Height above the pivot where the health bar is drawn.")]
         public float barHeight = 2f;
-        [Tooltip("While this unit is alive, this one can't be damaged or targeted (e.g. outer tower protects inner tower).")]
-        public Unit protectedBy;
+        [Tooltip("While ALL of these are alive, this unit can't be damaged or targeted (the outer tower protects the inner " +
+                 "tower; every lane's inner tower protects the core, so losing any one exposes it).")]
+        public Unit[] protectedBy = System.Array.Empty<Unit>();
         public bool destroyOnDeath = true;
         [Tooltip("Vision radius this unit gives its team (fog of war). 0 = none.")]
         public float sightRadius;
@@ -40,7 +41,19 @@ namespace Moba
         public bool IsAlive => Health > 0f;
         // False while the unit is hidden in the local player's fog of war (set by FogOfWar).
         public bool IsVisibleToPlayer { get; set; } = true;
-        public bool IsTargetable => IsAlive && (protectedBy == null || !protectedBy.IsAlive);
+        public bool IsTargetable => IsAlive && !IsProtected;
+
+        bool IsProtected
+        {
+            get
+            {
+                if (protectedBy == null || protectedBy.Length == 0) return false;
+                foreach (Unit p in protectedBy)
+                    if (p == null || !p.IsAlive) return false;
+                return true;
+            }
+        }
+
         public Vector3 AimPoint => transform.position + Vector3.up * (barHeight * 0.5f);
 
         void Awake() => Health = maxHealth;

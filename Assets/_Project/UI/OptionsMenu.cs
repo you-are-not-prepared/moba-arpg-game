@@ -67,6 +67,11 @@ namespace Moba.UI
                 RefreshInterface();
             };
             _root.Q<Button>("resumeButton").clicked += Close;
+            _root.Q<Button>("leaveButton").clicked += () =>
+            {
+                Close();
+                if (GameManager.Instance != null) GameManager.Instance.LeaveToMenu();
+            };
 
             BuildBindingList();
             BuildInterfaceList();

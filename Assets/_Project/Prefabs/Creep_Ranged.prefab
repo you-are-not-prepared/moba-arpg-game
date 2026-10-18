@@ -167,7 +167,7 @@ MonoBehaviour:
   maxHealth: 80
   radius: 0.35
   barHeight: 1.5
-  protectedBy: {fileID: 0}
+  protectedBy: []
   destroyOnDeath: 1
   sightRadius: 9
   goldBounty: 14

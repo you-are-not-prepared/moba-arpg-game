@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64567430dfb07c4499a90a3abcb4b3d0, type: 3}
+  m_Name: Ult_SkybreakerArrow
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ProjectileSpell
+  displayName: Skybreaker Arrow
+  description: Looses a huge arrow that flies across the map, piercing and stunning
+    every enemy it passes.
+  cost: 0
+  icon: {fileID: 0}
+  color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
+  glyph: SA
+  tags: 1
+  targeting: 1
+  unitFilter: 0
+  range: 0
+  areaRadius: 0
+  cooldownByRank:
+  - 60
+  - 50
+  - 40
+  manaCostByRank:
+  - 100
+  baseDamage: 200
+  damagePerRank: 100
+  explosionRadius: 0
+  pierce: 1
+  stunDuration: 1.5
+  projectileSpeed: 26
+  maxDistance: 32
+  projectileSize: 1.4
+  launchHeight: 1.2
+  spreadAngle: 8
+  projectileMaterial: {fileID: 2100000, guid: 188543d0467601e41b19aafd36ad025d, type: 2}
+  explosionMaterial: {fileID: 2100000, guid: 83fa0e9ef5907c2428d52873ef3ed591, type: 2}

@@ -28,6 +28,7 @@
             </ui:VisualElement>
 
             <ui:VisualElement class="options__footer">
+                <ui:Button name="leaveButton" class="options__button options__button--leave" text="Leave match" />
                 <ui:Button name="resumeButton" class="options__button options__button--primary" text="Resume" />
             </ui:VisualElement>
         </ui:VisualElement>

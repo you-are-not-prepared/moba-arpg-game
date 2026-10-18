@@ -345,7 +345,8 @@ namespace Moba.UI
             _ => null,
         };
 
-        bool CanDrag(DragSource source) => ItemAt(source) != null && _inventory != null && _abilities != null;
+        bool CanDrag(DragSource source) => ItemAt(source) != null && _inventory != null && _abilities != null
+                                           && !(source.Kind == DragKind.Spell && _abilities.IsSlotLocked(source.Index));
 
         void BeginDrag(DragSource source)
         {

@@ -37,6 +37,9 @@ namespace Moba.UI
         Minimap _minimap;
         readonly SlotView[] _slots = new SlotView[AbilityCaster.SlotCount];
         int _hoveredSlot = -1;
+        bool _hoveredPortrait;
+        Label _portraitGlyph;
+        VisualElement _portrait;
 
         GameManager _game;
         HeroController _hero;
@@ -86,6 +89,10 @@ namespace Moba.UI
             _time = _root.Q<Label>("timeLabel");
             _wave = _root.Q<Label>("waveLabel");
             _level = _root.Q<Label>("levelLabel");
+            _portrait = _root.Q("portrait");
+            _portraitGlyph = _root.Q<Label>("portraitInitial");
+            _portrait.RegisterCallback<PointerEnterEvent>(_ => _hoveredPortrait = true);
+            _portrait.RegisterCallback<PointerLeaveEvent>(_ => _hoveredPortrait = false);
             _skillPoints = _root.Q<Label>("skillPointsLabel");
             _health = new ResourceBar(_root.Q("healthBar"));
             _mana = new ResourceBar(_root.Q("manaBar"));
@@ -121,6 +128,7 @@ namespace Moba.UI
             _minimap = new Minimap();
             _minimapFrame.Add(_minimap);
             SetUpInventoryAndShop();
+            SetUpCheats();
 
             _bars.Clear();
             _barPool.Clear();
@@ -146,6 +154,12 @@ namespace Moba.UI
             if (_hero == null) return;
             _progression = _hero.GetComponent<HeroProgression>();
             _abilities = _hero.Abilities;
+            if (_hero.definition != null)
+            {
+                _portraitGlyph.text = _hero.definition.glyph;
+                // Hero colour is data, so it's set here rather than in USS.
+                _portraitGlyph.style.color = _hero.definition.color;
+            }
             if (_progression != null) _progression.BountyEarned += OnBountyEarned;
             BindInventory();
         }
@@ -175,6 +189,7 @@ namespace Moba.UI
             _respawn.style.scale = new Scale(Vector2.one * hud);
             _shopWindow.style.scale = new Scale(Vector2.one * hud);
             _hudMessage.style.scale = new Scale(Vector2.one * hud);
+            _cheatPanel.style.scale = new Scale(Vector2.one * hud);
         }
 
         // Keeps the tooltip and targeting hint just above the (scaled) hero panel.
@@ -199,6 +214,7 @@ namespace Moba.UI
             UpdateHeroPanel();
             UpdateSlots();
             UpdateInventoryAndShop();
+            UpdateCheats();
             UpdateTooltip();
             UpdateUnitBars();
             UpdateFloatingText();
@@ -254,7 +270,7 @@ namespace Moba.UI
 
         void UpdateTooltip()
         {
-            if (ShowSocketTooltip() || ShowItemTooltip()) return;
+            if (ShowHeroTooltip() || ShowSocketTooltip() || ShowItemTooltip()) return;
             if (_hoveredSlot < 0 || _abilities == null || _dragFrom.Kind != DragKind.None)
             {
                 _tooltip.AddToClassList("hidden");
@@ -286,16 +302,29 @@ namespace Moba.UI
             string stats = $"{rankLine}\nCooldown {a.Cooldown(shownRank):0.#}s   ·   {a.ManaCost(shownRank):0} mana";
             if (!string.IsNullOrEmpty(effect)) stats += $"\n{effect}";
 
-            SetText(_tooltipTitle, $"[{key}] {a.displayName}");
+            string suffix = _abilities.IsSlotLocked(index) ? (a.IsPassive ? " (passive ultimate)" : " (ultimate)") : "";
+            SetText(_tooltipTitle, $"[{key}] {a.displayName}{suffix}");
             SetText(_tooltipStats, stats);
             SetText(_tooltipBody, string.IsNullOrEmpty(a.description) ? DescribeMods(index) : $"{a.description}\n{DescribeMods(index)}");
+        }
+
+        bool ShowHeroTooltip()
+        {
+            HeroDefinition def = _hero != null ? _hero.definition : null;
+            if (!_hoveredPortrait || def == null) return false;
+            _tooltip.RemoveFromClassList("hidden");
+            SetText(_tooltipTitle, string.IsNullOrEmpty(def.title) ? def.displayName : $"{def.displayName}, {def.title}");
+            SetText(_tooltipStats, $"Passive: {def.passiveName}");
+            string ult = def.ultimate != null ? $"\nUltimate: {def.ultimate.displayName}. {def.ultimate.description}" : "";
+            SetText(_tooltipBody, def.passiveDescription + ult);
+            return true;
         }
 
         string DescribeMods(int index)
         {
             var parts = new List<string>();
             int empty = 0;
-            for (int s = 0; s < AbilityCaster.ModSocketCount; s++)
+            for (int s = 0; s < _abilities.SocketCount(index); s++)
             {
                 ModDefinition mod = _abilities.GetMod(index, s);
                 if (mod == null) empty++;
@@ -428,7 +457,7 @@ namespace Moba.UI
             }
         }
 
-        static void SetText(Label label, string text)
+        static void SetText(TextElement label, string text)
         {
             if (label.text != text) label.text = text;
         }
@@ -462,7 +491,7 @@ namespace Moba.UI
         {
             public readonly VisualElement Frame;
             public readonly Button LevelUp;
-            public readonly VisualElement[] Sockets = new VisualElement[AbilityCaster.ModSocketCount];
+            public readonly VisualElement[] Sockets = new VisualElement[AbilityCaster.MaxModSockets];
             readonly VisualElement _root, _icon, _cooldown, _pips;
             readonly Label _cooldownText, _cost, _glyph;
             AbilityDefinition _shownAbility;
@@ -505,8 +534,10 @@ namespace Moba.UI
                     Frame.style.backgroundColor = a != null && !hasIcon ? new StyleColor(a.color) : new StyleColor(StyleKeyword.Null);
                 }
 
+                int socketCount = caster.SocketCount(index);
                 for (int s = 0; s < Sockets.Length; s++)
                 {
+                    Sockets[s].EnableInClassList("hidden", s >= socketCount);
                     bool filled = caster.GetMod(index, s) != null;
                     bool active = caster.IsModActive(index, s);
                     Sockets[s].EnableInClassList("mod-socket--filled", filled && active);
@@ -604,6 +635,7 @@ namespace Moba.UI
                 _fill.style.width = Length.Percent(100f * unit.Health / unit.maxHealth);
                 _root.EnableInClassList("unit-bar--protected", !unit.IsTargetable);
                 _root.EnableInClassList("unit-bar--burning", Burning.IsBurning(unit));
+                _root.EnableInClassList("unit-bar--stunned", Stun.IsStunned(unit));
                 if (level > 0 && level != _shownLevel)
                 {
                     _shownLevel = level;

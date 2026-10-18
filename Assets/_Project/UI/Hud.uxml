@@ -54,6 +54,16 @@
 
         <ui:Button name="menuButton" class="menu-button" text="Options" />
 
+        <ui:VisualElement name="cheatPanel" class="panel cheats">
+            <ui:Button name="cheatHeader" class="cheats__header" text="Cheats [-]" />
+            <ui:VisualElement name="cheatBody" class="cheats__body">
+                <ui:Button name="cheatLevel" class="cheats__button" text="+1 level" />
+                <ui:Button name="cheatGold" class="cheats__button" text="+10000 gold" />
+                <ui:Button name="cheatMana" class="cheats__button cheats__toggle" text="No mana cost" />
+                <ui:Button name="cheatCooldowns" class="cheats__button cheats__toggle" text="No cooldowns" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
         <ui:VisualElement name="shopWindow" class="panel shop hidden">
             <ui:VisualElement class="shop__header">
                 <ui:Label class="shop__title" text="Shop" />

@@ -31,7 +31,7 @@ namespace Moba
 
         public bool TryAttack(Unit target)
         {
-            if (target == null || !target.IsTargetable || !InRange(target)) return false;
+            if (target == null || !target.IsTargetable || !InRange(target) || Stun.IsStunned(_self)) return false;
 
             if (faceTarget)
             {

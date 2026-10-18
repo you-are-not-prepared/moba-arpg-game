@@ -35,6 +35,10 @@ namespace Moba
 
         void Update()
         {
+            bool stunned = Stun.IsStunned(_unit);
+            if (_agent.isOnNavMesh) _agent.isStopped = stunned;
+            if (stunned) return;
+
             if (Time.time >= _nextRetarget)
             {
                 _nextRetarget = Time.time + retargetInterval;

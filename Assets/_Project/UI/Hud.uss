@@ -578,6 +578,65 @@
     background-color: rgb(40, 46, 60);
 }
 
+/* ---------- Cheat menu ---------- */
+
+.cheats {
+    position: absolute;
+    top: 58px;
+    right: 12px;
+    width: 170px;
+    padding: 6px;
+    transform-origin: right top;
+}
+
+.cheats__header {
+    height: 26px;
+    padding: 0 6px;
+    margin: 0;
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--gold);
+}
+
+.cheats__body {
+    margin-top: 4px;
+}
+
+.cheats--collapsed > .cheats__body {
+    display: none;
+}
+
+.cheats__button {
+    height: 30px;
+    padding: 0 8px;
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    border-width: 1px;
+    border-radius: 4px;
+    border-color: rgb(55, 60, 72);
+    background-color: rgb(24, 28, 38);
+    color: var(--text);
+}
+
+.cheats__button:hover {
+    border-color: var(--gold);
+}
+
+.cheats__button:disabled {
+    opacity: 0.45;
+}
+
+.cheats__toggle--on {
+    border-color: rgb(90, 170, 90);
+    background-color: rgb(30, 60, 34);
+    color: rgb(170, 240, 170);
+}
+
 /* ---------- Inventory ---------- */
 
 .inventory {
@@ -906,4 +965,13 @@
     top: 0;
     right: 0;
     bottom: 0;
+}
+
+.unit-bar--stunned {
+    border-width: 2px;
+    border-color: rgb(255, 230, 80);
+}
+
+.portrait:hover {
+    border-color: rgb(255, 235, 150);
 }
