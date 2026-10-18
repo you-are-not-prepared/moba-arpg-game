@@ -42,8 +42,24 @@ namespace Moba.Abilities
 
         Unit _unit;
         HeroProgression _progression;
+        bool _noCooldowns;
 
         public float Mana { get; private set; }
+
+        // Cheat menu: casts cost no mana.
+        public bool NoManaCost { get; set; }
+
+        // Cheat menu: casts start no cooldown. Turning it on also ends the cooldowns already running.
+        public bool NoCooldowns
+        {
+            get => _noCooldowns;
+            set
+            {
+                _noCooldowns = value;
+                if (value)
+                    foreach (Slot s in slots) s.cooldownRemaining = 0f;
+            }
+        }
         public int SkillPoints { get; set; }
         public Unit Unit => _unit;
         int HeroLevel => _progression != null ? _progression.Level : 1;
@@ -173,7 +189,7 @@ namespace Moba.Abilities
             if (s.rank <= 0) return CastBlock.NotLearned;
             if (s.ability.IsPassive) return CastBlock.Passive;
             if (s.cooldownRemaining > 0f) return CastBlock.OnCooldown;
-            if (Mana < s.ability.ManaCost(s.rank)) return CastBlock.NotEnoughMana;
+            if (!NoManaCost && Mana < s.ability.ManaCost(s.rank)) return CastBlock.NotEnoughMana;
             return CastBlock.None;
         }
 
@@ -211,8 +227,8 @@ namespace Moba.Abilities
             }
             if (!InCastRange(index, point, target)) return false;
 
-            Mana -= a.ManaCost(s.rank);
-            s.cooldownTotal = a.Cooldown(s.rank) * cooldownMultiplier;
+            if (!NoManaCost) Mana -= a.ManaCost(s.rank);
+            s.cooldownTotal = NoCooldowns ? 0f : a.Cooldown(s.rank) * cooldownMultiplier;
             s.cooldownRemaining = s.cooldownTotal;
 
             Vector3 facing = point - transform.position;

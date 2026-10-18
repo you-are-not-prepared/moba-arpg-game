@@ -128,6 +128,7 @@ namespace Moba.UI
             _minimap = new Minimap();
             _minimapFrame.Add(_minimap);
             SetUpInventoryAndShop();
+            SetUpCheats();
 
             _bars.Clear();
             _barPool.Clear();
@@ -188,6 +189,7 @@ namespace Moba.UI
             _respawn.style.scale = new Scale(Vector2.one * hud);
             _shopWindow.style.scale = new Scale(Vector2.one * hud);
             _hudMessage.style.scale = new Scale(Vector2.one * hud);
+            _cheatPanel.style.scale = new Scale(Vector2.one * hud);
         }
 
         // Keeps the tooltip and targeting hint just above the (scaled) hero panel.
@@ -212,6 +214,7 @@ namespace Moba.UI
             UpdateHeroPanel();
             UpdateSlots();
             UpdateInventoryAndShop();
+            UpdateCheats();
             UpdateTooltip();
             UpdateUnitBars();
             UpdateFloatingText();
@@ -454,7 +457,7 @@ namespace Moba.UI
             }
         }
 
-        static void SetText(Label label, string text)
+        static void SetText(TextElement label, string text)
         {
             if (label.text != text) label.text = text;
         }

@@ -100,6 +100,14 @@ namespace Moba
             if (IsMaxLevel) Xp = 0f;
         }
 
+        // Cheat menu: jump straight to the next level (progress toward it is dropped).
+        public void GainLevel()
+        {
+            if (IsMaxLevel) return;
+            Xp = 0f;
+            LevelUp();
+        }
+
         void LevelUp()
         {
             Level++;
