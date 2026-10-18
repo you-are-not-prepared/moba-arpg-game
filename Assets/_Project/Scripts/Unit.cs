@@ -8,6 +8,12 @@ namespace Moba
 
     public enum UnitKind { Hero, Creep, Tower, Core }
 
+    // Changes the damage a unit deals (e.g. a hero passive). Registered with Unit.AddDamageModifier.
+    public interface IOutgoingDamageModifier
+    {
+        float ModifyOutgoingDamage(Unit target, float amount);
+    }
+
     // Anything on the map that has a team and health and can be targeted.
     // Pivot is at the unit's feet; distances are measured edge-to-edge on the XZ plane.
     public class Unit : MonoBehaviour
@@ -37,6 +43,8 @@ namespace Moba
         public int goldBounty;
         public float xpBounty;
 
+        readonly List<IOutgoingDamageModifier> _damageModifiers = new();
+
         public float Health { get; private set; }
         public bool IsAlive => Health > 0f;
         // False while the unit is hidden in the local player's fog of war (set by FogOfWar).
@@ -63,8 +71,22 @@ namespace Moba
         public void TakeDamage(float amount, Unit source)
         {
             if (!IsTargetable) return;
+            if (source != null) amount = source.ModifyOutgoingDamage(this, amount);
             Health = Mathf.Max(0f, Health - amount);
             if (Health <= 0f) Die(source);
+        }
+
+        public void AddDamageModifier(IOutgoingDamageModifier modifier)
+        {
+            if (!_damageModifiers.Contains(modifier)) _damageModifiers.Add(modifier);
+        }
+
+        public void RemoveDamageModifier(IOutgoingDamageModifier modifier) => _damageModifiers.Remove(modifier);
+
+        float ModifyOutgoingDamage(Unit target, float amount)
+        {
+            foreach (IOutgoingDamageModifier m in _damageModifiers) amount = m.ModifyOutgoingDamage(target, amount);
+            return amount;
         }
 
         public void ResetHealth() => Health = maxHealth;

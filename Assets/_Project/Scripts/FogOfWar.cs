@@ -149,7 +149,8 @@ namespace Moba
             foreach (Unit u in Unit.All)
             {
                 bool structure = u.kind == UnitKind.Tower || u.kind == UnitKind.Core;
-                bool visible = u.team == _team || structure || SeenBySources(u);
+                // Dead enemy heroes stay hidden (their controller hides them; fog mustn't show them again).
+                bool visible = u.team == _team || structure || (u.IsAlive && SeenBySources(u));
                 u.IsVisibleToPlayer = visible;
                 if (u.team == _team || structure) continue;
 
@@ -162,7 +163,8 @@ namespace Moba
                         Shown = true,
                     };
                 }
-                if (visual.Shown != visible) Show(u, visual, visible);
+                // Also re-hide when something else switched a hidden unit's renderers back on (e.g. a hero respawning).
+                if (visual.Shown != visible || (!visible && AnyRendererOn(visual))) Show(u, visual, visible);
                 visual.Shown = visible;
                 _unitVisuals[u] = visual;
             }
@@ -171,6 +173,13 @@ namespace Moba
             foreach (Unit u in _unitVisuals.Keys)
                 if (u == null) _stale.Add(u);
             foreach (Unit u in _stale) _unitVisuals.Remove(u);
+        }
+
+        static bool AnyRendererOn(UnitVisual visual)
+        {
+            foreach (Renderer r in visual.Renderers)
+                if (r != null && r.enabled) return true;
+            return false;
         }
 
         static void Show(Unit unit, UnitVisual visual, bool shown)

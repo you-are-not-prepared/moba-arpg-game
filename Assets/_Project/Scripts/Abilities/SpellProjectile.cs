@@ -62,6 +62,12 @@ namespace Moba.Abilities
             Vector3 to = from + _dir * step;
 
             Unit hit = FirstHit(from, to, out float t);
+            // A shield in the way stops the projectile before anything behind it is hit.
+            if (ProjectileShield.TryBlock(_p.Team, from, hit != null ? Vector3.Lerp(from, to, t) : to, out _))
+            {
+                Destroy(gameObject);
+                return;
+            }
             if (hit != null)
             {
                 transform.position = Vector3.Lerp(from, to, t);

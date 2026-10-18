@@ -175,8 +175,8 @@ MonoBehaviour:
   protectedBy: []
   destroyOnDeath: 0
   sightRadius: 14.4
-  goldBounty: 0
-  xpBounty: 0
+  goldBounty: 300
+  xpBounty: 200
 --- !u!114 &3452509540742424687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,6 +328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroController
   definition: {fileID: 0}
+  isPlayer: 1
   respawnSeconds: 5
   spawnPoint: {fileID: 0}
   moveMarkerMaterial: {fileID: 2100000, guid: 53870e2ab9916424dacb96a5bb69154e, type: 2}

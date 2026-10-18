@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5547e7011624c094bb78f3d44b8a5f69, type: 3}
+  m_Name: Ult_AegisWall
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ShieldWallSpell
+  displayName: Aegis Wall
+  description: Raises a shield wall in front of you for 5 seconds that destroys every
+    enemy projectile flying into it. You can move and turn; the wall stays with you.
+    Tower shots pass through.
+  cost: 0
+  icon: {fileID: 0}
+  color: {r: 0.55, g: 0.68, b: 0.85, a: 1}
+  glyph: AW
+  tags: 0
+  targeting: 0
+  unitFilter: 0
+  range: 0
+  areaRadius: 0
+  cooldownByRank:
+  - 60
+  - 50
+  - 40
+  manaCostByRank:
+  - 100
+  duration: 5
+  radius: 2.4
+  arcDegrees: 150
+  height: 2.6
+  wallMaterial: {fileID: 2100000, guid: fce509281bf22af46969680004b2ba1f, type: 2}
+  blockFlashMaterial: {fileID: 2100000, guid: 60ead8b6d10a80e43839068abe7e1a3c, type: 2}

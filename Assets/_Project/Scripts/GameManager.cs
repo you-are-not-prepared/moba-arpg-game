@@ -10,7 +10,10 @@ namespace Moba
         public static GameManager Instance { get; private set; }
 
         public Team playerTeam = Team.Blue;
+        // The local player's hero.
         public HeroController hero;
+        // Every hero in the match (player and bots), filled by MatchBootstrap.
+        [System.NonSerialized] public System.Collections.Generic.List<HeroController> heroes = new();
         public CreepSpawner playerSpawner;
         public MobaCamera cameraRig;
         public Items.Shop playerShop;

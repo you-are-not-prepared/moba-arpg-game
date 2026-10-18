@@ -15,9 +15,23 @@ namespace Moba.Items
         [Tooltip("Heroes within this distance (XZ) of the shop can buy and sell.")]
         public float radius = 14f;
         [Range(0f, 1f)] public float sellRefund = 0.7f;
+        [Tooltip("Fountain: allied heroes inside the radius regain this fraction of max health and mana per second.")]
+        public float regenFractionPerSecond = 0.1f;
 
         void OnEnable() => s_All.Add(this);
         void OnDisable() => s_All.Remove(this);
+
+        void Update()
+        {
+            if (regenFractionPerSecond <= 0f) return;
+            float fraction = regenFractionPerSecond * Time.deltaTime;
+            foreach (Unit u in Unit.All)
+            {
+                if (u.kind != UnitKind.Hero || !u.IsAlive || !CanUse(u)) continue;
+                u.Heal(u.maxHealth * fraction);
+                if (u.TryGetComponent(out Abilities.AbilityCaster caster)) caster.RestoreMana(caster.maxMana * fraction);
+            }
+        }
 
         public static Shop ForTeam(Team team)
         {
