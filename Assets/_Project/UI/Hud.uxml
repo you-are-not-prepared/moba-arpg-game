@@ -61,6 +61,7 @@
                 <ui:Button name="cheatGold" class="cheats__button" text="+10000 gold" />
                 <ui:Button name="cheatMana" class="cheats__button cheats__toggle" text="No mana cost" />
                 <ui:Button name="cheatCooldowns" class="cheats__button cheats__toggle" text="No cooldowns" />
+                <ui:Button name="cheatSpeed" class="cheats__button cheats__toggle" text="Game speed: 1x" />
             </ui:VisualElement>
         </ui:VisualElement>
 

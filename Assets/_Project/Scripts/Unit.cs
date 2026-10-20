@@ -24,6 +24,8 @@ namespace Moba
         // (victim, killer). The killer is whoever landed the last hit and may be null.
         public static event Action<Unit, Unit> AnyDied;
         public event Action<Unit, Unit> Died;
+        // (victim, source, health actually removed). The source may be null.
+        public static event Action<Unit, Unit, float> AnyDamaged;
 
         public Team team;
         public UnitKind kind;
@@ -76,7 +78,9 @@ namespace Moba
             if (source != null) amount = source.ModifyOutgoingDamage(this, amount);
             if (kind == UnitKind.Hero && source != null && source.kind == UnitKind.Hero && source.team != team)
                 _lastHitByHero[source] = Time.time;
+            float dealt = Mathf.Min(amount, Health); // overkill doesn't count
             Health = Mathf.Max(0f, Health - amount);
+            if (dealt > 0f) AnyDamaged?.Invoke(this, source, dealt);
             if (Health <= 0f) Die(source);
         }
 

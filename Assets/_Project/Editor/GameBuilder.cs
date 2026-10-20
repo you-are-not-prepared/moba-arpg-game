@@ -623,6 +623,7 @@ namespace Moba.EditorTools
             var frontend = go.AddComponent<FrontendController>();
             frontend.roster = roster;
             frontend.layouts = layouts;
+            frontend.items = AssetDatabase.LoadAssetAtPath<ItemCatalog>(ItemCatalogPath);
 
             EditorSceneManager.SaveScene(scene, FrontendScenePath);
         }

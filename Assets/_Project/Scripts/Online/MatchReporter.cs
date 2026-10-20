@@ -1,4 +1,6 @@
+using Moba.Abilities;
 using Moba.Bots;
+using Moba.Items;
 using UnityEngine;
 
 namespace Moba.Online
@@ -74,11 +76,36 @@ namespace Moba.Online
                     deaths = progression.Deaths,
                     assists = progression.Assists,
                     creepScore = progression.CreepScore,
+                    heroDamage = Mathf.RoundToInt(progression.HeroDamage),
+                    totalDamage = Mathf.RoundToInt(progression.TotalDamage),
+                    damageTaken = Mathf.RoundToInt(progression.DamageTaken),
+                    build = BuildOf(hero),
                 });
             }
 
             string error = await MatchService.Report(matchId, result);
             if (error != null) Debug.LogWarning($"[Matches] Result not recorded: {error}");
         }
+
+        // Inventory (8 slots) and Q/W/E/R with their mods, by asset name.
+        static PlayerBuild BuildOf(HeroController hero)
+        {
+            var build = new PlayerBuild();
+            if (hero.TryGetComponent(out Inventory inventory))
+                for (int i = 0; i < Inventory.SlotCount; i++)
+                    build.items.Add(IdOf(inventory.Get(i)));
+
+            AbilityCaster caster = hero.Abilities;
+            for (int slot = 0; slot < AbilityCaster.SlotCount; slot++)
+            {
+                var spell = new SpellBuild { id = IdOf(caster.GetSlot(slot).ability), rank = caster.GetSlot(slot).rank };
+                for (int socket = 0; socket < caster.SocketCount(slot); socket++)
+                    spell.mods.Add(IdOf(caster.GetMod(slot, socket)));
+                build.spells.Add(spell);
+            }
+            return build;
+        }
+
+        static string IdOf(InventoryItem item) => item != null ? item.name : "";
     }
 }

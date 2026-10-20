@@ -55,7 +55,43 @@ namespace Moba.UI
                 return;
             }
             SetHistoryStatus(null);
-            foreach (MatchSummary match in history.matches) _historyList.Add(HistoryRow(match));
+            foreach (MatchSummary match in history.matches) _historyList.Add(HistoryEntry(match));
+        }
+
+        // A match row; clicking it opens (and the first time loads) its details underneath.
+        VisualElement HistoryEntry(MatchSummary match)
+        {
+            var entry = new VisualElement();
+            entry.AddToClassList("history-entry");
+            VisualElement row = HistoryRow(match);
+            Label toggle = Text("+", "history-row__toggle");
+            row.Add(toggle);
+            var details = new VisualElement();
+            details.AddToClassList("match-details");
+            details.AddToClassList("hidden");
+            entry.Add(row);
+            entry.Add(details);
+
+            bool loading = false;
+            row.RegisterCallback<ClickEvent>(async _ =>
+            {
+                bool open = details.ClassListContains("hidden");
+                details.EnableInClassList("hidden", !open);
+                row.EnableInClassList("history-row--open", open);
+                toggle.text = open ? "-" : "+";
+                if (!open) HideItemTooltip(_itemTooltipAnchor);
+                if (!open || loading || details.childCount > 0) return;
+
+                loading = true;
+                details.Add(Text("Loading details…", "match-details__status"));
+                var (detail, error) = await MatchService.Detail(match.matchId);
+                loading = false;
+                if (this == null) return;
+                details.Clear();
+                if (error != null) details.Add(Text(error, "match-details__status"));
+                else BuildDetails(details, detail);
+            });
+            return entry;
         }
 
         void SetHistoryStatus(string text)

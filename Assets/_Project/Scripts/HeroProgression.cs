@@ -36,6 +36,10 @@ namespace Moba
         // Enemy heroes this hero damaged in the AssistWindow before someone else killed them.
         public int Assists { get; private set; }
         public const float AssistWindow = 10f;
+        // Health actually removed: from enemy heroes, from anything, and from this hero.
+        public float HeroDamage { get; private set; }
+        public float TotalDamage { get; private set; }
+        public float DamageTaken { get; private set; }
         public bool IsMaxLevel => Level >= maxLevel;
         public float XpToNextLevel => xpToLevelBase + xpToLevelPerLevel * (Level - 1);
 
@@ -61,8 +65,25 @@ namespace Moba
             Gold += whole;
         }
 
-        void OnEnable() => Unit.AnyDied += OnAnyDied;
-        void OnDisable() => Unit.AnyDied -= OnAnyDied;
+        void OnEnable()
+        {
+            Unit.AnyDied += OnAnyDied;
+            Unit.AnyDamaged += OnAnyDamaged;
+        }
+
+        void OnDisable()
+        {
+            Unit.AnyDied -= OnAnyDied;
+            Unit.AnyDamaged -= OnAnyDamaged;
+        }
+
+        void OnAnyDamaged(Unit victim, Unit source, float amount)
+        {
+            if (victim == _unit) DamageTaken += amount;
+            if (source != _unit) return;
+            TotalDamage += amount;
+            if (victim.kind == UnitKind.Hero) HeroDamage += amount;
+        }
 
         void OnAnyDied(Unit victim, Unit killer)
         {

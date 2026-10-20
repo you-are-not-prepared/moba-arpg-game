@@ -794,3 +794,283 @@
     background-color: rgb(90, 60, 20);
     color: var(--gold);
 }
+
+/* ---------- Match details (expanded history entry) ---------- */
+
+.history-entry {
+    margin-bottom: 8px;
+}
+
+.history-entry > .history-row {
+    margin-bottom: 0;
+}
+
+.history-row:hover {
+    border-color: rgb(110, 115, 128);
+}
+
+.history-row--open {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.history-row__toggle {
+    width: 28px;
+    padding: 0;
+    margin: 0 0 0 10px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--text-dim);
+}
+
+.match-details {
+    padding: 10px 18px 14px 26px;
+    border-width: 0 2px 2px 2px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-color: var(--border);
+    background-color: rgb(16, 20, 28);
+}
+
+.match-details__status {
+    padding: 0;
+    margin: 8px 0 0 0;
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+.match-details__team {
+    padding: 0;
+    margin: 10px 0 4px 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+}
+
+.match-details__team--win {
+    color: rgb(110, 215, 135);
+}
+
+.match-details__team--loss {
+    color: rgb(235, 110, 100);
+}
+
+.details-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 54px;
+    padding: 4px 8px;
+    margin-bottom: 3px;
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: rgb(40, 45, 56);
+    background-color: var(--panel);
+}
+
+.details-row--labels {
+    min-height: 20px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.details-row--me {
+    border-color: var(--gold);
+}
+
+.details-col {
+    padding: 0;
+    margin: 0;
+    font-size: 11px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    -unity-text-align: middle-center;
+    color: var(--text-dim);
+}
+
+.details-col--player {
+    width: 220px;
+    -unity-text-align: middle-left;
+}
+
+.details-col--kda {
+    width: 100px;
+}
+
+.details-col--cs {
+    width: 50px;
+}
+
+.details-col--damage {
+    width: 140px;
+    margin-right: 10px;
+}
+
+.details-col--total {
+    width: 100px;
+}
+
+.details-col--spells {
+    width: 180px;
+}
+
+.details-col--items {
+    flex-grow: 1;
+}
+
+.details-player {
+    flex-direction: row;
+    align-items: center;
+}
+
+.details-player .history-mini {
+    margin-right: 10px;
+}
+
+.details-player__hero {
+    padding: 0;
+    margin: 0;
+    font-size: 15px;
+    -unity-font-style: bold;
+    color: var(--text);
+}
+
+.details-player__name {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.details-cell {
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--text);
+}
+
+.details-bar {
+    height: 24px;
+    justify-content: center;
+    border-radius: 4px;
+    background-color: rgb(26, 30, 40);
+    overflow: hidden;
+}
+
+.details-bar__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.details-bar--damage {
+    background-color: rgb(170, 70, 55);
+}
+
+.details-bar--taken {
+    background-color: rgb(70, 95, 150);
+}
+
+.details-bar__value {
+    padding: 0 8px;
+    margin: 0;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: var(--text);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.details-tiles {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.details-spell {
+    align-items: center;
+    margin-right: 6px;
+}
+
+.details-mods {
+    flex-direction: row;
+    margin-top: 2px;
+}
+
+.details-tile {
+    align-items: center;
+    justify-content: center;
+    border-width: 1px;
+    border-radius: 4px;
+    border-color: rgb(55, 60, 72);
+    background-color: rgb(18, 21, 28);
+}
+
+.details-tile--spell {
+    width: 34px;
+    height: 34px;
+}
+
+.details-tile--mod {
+    width: 14px;
+    height: 14px;
+    margin: 0 1px;
+    border-radius: 2px;
+}
+
+.details-tile--item {
+    width: 30px;
+    height: 30px;
+    margin-right: 4px;
+}
+
+.details-tile__glyph {
+    padding: 0;
+    margin: 0;
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.details-tile--hoverable:hover {
+    border-color: var(--gold);
+}
+
+/* Item / spell / mod tooltip (match details), worded like the in-game one. */
+.item-tooltip {
+    position: absolute;
+    width: 340px;
+    padding: 10px 14px 12px 14px;
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: var(--accent-border);
+    background-color: rgba(12, 16, 24, 0.97);
+}
+
+.item-tooltip__title {
+    padding: 0;
+    margin: 0 0 3px 0;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: var(--gold);
+}
+
+.item-tooltip__stats {
+    padding: 0;
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    white-space: normal;
+    color: rgb(140, 220, 140);
+}
+
+.item-tooltip__body {
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    white-space: normal;
+    color: var(--text);
+}

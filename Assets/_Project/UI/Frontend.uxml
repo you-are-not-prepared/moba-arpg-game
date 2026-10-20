@@ -111,5 +111,11 @@
                 <ui:Button name="lockButton" class="fe-button fe-button--primary" text="Lock in" />
             </ui:VisualElement>
         </ui:VisualElement>
+
+        <ui:VisualElement name="itemTooltip" class="item-tooltip hidden" picking-mode="Ignore">
+            <ui:Label name="itemTooltipTitle" class="item-tooltip__title" picking-mode="Ignore" />
+            <ui:Label name="itemTooltipStats" class="item-tooltip__stats" picking-mode="Ignore" />
+            <ui:Label name="itemTooltipBody" class="item-tooltip__body" picking-mode="Ignore" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
