@@ -84,6 +84,7 @@ namespace Moba.UI
             BuildHeroTiles();
             SetUpLogin(root);
             SetUpHistory(root);
+            SetUpItemTooltip(root);
 
             if (MatchSettings.OpenChampionSelect)
             {
@@ -268,6 +269,7 @@ namespace Moba.UI
             _startScreen.EnableInClassList("hidden", screen != _startScreen);
             _selectScreen.EnableInClassList("hidden", screen != _selectScreen);
             _historyScreen.EnableInClassList("hidden", screen != _historyScreen);
+            HideItemTooltip(_itemTooltipAnchor);
         }
 
         void Update()

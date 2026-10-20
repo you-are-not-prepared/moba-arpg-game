@@ -110,6 +110,8 @@ namespace Moba.Online
     {
         public string id;
         public List<string> mods = new();
+        // 0 = not learned (or recorded before ranks were).
+        public int rank;
     }
 
     [Serializable]

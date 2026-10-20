@@ -77,6 +77,15 @@ namespace Moba
             SceneManager.LoadScene(MatchSettings.FrontendScene);
         }
 
-        void ApplyTimeScale() => Time.timeScale = _paused || IsOver ? 0f : 1f;
+        // Cheat menu: how fast the match runs (1 = normal). Pausing and the end screen still stop time.
+        public float GameSpeed { get; private set; } = 1f;
+
+        public void SetGameSpeed(float speed)
+        {
+            GameSpeed = Mathf.Max(0.1f, speed);
+            ApplyTimeScale();
+        }
+
+        void ApplyTimeScale() => Time.timeScale = _paused || IsOver ? 0f : GameSpeed;
     }
 }

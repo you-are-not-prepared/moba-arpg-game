@@ -1014,8 +1014,8 @@
 }
 
 .details-tile--mod {
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     margin: 0 1px;
     border-radius: 2px;
 }
@@ -1034,4 +1034,43 @@
     color: rgb(255, 255, 255);
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.details-tile--hoverable:hover {
+    border-color: var(--gold);
+}
+
+/* Item / spell / mod tooltip (match details), worded like the in-game one. */
+.item-tooltip {
+    position: absolute;
+    width: 340px;
+    padding: 10px 14px 12px 14px;
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: var(--accent-border);
+    background-color: rgba(12, 16, 24, 0.97);
+}
+
+.item-tooltip__title {
+    padding: 0;
+    margin: 0 0 3px 0;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: var(--gold);
+}
+
+.item-tooltip__stats {
+    padding: 0;
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    white-space: normal;
+    color: rgb(140, 220, 140);
+}
+
+.item-tooltip__body {
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    white-space: normal;
+    color: var(--text);
 }

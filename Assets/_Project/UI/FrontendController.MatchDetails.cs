@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Moba.Abilities;
 using Moba.Items;
 using Moba.Online;
 using UnityEngine;
@@ -113,14 +114,15 @@ namespace Moba.UI
         VisualElement SpellTile(SpellBuild spell)
         {
             VisualElement column = Block("details-spell");
-            column.Add(ItemTile(spell.id, "details-tile--spell"));
+            column.Add(ItemTile(spell.id, "details-tile--spell", spell));
             VisualElement mods = Block("details-mods");
-            foreach (string mod in spell.mods ?? new List<string>()) mods.Add(ItemTile(mod, "details-tile--mod"));
+            foreach (string mod in spell.mods ?? new List<string>()) mods.Add(ItemTile(mod, "details-tile--mod", spell));
             column.Add(mods);
             return column;
         }
 
-        VisualElement ItemTile(string id, string sizeClass)
+        // `spell` is the spell slot the tile belongs to (for spells and mods), or null for inventory items.
+        VisualElement ItemTile(string id, string sizeClass, SpellBuild spell = null)
         {
             VisualElement tile = Block("details-tile");
             tile.AddToClassList(sizeClass);
@@ -129,7 +131,98 @@ namespace Moba.UI
             // Per-item colour is data, so it's set here rather than in USS.
             tile.style.backgroundColor = item.color;
             if (sizeClass != "details-tile--mod") tile.Add(Text(item.glyph, "details-tile__glyph"));
+
+            tile.pickingMode = PickingMode.Position;
+            tile.AddToClassList("details-tile--hoverable");
+            tile.RegisterCallback<PointerEnterEvent>(_ => ShowItemTooltip(tile, item, spell));
+            tile.RegisterCallback<PointerLeaveEvent>(_ => HideItemTooltip(tile));
             return tile;
+        }
+
+        // ---------- Tooltip (same wording as the in-game one) ----------
+
+        VisualElement _itemTooltip, _itemTooltipAnchor;
+        Label _itemTooltipTitle, _itemTooltipStats, _itemTooltipBody;
+
+        void SetUpItemTooltip(VisualElement root)
+        {
+            _itemTooltip = root.Q("itemTooltip");
+            _itemTooltipTitle = root.Q<Label>("itemTooltipTitle");
+            _itemTooltipStats = root.Q<Label>("itemTooltipStats");
+            _itemTooltipBody = root.Q<Label>("itemTooltipBody");
+            // Re-place once the tooltip knows its height (it changes with the text).
+            _itemTooltip.RegisterCallback<GeometryChangedEvent>(_ => PlaceItemTooltip());
+        }
+
+        void ShowItemTooltip(VisualElement anchor, InventoryItem item, SpellBuild slot)
+        {
+            _itemTooltipAnchor = anchor;
+            string stats, body = item.description ?? "";
+            switch (item)
+            {
+                case AbilityDefinition spell:
+                {
+                    // With the mods that were socketed and the rank it had at the end of the match.
+                    var modifiers = SpellModifiers.None;
+                    var modNames = new List<string>();
+                    foreach (string modId in slot?.mods ?? new List<string>())
+                    {
+                        if (FindItem(modId) is not ModDefinition mod) continue;
+                        bool active = mod.Supports(spell);
+                        if (active) mod.Apply(ref modifiers);
+                        modNames.Add(active ? mod.displayName : $"{mod.displayName} (inactive)");
+                    }
+                    int rank = slot != null ? slot.rank : 0;
+                    string described = spell.Describe(Mathf.Max(1, rank), modifiers);
+                    string rankText = rank > 0 ? $"Rank {rank}" : "Not learned";
+                    stats = string.IsNullOrEmpty(described) ? $"Spell   ·   {rankText}" : $"Spell   ·   {rankText}   ·   {described}";
+                    if (modNames.Count > 0) body = $"{body}\nMods: {string.Join(", ", modNames)}".Trim();
+                    break;
+                }
+                case ModDefinition mod:
+                {
+                    stats = $"Mod   ·   {mod.StatsText}";
+                    var socketedIn = FindItem(slot?.id) as AbilityDefinition;
+                    if (socketedIn != null && !mod.Supports(socketedIn))
+                        body = $"{body}\nDoesn't work with {socketedIn.displayName}.";
+                    break;
+                }
+                default:
+                    stats = string.IsNullOrEmpty(item.StatsText) ? item.KindLabel : $"{item.KindLabel}   ·   {item.StatsText}";
+                    break;
+            }
+
+            _itemTooltipTitle.text = item.displayName;
+            _itemTooltipStats.text = stats;
+            _itemTooltipBody.text = body;
+            _itemTooltipBody.EnableInClassList("hidden", string.IsNullOrEmpty(body));
+            _itemTooltip.RemoveFromClassList("hidden");
+            _itemTooltip.BringToFront();
+            PlaceItemTooltip();
+        }
+
+        void HideItemTooltip(VisualElement anchor)
+        {
+            if (_itemTooltipAnchor != anchor) return;
+            _itemTooltipAnchor = null;
+            _itemTooltip.AddToClassList("hidden");
+        }
+
+        // Below the hovered tile, or above it when there's no room; never off the side of the screen.
+        void PlaceItemTooltip()
+        {
+            if (_itemTooltipAnchor == null || _itemTooltip.ClassListContains("hidden")) return;
+            Rect anchor = _itemTooltipAnchor.worldBound;
+            Rect screen = _itemTooltip.parent.worldBound;
+            float width = _itemTooltip.resolvedStyle.width;
+            float height = _itemTooltip.resolvedStyle.height;
+            if (float.IsNaN(width) || float.IsNaN(height)) return;
+
+            float left = Mathf.Clamp(anchor.xMin, 8f, screen.width - width - 8f);
+            float top = anchor.yMax + 6f;
+            if (top + height > screen.height - 8f) top = anchor.yMin - height - 6f;
+            _itemTooltip.style.left = left - screen.xMin;
+            _itemTooltip.style.top = top - screen.yMin;
         }
 
         // Shop items, spells and mods by asset name, plus every hero's ultimate.

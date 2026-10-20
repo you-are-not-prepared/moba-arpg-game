@@ -98,7 +98,7 @@ namespace Moba.Online
             AbilityCaster caster = hero.Abilities;
             for (int slot = 0; slot < AbilityCaster.SlotCount; slot++)
             {
-                var spell = new SpellBuild { id = IdOf(caster.GetSlot(slot).ability) };
+                var spell = new SpellBuild { id = IdOf(caster.GetSlot(slot).ability), rank = caster.GetSlot(slot).rank };
                 for (int socket = 0; socket < caster.SocketCount(slot); socket++)
                     spell.mods.Add(IdOf(caster.GetMod(slot, socket)));
                 build.spells.Add(spell);

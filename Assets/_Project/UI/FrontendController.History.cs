@@ -79,6 +79,7 @@ namespace Moba.UI
                 details.EnableInClassList("hidden", !open);
                 row.EnableInClassList("history-row--open", open);
                 toggle.text = open ? "-" : "+";
+                if (!open) HideItemTooltip(_itemTooltipAnchor);
                 if (!open || loading || details.childCount > 0) return;
 
                 loading = true;
