@@ -19,6 +19,8 @@ namespace Moba.UI
 
         public HeroRoster roster;
         public MapLayoutCatalog layouts;
+        [Tooltip("For item and spell icons in match details.")]
+        public Items.ItemCatalog items;
 
         sealed class Seat
         {

@@ -33,6 +33,14 @@ namespace Moba.Online
             return response.Ok ? (response.Read<MatchHistoryResponse>(), null) : (null, response.ErrorMessage);
         }
 
+        // Everything recorded about one match (damage, builds).
+        public static async Task<(MatchDetailResponse detail, string error)> Detail(string matchId)
+        {
+            BackendClient.Response response =
+                await BackendClient.Send("GET", $"/me/matches/{matchId}", token: AccountService.SessionToken);
+            return response.Ok ? (response.Read<MatchDetailResponse>(), null) : (null, response.ErrorMessage);
+        }
+
         public static async Task<(PlayerStatsResponse stats, string error)> Stats()
         {
             BackendClient.Response response = await BackendClient.Send("GET", "/me/stats", token: AccountService.SessionToken);
@@ -82,6 +90,57 @@ namespace Moba.Online
         public int deaths;
         public int assists;
         public int creepScore;
+        public int heroDamage;
+        public int totalDamage;
+        public int damageTaken;
+        public PlayerBuild build;
+    }
+
+    // Final build. Item ids are asset names ("IronBlade", "Spell_Fireball"); "" is an empty slot.
+    [Serializable]
+    public class PlayerBuild
+    {
+        public List<string> items = new();
+        // Q, W, E, R in order.
+        public List<SpellBuild> spells = new();
+    }
+
+    [Serializable]
+    public class SpellBuild
+    {
+        public string id;
+        public List<string> mods = new();
+    }
+
+    [Serializable]
+    public class MatchDetailResponse
+    {
+        public string matchId;
+        public string winnerTeam;
+        public bool won;
+        public int slot;
+        public List<MatchDetailPlayer> players = new();
+    }
+
+    [Serializable]
+    public class MatchDetailPlayer
+    {
+        public int slot;
+        public string team;
+        public string heroId;
+        public bool isBot;
+        public string username;
+        public int level;
+        public int kills;
+        public int deaths;
+        public int assists;
+        public int creepScore;
+        // False for matches recorded before damage and builds were tracked.
+        public bool hasDetails;
+        public int heroDamage;
+        public int totalDamage;
+        public int damageTaken;
+        public PlayerBuild build;
     }
 
     [Serializable]

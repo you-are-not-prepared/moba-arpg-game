@@ -243,6 +243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moba.UI.FrontendController
   roster: {fileID: 11400000, guid: a697281cf4c15a040a0667795b95dbb5, type: 2}
   layouts: {fileID: 11400000, guid: 6b2eb1c08f4a6c241a8ae8d1d924cd70, type: 2}
+  items: {fileID: 11400000, guid: 8c5d7eb7a0bbba44ba5ed800f57db526, type: 2}
 --- !u!114 &1574632895
 MonoBehaviour:
   m_ObjectHideFlags: 0
