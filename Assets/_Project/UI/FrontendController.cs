@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Moba.Online;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -31,6 +32,11 @@ namespace Moba.UI
             public Label Glyph, Who, HeroName;
         }
 
+        VisualElement _loginScreen, _loginForm, _registerForm;
+        Label _loginHeading, _loginMessage, _accountLabel;
+        Button _loginSubmit, _loginSwitch, _playOffline, _accountButton;
+        TextField _loginName, _loginPassword, _registerEmail, _registerUsername, _registerPassword, _registerConfirm;
+        bool _registerMode, _busy;
         VisualElement _startScreen, _selectScreen, _startMenu, _modeMenu;
         VisualElement _heroGrid, _heroDetail, _allyList, _enemyList;
         Label _mapName, _mapDescription, _status, _modeLabel;
@@ -74,16 +80,188 @@ namespace Moba.UI
             _preview = new LanePreview();
             root.Q("mapPreview").Add(_preview);
             BuildHeroTiles();
+            SetUpLogin(root);
 
             if (MatchSettings.OpenChampionSelect)
             {
                 MatchSettings.OpenChampionSelect = false;
                 StartChampionSelect(MatchSettings.Mode);
             }
-            else
+            else if (AccountService.IsLoggedIn || AccountService.PlayingOffline)
             {
                 ShowStart();
             }
+            else if (AccountService.HasSavedSession)
+            {
+                _ = ResumeSession();
+            }
+            else
+            {
+                ShowLogin();
+            }
+        }
+
+        void OnDisable() => AccountService.Changed -= RefreshAccountBar;
+
+        // ---------- Login / register ----------
+
+        void SetUpLogin(VisualElement root)
+        {
+            _loginScreen = root.Q("loginScreen");
+            _loginForm = root.Q("loginForm");
+            _registerForm = root.Q("registerForm");
+            _loginHeading = root.Q<Label>("loginHeading");
+            _loginMessage = root.Q<Label>("loginMessage");
+            _loginSubmit = root.Q<Button>("loginSubmit");
+            _loginSwitch = root.Q<Button>("loginSwitch");
+            _playOffline = root.Q<Button>("playOfflineButton");
+            _loginName = root.Q<TextField>("loginName");
+            _loginPassword = root.Q<TextField>("loginPassword");
+            _registerEmail = root.Q<TextField>("registerEmail");
+            _registerUsername = root.Q<TextField>("registerUsername");
+            _registerPassword = root.Q<TextField>("registerPassword");
+            _registerConfirm = root.Q<TextField>("registerConfirm");
+            _accountLabel = root.Q<Label>("accountLabel");
+            _accountButton = root.Q<Button>("accountButton");
+
+            _loginSubmit.clicked += () => _ = Submit();
+            _loginSwitch.clicked += () => SetRegisterMode(!_registerMode);
+            _playOffline.clicked += PlayOffline;
+            _accountButton.clicked += () => _ = OnAccountButton();
+            // Enter submits from any field.
+            root.Q("loginCard").RegisterCallback<KeyDownEvent>(e =>
+            {
+                if (e.keyCode is not (KeyCode.Return or KeyCode.KeypadEnter)) return;
+                e.StopPropagation();
+                _ = Submit();
+            }, TrickleDown.TrickleDown);
+
+            AccountService.Changed += RefreshAccountBar;
+            RefreshAccountBar();
+        }
+
+        void ShowLogin()
+        {
+            ShowOnly(_loginScreen);
+            SetRegisterMode(_registerMode);
+            ShowMessage(null);
+            (_registerMode ? _registerEmail : _loginName).Focus();
+        }
+
+        void SetRegisterMode(bool register)
+        {
+            _registerMode = register;
+            _loginForm.EnableInClassList("hidden", register);
+            _registerForm.EnableInClassList("hidden", !register);
+            _loginHeading.text = register ? "Create an account" : "Log in";
+            _loginSubmit.text = register ? "Create account" : "Log in";
+            _loginSwitch.text = register ? "Already have an account? Log in" : "No account yet? Create one";
+            ShowMessage(null);
+        }
+
+        async System.Threading.Tasks.Task Submit()
+        {
+            if (_busy) return;
+            string error = _registerMode ? CheckRegisterFields() : CheckLoginFields();
+            if (error != null)
+            {
+                ShowMessage(error);
+                return;
+            }
+
+            SetBusy(true, _registerMode ? "Creating your account…" : "Logging in…");
+            error = _registerMode
+                ? await AccountService.Register(_registerEmail.value.Trim(), _registerUsername.value.Trim(), _registerPassword.value)
+                : await AccountService.Login(_loginName.value.Trim(), _loginPassword.value);
+            if (this == null) return; // the scene changed while waiting
+            SetBusy(false, null);
+
+            if (error != null)
+            {
+                ShowMessage(error);
+                return;
+            }
+            _loginPassword.value = _registerPassword.value = _registerConfirm.value = "";
+            ShowStart();
+        }
+
+        string CheckLoginFields()
+        {
+            if (string.IsNullOrWhiteSpace(_loginName.value)) return "Enter your email or username.";
+            if (string.IsNullOrEmpty(_loginPassword.value)) return "Enter your password.";
+            return null;
+        }
+
+        // Quick checks before asking the server (which checks everything again).
+        string CheckRegisterFields()
+        {
+            if (string.IsNullOrWhiteSpace(_registerEmail.value) || !_registerEmail.value.Contains('@'))
+                return "Enter a valid email address.";
+            string username = _registerUsername.value.Trim();
+            if (username.Length < 3) return "Usernames need at least 3 characters.";
+            if (_registerPassword.value.Length < 8) return "Passwords need at least 8 characters.";
+            if (_registerPassword.value != _registerConfirm.value) return "The passwords don't match.";
+            return null;
+        }
+
+        // A session remembered from an earlier run: check it with the server before showing the menu.
+        async System.Threading.Tasks.Task ResumeSession()
+        {
+            ShowLogin();
+            SetBusy(true, "Signing in…");
+            string error = await AccountService.Resume();
+            if (this == null) return;
+            SetBusy(false, null);
+            if (error == null) ShowStart();
+            else ShowMessage(error);
+        }
+
+        void PlayOffline()
+        {
+            if (_busy) return;
+            AccountService.PlayingOffline = true;
+            RefreshAccountBar();
+            ShowStart();
+        }
+
+        async System.Threading.Tasks.Task OnAccountButton()
+        {
+            if (AccountService.IsLoggedIn) await AccountService.Logout();
+            if (this == null) return;
+            AccountService.PlayingOffline = false;
+            SetRegisterMode(false);
+            ShowLogin();
+        }
+
+        void RefreshAccountBar()
+        {
+            if (_accountLabel == null) return;
+            bool loggedIn = AccountService.IsLoggedIn;
+            _accountLabel.text = loggedIn ? $"Logged in as <b>{AccountService.Profile.username}</b>" : "Playing offline";
+            _accountButton.text = loggedIn ? "Log out" : "Log in";
+        }
+
+        void SetBusy(bool busy, string status)
+        {
+            _busy = busy;
+            _loginSubmit.SetEnabled(!busy);
+            _loginSwitch.SetEnabled(!busy);
+            _playOffline.SetEnabled(!busy);
+            if (busy) ShowMessage(status, info: true);
+        }
+
+        void ShowMessage(string message, bool info = false)
+        {
+            _loginMessage.text = message ?? "";
+            _loginMessage.EnableInClassList("hidden", string.IsNullOrEmpty(message));
+            _loginMessage.EnableInClassList("login__message--info", info);
+        }
+
+        void ShowOnly(VisualElement screen)
+        {
+            _loginScreen.EnableInClassList("hidden", screen != _loginScreen);
+            _startScreen.EnableInClassList("hidden", screen != _startScreen);
+            _selectScreen.EnableInClassList("hidden", screen != _selectScreen);
         }
 
         void Update()
@@ -103,16 +281,15 @@ namespace Moba.UI
 
         void ShowStart()
         {
-            _startScreen.RemoveFromClassList("hidden");
-            _selectScreen.AddToClassList("hidden");
+            ShowOnly(_startScreen);
             _startMenu.RemoveFromClassList("hidden");
             _modeMenu.AddToClassList("hidden");
+            RefreshAccountBar();
         }
 
         void ShowModeMenu()
         {
-            _startScreen.RemoveFromClassList("hidden");
-            _selectScreen.AddToClassList("hidden");
+            ShowOnly(_startScreen);
             _startMenu.AddToClassList("hidden");
             _modeMenu.RemoveFromClassList("hidden");
         }
@@ -120,8 +297,7 @@ namespace Moba.UI
         void StartChampionSelect(MatchMode mode)
         {
             MatchSettings.Mode = mode;
-            _startScreen.AddToClassList("hidden");
-            _selectScreen.RemoveFromClassList("hidden");
+            ShowOnly(_selectScreen);
             _modeLabel.text = mode == MatchMode.PvE
                 ? $"PvE · {MatchSettings.TeamSize}v{MatchSettings.TeamSize} against bots"
                 : "PvP · online play isn't available yet: the match starts without other players";

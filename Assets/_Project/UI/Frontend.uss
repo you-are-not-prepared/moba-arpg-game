@@ -133,6 +133,109 @@
     color: var(--text-dim);
 }
 
+/* ---------- Login ---------- */
+
+.login-card {
+    width: 460px;
+    padding: 26px 32px 18px 32px;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: var(--border);
+    background-color: var(--panel);
+}
+
+.login__heading {
+    padding: 0;
+    margin: 0 0 8px 0;
+    font-size: 26px;
+    -unity-font-style: bold;
+    color: var(--text);
+}
+
+.login__label {
+    padding: 0;
+    margin: 12px 0 5px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+.login__field {
+    height: 44px;
+    margin: 0;
+    --unity-cursor-color: rgb(255, 205, 70);
+}
+
+.login__field > .unity-base-text-field__input {
+    padding: 0 12px;
+    font-size: 17px;
+    -unity-text-align: middle-left;
+    border-width: 2px;
+    border-radius: 6px;
+    border-color: var(--border);
+    background-color: rgb(12, 15, 22);
+    color: var(--text);
+}
+
+.login__field:focus > .unity-base-text-field__input {
+    border-color: var(--gold);
+}
+
+.login__message {
+    padding: 0;
+    margin: 14px 0 0 0;
+    font-size: 14px;
+    white-space: normal;
+    color: rgb(240, 115, 100);
+}
+
+.login__message--info {
+    color: var(--text-dim);
+}
+
+.login__submit {
+    margin-top: 20px;
+}
+
+.login__link {
+    align-self: center;
+    margin: 12px 0 0 0;
+    padding: 4px 8px;
+    font-size: 14px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--text-dim);
+}
+
+.login__link:hover {
+    color: var(--gold);
+}
+
+.login__offline {
+    margin-top: 22px;
+}
+
+.account-bar {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.account-bar__label {
+    padding: 0;
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-dim);
+}
+
+.account-bar__button {
+    margin: 0 0 0 10px;
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: var(--border);
+}
+
 /* ---------- Champion select ---------- */
 
 .select {
