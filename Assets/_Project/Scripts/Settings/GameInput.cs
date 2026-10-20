@@ -130,10 +130,25 @@ namespace Moba
             return null;
         }
 
+        // Raised after the bindings were saved (rebinds, resets, or bindings loaded from the account).
+        public static event System.Action Saved;
+
         public void Save()
         {
             PlayerPrefs.SetString(PrefsKey, Asset.SaveBindingOverridesAsJson());
             PlayerPrefs.Save();
+            Saved?.Invoke();
+        }
+
+        // The current binding overrides as JSON (what Save stores; ApplyOverridesJson reads it back).
+        public string OverridesJson() => Asset.SaveBindingOverridesAsJson();
+
+        // Replaces all binding overrides with `json` (from SaveBindingOverridesAsJson; empty = defaults), then saves.
+        public void ApplyOverridesJson(string json)
+        {
+            Asset.RemoveAllBindingOverrides();
+            if (!string.IsNullOrEmpty(json)) Asset.LoadBindingOverridesFromJson(json);
+            Save();
         }
 
         void Load()
@@ -151,6 +166,7 @@ namespace Moba
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {
+            Saved = null;
             if (s_Instance == null) return;
             s_Instance.Asset.Disable();
             Object.DestroyImmediate(s_Instance.Asset);

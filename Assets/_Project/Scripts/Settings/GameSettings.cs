@@ -37,6 +37,14 @@ namespace Moba
             Changed?.Invoke();
         }
 
+        // Takes over every value of `other` (e.g. settings loaded from the player's account), then saves.
+        public static void ReplaceWith(GameSettings other)
+        {
+            if (other == null) return;
+            JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(other), Current);
+            NotifyChanged();
+        }
+
         public static void ResetInterface()
         {
             var defaults = new GameSettings();

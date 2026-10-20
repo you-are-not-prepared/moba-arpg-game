@@ -1,7 +1,39 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="Frontend.uss" />
     <ui:VisualElement name="frontendRoot" class="frontend">
-        <ui:VisualElement name="startScreen" class="screen start">
+        <ui:VisualElement name="loginScreen" class="screen start hidden">
+            <ui:Label class="start__title" text="Project MOBA" />
+            <ui:Label class="start__subtitle" text="A MOBA with ARPG builds · prototype" />
+            <ui:VisualElement name="loginCard" class="login-card">
+                <ui:Label name="loginHeading" class="login__heading" text="Log in" />
+                <ui:VisualElement name="loginForm">
+                    <ui:Label class="login__label" text="Email or username" />
+                    <ui:TextField name="loginName" class="login__field" max-length="254" />
+                    <ui:Label class="login__label" text="Password" />
+                    <ui:TextField name="loginPassword" class="login__field" password="true" max-length="128" />
+                </ui:VisualElement>
+                <ui:VisualElement name="registerForm" class="hidden">
+                    <ui:Label class="login__label" text="Email" />
+                    <ui:TextField name="registerEmail" class="login__field" max-length="254" />
+                    <ui:Label class="login__label" text="Username (3–24 letters, numbers, _)" />
+                    <ui:TextField name="registerUsername" class="login__field" max-length="24" />
+                    <ui:Label class="login__label" text="Password (at least 8 characters)" />
+                    <ui:TextField name="registerPassword" class="login__field" password="true" max-length="128" />
+                    <ui:Label class="login__label" text="Confirm password" />
+                    <ui:TextField name="registerConfirm" class="login__field" password="true" max-length="128" />
+                </ui:VisualElement>
+                <ui:Label name="loginMessage" class="login__message hidden" />
+                <ui:Button name="loginSubmit" class="fe-button fe-button--primary login__submit" text="Log in" />
+                <ui:Button name="loginSwitch" class="login__link" text="No account yet? Create one" />
+            </ui:VisualElement>
+            <ui:Button name="playOfflineButton" class="login__link login__offline" text="Play offline (nothing is saved to an account)" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="startScreen" class="screen start hidden">
+            <ui:VisualElement class="account-bar">
+                <ui:Label name="accountLabel" class="account-bar__label" />
+                <ui:Button name="accountButton" class="login__link account-bar__button" />
+            </ui:VisualElement>
             <ui:Label class="start__title" text="Project MOBA" />
             <ui:Label class="start__subtitle" text="A MOBA with ARPG builds · prototype" />
 
