@@ -21,6 +21,10 @@ namespace Moba
         bool _paused;
 
         public Team? Winner { get; private set; }
+        // Raised once, with the winning team, when a core falls.
+        public event System.Action<Team> MatchEnded;
+        // Set when the cheat menu is used; such matches stay out of the player's stats.
+        public bool CheatsUsed { get; set; }
         public bool IsOver => Winner.HasValue;
         public bool IsPaused => _paused;
         public float MatchTime => Time.timeSinceLevelLoad;
@@ -44,6 +48,7 @@ namespace Moba
             if (unit.kind != UnitKind.Core || IsOver) return;
             Winner = unit.team == Team.Blue ? Team.Red : Team.Blue;
             ApplyTimeScale();
+            MatchEnded?.Invoke(Winner.Value);
         }
 
         void Update()

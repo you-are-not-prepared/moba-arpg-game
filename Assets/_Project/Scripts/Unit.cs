@@ -44,6 +44,8 @@ namespace Moba
         public float xpBounty;
 
         readonly List<IOutgoingDamageModifier> _damageModifiers = new();
+        // Heroes only: when each enemy hero last damaged this unit (for assists).
+        readonly Dictionary<Unit, float> _lastHitByHero = new();
 
         public float Health { get; private set; }
         public bool IsAlive => Health > 0f;
@@ -72,6 +74,8 @@ namespace Moba
         {
             if (!IsTargetable) return;
             if (source != null) amount = source.ModifyOutgoingDamage(this, amount);
+            if (kind == UnitKind.Hero && source != null && source.kind == UnitKind.Hero && source.team != team)
+                _lastHitByHero[source] = Time.time;
             Health = Mathf.Max(0f, Health - amount);
             if (Health <= 0f) Die(source);
         }
@@ -89,7 +93,15 @@ namespace Moba
             return amount;
         }
 
-        public void ResetHealth() => Health = maxHealth;
+        public void ResetHealth()
+        {
+            Health = maxHealth;
+            _lastHitByHero.Clear();
+        }
+
+        // Whether `hero` damaged this unit within the last `seconds` (assists).
+        public bool WasDamagedBy(Unit hero, float seconds) =>
+            hero != null && _lastHitByHero.TryGetValue(hero, out float time) && Time.time - time <= seconds;
 
         public void Heal(float amount)
         {

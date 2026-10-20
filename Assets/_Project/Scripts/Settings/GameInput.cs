@@ -58,6 +58,7 @@ namespace Moba
         public readonly InputAction CameraCenter;
         public readonly InputAction PanUp, PanDown, PanLeft, PanRight;
         public readonly InputAction OpenShop;
+        public readonly InputAction Scoreboard;
         public readonly InputAction Restart;
         public readonly InputAction Menu;
 
@@ -91,6 +92,7 @@ namespace Moba
             PanRight = Add("panRight", "Pan camera right", Category.Camera, "<Keyboard>/rightArrow");
 
             OpenShop = Add("openShop", "Open / close shop", Category.Interface, "<Keyboard>/b");
+            Scoreboard = Add("scoreboard", "Show scoreboard (hold)", Category.Interface, "<Keyboard>/tab");
 
             Restart = Add("restart", "Restart match (end screen)", Category.Match, "<Keyboard>/r", checkConflicts: false);
 
