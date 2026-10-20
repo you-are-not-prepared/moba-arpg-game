@@ -11,7 +11,7 @@ namespace Moba.UI
     // after another (never a hero their own team already has); in PvP the other slots stay open, since online play
     // doesn't exist yet. Locking in loads the map with the lineup (see MatchSettings / MatchBootstrap).
     [RequireComponent(typeof(UIDocument))]
-    public class FrontendController : MonoBehaviour
+    public partial class FrontendController : MonoBehaviour
     {
         const float FirstBotPickDelay = 0.6f;
         const float MinBotPickGap = 0.5f;
@@ -81,6 +81,7 @@ namespace Moba.UI
             root.Q("mapPreview").Add(_preview);
             BuildHeroTiles();
             SetUpLogin(root);
+            SetUpHistory(root);
 
             if (MatchSettings.OpenChampionSelect)
             {
@@ -239,6 +240,8 @@ namespace Moba.UI
             bool loggedIn = AccountService.IsLoggedIn;
             _accountLabel.text = loggedIn ? $"Logged in as <b>{AccountService.Profile.username}</b>" : "Playing offline";
             _accountButton.text = loggedIn ? "Log out" : "Log in";
+            // Match history lives on the account.
+            _historyButton?.EnableInClassList("hidden", !loggedIn);
         }
 
         void SetBusy(bool busy, string status)
@@ -262,6 +265,7 @@ namespace Moba.UI
             _loginScreen.EnableInClassList("hidden", screen != _loginScreen);
             _startScreen.EnableInClassList("hidden", screen != _startScreen);
             _selectScreen.EnableInClassList("hidden", screen != _selectScreen);
+            _historyScreen.EnableInClassList("hidden", screen != _historyScreen);
         }
 
         void Update()

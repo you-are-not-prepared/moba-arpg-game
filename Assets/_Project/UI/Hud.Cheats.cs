@@ -25,19 +25,35 @@ namespace Moba.UI
                 _cheatPanel.EnableInClassList("cheats--collapsed", collapse);
                 _cheatHeader.text = collapse ? "Cheats [+]" : "Cheats [-]";
             };
-            _cheatLevel.clicked += () => _progression?.GainLevel();
-            gold.clicked += () => _progression?.AddGold(CheatGold);
+            _cheatLevel.clicked += () =>
+            {
+                MarkCheated();
+                _progression?.GainLevel();
+            };
+            gold.clicked += () =>
+            {
+                MarkCheated();
+                _progression?.AddGold(CheatGold);
+            };
             _cheatMana.clicked += () =>
             {
+                MarkCheated();
                 if (_abilities != null) _abilities.NoManaCost = !_abilities.NoManaCost;
             };
             _cheatCooldowns.clicked += () =>
             {
+                MarkCheated();
                 if (_abilities != null) _abilities.NoCooldowns = !_abilities.NoCooldowns;
             };
 
             // Keyboard focus would let Space/Enter re-click the last button while playing.
             _cheatPanel.Query<Button>().ForEach(b => b.focusable = false);
+        }
+
+        // A match where any cheat was used is recorded as such and left out of the player's stats.
+        void MarkCheated()
+        {
+            if (_game != null) _game.CheatsUsed = true;
         }
 
         void UpdateCheats()

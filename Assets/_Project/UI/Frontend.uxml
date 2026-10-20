@@ -39,6 +39,7 @@
 
             <ui:VisualElement name="startMenu" class="start__menu">
                 <ui:Button name="findMatchButton" class="fe-button fe-button--primary start__button" text="Find a match" />
+                <ui:Button name="historyButton" class="fe-button start__button" text="Match history" />
                 <ui:Button name="quitButton" class="fe-button start__button" text="Quit" />
             </ui:VisualElement>
 
@@ -56,6 +57,18 @@
                 </ui:VisualElement>
                 <ui:Button name="modeBackButton" class="fe-button start__button" text="Back" />
             </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="historyScreen" class="screen history hidden">
+            <ui:VisualElement class="history__header">
+                <ui:VisualElement class="history__heading">
+                    <ui:Label class="select__title" text="Match history" />
+                    <ui:Label name="historySummary" class="history__summary" />
+                </ui:VisualElement>
+                <ui:Button name="historyBack" class="fe-button" text="Back" />
+            </ui:VisualElement>
+            <ui:Label name="historyStatus" class="history__status hidden" />
+            <ui:ScrollView name="historyList" class="history__list" />
         </ui:VisualElement>
 
         <ui:VisualElement name="selectScreen" class="screen select hidden">

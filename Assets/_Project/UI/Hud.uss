@@ -981,3 +981,260 @@
 .portrait:hover {
     border-color: rgb(255, 235, 150);
 }
+
+/* ---------- Scoreboard (hold Tab) ---------- */
+
+.scoreboard {
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    width: 980px;
+    translate: -50% 0;
+    padding: 14px 18px 16px 18px;
+    transform-origin: center top;
+}
+
+.scoreboard__header {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.scoreboard__kills {
+    width: 80px;
+    padding: 0;
+    margin: 0;
+    font-size: 30px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.scoreboard__kills--ally {
+    color: var(--ally);
+}
+
+.scoreboard__kills--enemy {
+    color: var(--enemy);
+}
+
+.scoreboard__time {
+    width: 110px;
+    padding: 0;
+    margin: 0;
+    font-size: 18px;
+    -unity-text-align: middle-center;
+    color: var(--text-dim);
+}
+
+.scoreboard__team {
+    padding: 0;
+    margin: 10px 0 4px 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+}
+
+.scoreboard__team--ally {
+    color: var(--ally);
+}
+
+.scoreboard__team--enemy {
+    color: var(--enemy);
+}
+
+.score-row {
+    flex-direction: row;
+    align-items: center;
+    height: 58px;
+    padding: 0 8px;
+    margin-bottom: 4px;
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: rgb(40, 45, 56);
+    background-color: rgba(24, 28, 38, 0.9);
+}
+
+.score-row--labels {
+    height: 22px;
+    margin: 0;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.score-row--self {
+    border-color: var(--gold);
+}
+
+.score-row--dead {
+    opacity: 0.6;
+}
+
+.score-col {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: var(--text-dim);
+    -unity-text-align: middle-center;
+}
+
+.score-col--hero {
+    width: 230px;
+    -unity-text-align: middle-left;
+}
+
+.score-col--level {
+    width: 50px;
+}
+
+.score-col--kda {
+    width: 110px;
+}
+
+.score-col--cs {
+    width: 60px;
+}
+
+.score-col--spells {
+    width: 180px;
+}
+
+.score-col--items {
+    flex-grow: 1;
+}
+
+.score-cell {
+    padding: 0;
+    margin: 0;
+    font-size: 17px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--text);
+}
+
+.score-hero {
+    width: 230px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.score-portrait {
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
+    border-radius: 21px;
+    border-width: 2px;
+    border-color: rgb(20, 22, 28);
+    align-items: center;
+    justify-content: center;
+}
+
+.score-portrait__glyph {
+    padding: 0;
+    margin: 0;
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.score-portrait__respawn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    border-radius: 21px;
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: rgb(240, 110, 100);
+}
+
+.score-hero__name {
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: var(--text);
+}
+
+.score-hero__player {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.score-spells {
+    width: 180px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.score-spell {
+    width: 40px;
+    margin: 0 2px;
+    align-items: center;
+}
+
+.score-tile {
+    align-items: center;
+    justify-content: center;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: rgb(55, 60, 72);
+    background-color: rgb(18, 21, 28);
+}
+
+.score-tile--spell {
+    width: 36px;
+    height: 36px;
+}
+
+.score-tile--item {
+    width: 32px;
+    height: 32px;
+    margin-right: 4px;
+}
+
+.score-tile__glyph {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.score-sockets {
+    flex-direction: row;
+    height: 7px;
+    margin-top: 2px;
+}
+
+.score-socket {
+    width: 6px;
+    height: 6px;
+    margin: 0 1px;
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: rgb(110, 115, 125);
+}
+
+.score-socket--filled {
+    border-color: var(--gold);
+    background-color: var(--gold);
+}
+
+.score-items {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+}

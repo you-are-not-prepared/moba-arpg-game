@@ -59,6 +59,9 @@ namespace Moba
                     hero.gameObject.AddComponent<BotBrain>().Init(LaneFor(slot.team, botIndex[slot.team]++));
                 }
             }
+
+            // Records the match on the player's account (when logged in).
+            game.gameObject.AddComponent<Online.MatchReporter>();
         }
 
         HeroController Spawn(HeroDefinition definition, Team team, int index, int perTeam, bool isBot)

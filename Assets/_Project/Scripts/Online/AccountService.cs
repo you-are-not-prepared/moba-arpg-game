@@ -25,6 +25,8 @@ namespace Moba.Online
         public static event Action Changed;
 
         static string Token => PlayerPrefs.GetString(TokenPrefsKey, "");
+        // For other backend calls made on the player's behalf (null when logged out).
+        public static string SessionToken => IsLoggedIn ? Token : null;
 
         public static async Task<string> Register(string email, string username, string password)
         {

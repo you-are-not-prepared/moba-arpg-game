@@ -621,3 +621,176 @@
     -unity-text-align: middle-center;
     color: var(--text-dim);
 }
+
+/* ---------- Match history ---------- */
+
+.history {
+    padding: 40px 56px;
+}
+
+.history__header {
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.history__summary {
+    padding: 0;
+    margin: 8px 0 0 0;
+    font-size: 17px;
+    white-space: normal;
+    color: var(--text);
+}
+
+.history__status {
+    padding: 0;
+    margin: 40px 0 0 0;
+    font-size: 17px;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    color: var(--text-dim);
+}
+
+.history__list {
+    flex-grow: 1;
+}
+
+.history-row {
+    flex-direction: row;
+    align-items: center;
+    height: 76px;
+    padding: 0 18px;
+    margin-bottom: 8px;
+    border-width: 2px;
+    border-left-width: 8px;
+    border-radius: 8px;
+    border-color: var(--border);
+    background-color: var(--panel);
+}
+
+.history-row--win {
+    border-left-color: rgb(80, 190, 110);
+}
+
+.history-row--loss {
+    border-left-color: rgb(210, 80, 70);
+}
+
+.history-row__result {
+    width: 150px;
+}
+
+.history-row__outcome {
+    padding: 0;
+    margin: 0;
+    font-size: 19px;
+    -unity-font-style: bold;
+}
+
+.history-row--win .history-row__outcome {
+    color: rgb(110, 215, 135);
+}
+
+.history-row--loss .history-row__outcome {
+    color: rgb(235, 110, 100);
+}
+
+.history-row__small {
+    padding: 0;
+    margin: 2px 0 0 0;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.history-row__hero {
+    width: 220px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.history-glyph {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
+    padding: 0;
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    border-radius: 24px;
+    border-width: 2px;
+    border-color: rgb(20, 22, 28);
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.history-row__name {
+    padding: 0;
+    margin: 0;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: var(--text);
+}
+
+.history-row__stat {
+    width: 140px;
+}
+
+.history-row__big {
+    padding: 0;
+    margin: 0;
+    font-size: 19px;
+    -unity-font-style: bold;
+    color: var(--text);
+}
+
+.history-row__teams {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-mini {
+    width: 30px;
+    height: 30px;
+    margin: 0 2px;
+    padding: 0;
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: rgb(20, 22, 28);
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.history-mini--you {
+    border-color: var(--gold);
+}
+
+.history-row__vs {
+    padding: 0;
+    margin: 0 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.history-row__when {
+    width: 140px;
+    align-items: flex-end;
+}
+
+.history-tag {
+    padding: 1px 6px;
+    margin: 4px 0 0 0;
+    font-size: 11px;
+    -unity-font-style: bold;
+    border-radius: 4px;
+    background-color: rgb(90, 60, 20);
+    color: var(--gold);
+}

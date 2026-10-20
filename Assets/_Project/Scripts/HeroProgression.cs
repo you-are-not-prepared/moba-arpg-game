@@ -33,6 +33,9 @@ namespace Moba
         public int CreepScore { get; private set; }
         public int Kills { get; private set; }
         public int Deaths { get; private set; }
+        // Enemy heroes this hero damaged in the AssistWindow before someone else killed them.
+        public int Assists { get; private set; }
+        public const float AssistWindow = 10f;
         public bool IsMaxLevel => Level >= maxLevel;
         public float XpToNextLevel => xpToLevelBase + xpToLevelPerLevel * (Level - 1);
 
@@ -66,6 +69,12 @@ namespace Moba
             if (victim == _unit)
             {
                 Deaths++;
+                return;
+            }
+            if (killer != _unit && victim.kind == UnitKind.Hero && victim.IsEnemyOf(_unit)
+                && victim.WasDamagedBy(_unit, AssistWindow))
+            {
+                Assists++;
                 return;
             }
             if (killer == null || killer != _unit) return;

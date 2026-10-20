@@ -74,6 +74,26 @@
             <ui:Label name="shopHint" class="shop__hint" />
         </ui:VisualElement>
 
+        <ui:VisualElement name="scoreboard" class="panel scoreboard hidden" picking-mode="Ignore">
+            <ui:VisualElement class="scoreboard__header" picking-mode="Ignore">
+                <ui:Label name="scoreAllyKills" class="scoreboard__kills scoreboard__kills--ally" text="0" picking-mode="Ignore" />
+                <ui:Label name="scoreTime" class="scoreboard__time" text="00:00" picking-mode="Ignore" />
+                <ui:Label name="scoreEnemyKills" class="scoreboard__kills scoreboard__kills--enemy" text="0" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="score-row score-row--labels" picking-mode="Ignore">
+                <ui:Label class="score-col score-col--hero" text="HERO" picking-mode="Ignore" />
+                <ui:Label class="score-col score-col--level" text="LVL" picking-mode="Ignore" />
+                <ui:Label class="score-col score-col--kda" text="K / D / A" picking-mode="Ignore" />
+                <ui:Label class="score-col score-col--cs" text="CS" picking-mode="Ignore" />
+                <ui:Label class="score-col score-col--spells" text="SPELLS" picking-mode="Ignore" />
+                <ui:Label class="score-col score-col--items" text="ITEMS" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label class="scoreboard__team scoreboard__team--ally" text="YOUR TEAM" picking-mode="Ignore" />
+            <ui:VisualElement name="scoreAllyRows" picking-mode="Ignore" />
+            <ui:Label class="scoreboard__team scoreboard__team--enemy" text="ENEMY TEAM" picking-mode="Ignore" />
+            <ui:VisualElement name="scoreEnemyRows" picking-mode="Ignore" />
+        </ui:VisualElement>
+
         <ui:VisualElement name="tooltip" class="panel tooltip hidden" picking-mode="Ignore">
             <ui:Label name="tooltipTitle" class="tooltip__title" picking-mode="Ignore" />
             <ui:Label name="tooltipStats" class="tooltip__stats" picking-mode="Ignore" />
