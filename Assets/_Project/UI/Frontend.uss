@@ -1074,3 +1074,27 @@
     white-space: normal;
     color: var(--text);
 }
+
+/* ---------- Post-match analysis ---------- */
+
+.post-match__title {
+    padding: 0;
+    margin: 0;
+    font-size: 52px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: var(--gold);
+}
+
+.post-match__title--win {
+    color: rgb(110, 215, 135);
+}
+
+.post-match__title--loss {
+    color: rgb(235, 110, 100);
+}
+
+.match-details--standalone {
+    border-width: 2px;
+    border-radius: 8px;
+}

@@ -71,6 +71,17 @@
             <ui:ScrollView name="historyList" class="history__list" />
         </ui:VisualElement>
 
+        <ui:VisualElement name="postMatchScreen" class="screen history hidden">
+            <ui:VisualElement class="history__header">
+                <ui:VisualElement class="history__heading">
+                    <ui:Label name="postMatchTitle" class="post-match__title" text="VICTORY" />
+                    <ui:Label name="postMatchInfo" class="history__summary" />
+                </ui:VisualElement>
+                <ui:Button name="postMatchBack" class="fe-button fe-button--primary" text="Back to menu" />
+            </ui:VisualElement>
+            <ui:ScrollView name="postMatchDetails" class="history__list" />
+        </ui:VisualElement>
+
         <ui:VisualElement name="selectScreen" class="screen select hidden">
             <ui:VisualElement class="select__header">
                 <ui:VisualElement class="select__heading">

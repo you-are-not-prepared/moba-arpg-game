@@ -7,8 +7,9 @@ using UnityEngine.AI;
 
 namespace Moba
 {
-    // Ascension for one hero: tracks which choices are due (one per threshold level reached), offers the two
-    // talents of the next tier, and applies the picked talent's stats. Added by HeroDefinition.ApplyTo.
+    // Ascension for one hero: tracks which choices are due (one per threshold level reached), offers the
+    // talents of the next tier (one per path at level 6, then two), and applies the picked talent's stats.
+    // Added by HeroDefinition.ApplyTo.
     [RequireComponent(typeof(HeroController))]
     public class HeroAscension : MonoBehaviour
     {
@@ -23,7 +24,7 @@ namespace Moba
         public event Action Changed;
 
         public IReadOnlyList<Talent> Picked => _picked;
-        // 0 = path A, 1 = path B, -1 before the first pick.
+        // 0 = path A, 1 = path B, 2 = path C..., -1 before the first pick.
         public int PathIndex => _path;
         public string PathName => _path >= 0 ? _tree.Path(_path).root.name : null;
 
@@ -60,23 +61,27 @@ namespace Moba
             if (HasPendingChoice) Changed?.Invoke();
         }
 
-        // The two talents of the pending choice: option 0 and option 1.
-        public (Talent first, Talent second) Options(int tier)
+        // The talents offered at `tier`: every path's first talent at tier 0, then the chosen path's two options.
+        public IReadOnlyList<Talent> Options(int tier)
         {
-            return tier switch
+            if (tier == 0)
             {
-                0 => (_tree.pathA.root, _tree.pathB.root),
-                1 => (_tree.Path(_path).second[0], _tree.Path(_path).second[1]),
-                _ => (_tree.Path(_path).third[0], _tree.Path(_path).third[1]),
-            };
+                var roots = new List<Talent>(_tree.PathCount);
+                foreach (AscensionPath path in _tree.paths) roots.Add(path.root);
+                return roots;
+            }
+            AscensionPath chosen = _tree.Path(_path);
+            return tier == 1 ? chosen.second : chosen.third;
         }
 
+        // Option index into Options(PendingTier). At tier 0 the option is also the path index.
         public void Choose(int option)
         {
             int tier = PendingTier;
-            if (tier < 0 || option is < 0 or > 1) return;
-            (Talent a, Talent b) = Options(tier);
-            Talent talent = option == 0 ? a : b;
+            if (tier < 0) return;
+            IReadOnlyList<Talent> options = Options(tier);
+            if (option < 0 || option >= options.Count) return;
+            Talent talent = options[option];
             if (tier == 0) _path = option;
             _picked.Add(talent);
             Apply(talent);

@@ -5,16 +5,16 @@ using UnityEngine;
 
 namespace Moba.Online
 {
-    // Records the match on the player's account: registers it with the server when it starts and sends the
-    // final numbers when a core falls. Does nothing while playing offline. Matches that are left early stay
-    // unfinished on the server and don't count.
+    // When a core falls, takes a snapshot of every player (level, K/D/A, CS, damage, build) for the post-match
+    // analysis screen. While logged in it also records the match on the account: registered with the server when
+    // the match starts, the snapshot sent when it ends. Matches that are left early stay unfinished there.
     [RequireComponent(typeof(GameManager))]
     public class MatchReporter : MonoBehaviour
     {
         GameManager _game;
         string _matchId;
         bool _startPending;
-        Team? _pendingWinner;
+        MatchDetailResponse _pendingReport;
 
         async void Start()
         {
@@ -22,19 +22,15 @@ namespace Moba.Online
             _game.MatchEnded += OnMatchEnded;
             if (!AccountService.IsLoggedIn || _game.heroes.Count == 0) return;
 
-            var request = new StartMatchRequest
-            {
-                mode = MatchSettings.Mode.ToString(),
-                mapLayout = TryGetComponent(out MapLayout layout) && layout.info != null ? layout.info.id : "unknown",
-            };
+            var request = new StartMatchRequest { mode = MatchSettings.Mode.ToString(), mapLayout = MapLayoutId() };
             // Slots follow game.heroes (the lineup order MatchBootstrap spawned them in).
             foreach (HeroController hero in _game.heroes)
             {
                 request.players.Add(new StartMatchPlayer
                 {
                     team = hero.Unit.team.ToString(),
-                    heroId = hero.definition != null ? hero.definition.id : "unknown",
-                    isBot = hero.GetComponent<BotBrain>() != null,
+                    heroId = HeroId(hero),
+                    isBot = IsBot(hero),
                     isLocal = hero == _game.hero,
                 });
             }
@@ -43,7 +39,7 @@ namespace Moba.Online
             _matchId = await MatchService.Start(request);
             _startPending = false;
             // A match can only end before the server replied if the reply was very slow.
-            if (this != null && _pendingWinner.HasValue) Report(_pendingWinner.Value);
+            if (this != null && _pendingReport != null) Report(_pendingReport);
         }
 
         void OnDestroy()
@@ -53,33 +49,75 @@ namespace Moba.Online
 
         void OnMatchEnded(Team winner)
         {
-            if (_startPending) _pendingWinner = winner;
-            else Report(winner);
+            MatchDetailResponse snapshot = Snapshot(winner);
+            PostMatch.Last = snapshot;
+            if (_startPending) _pendingReport = snapshot;
+            else Report(snapshot);
         }
 
-        async void Report(Team winner)
+        MatchDetailResponse Snapshot(Team winner)
         {
-            if (string.IsNullOrEmpty(_matchId)) return;
-            string matchId = _matchId;
-            _matchId = null; // once
-
-            var result = new MatchResultRequest { winnerTeam = winner.ToString(), cheatsUsed = _game.CheatsUsed };
+            var detail = new MatchDetailResponse
+            {
+                winnerTeam = winner.ToString(),
+                mode = MatchSettings.Mode.ToString(),
+                mapLayout = MapLayoutId(),
+                durationSeconds = Mathf.RoundToInt(_game.MatchTime),
+                cheatsUsed = _game.CheatsUsed,
+            };
             for (int slot = 0; slot < _game.heroes.Count; slot++)
             {
                 HeroController hero = _game.heroes[slot];
                 var progression = hero.GetComponent<HeroProgression>();
-                result.players.Add(new PlayerResult
+                bool isLocal = hero == _game.hero;
+                if (isLocal)
+                {
+                    detail.slot = slot;
+                    detail.won = hero.Unit.team == winner;
+                }
+                detail.players.Add(new MatchDetailPlayer
                 {
                     slot = slot,
+                    team = hero.Unit.team.ToString(),
+                    heroId = HeroId(hero),
+                    isBot = IsBot(hero),
+                    username = isLocal && AccountService.IsLoggedIn ? AccountService.Profile.username : null,
                     level = progression.Level,
                     kills = progression.Kills,
                     deaths = progression.Deaths,
                     assists = progression.Assists,
                     creepScore = progression.CreepScore,
+                    hasDetails = true,
                     heroDamage = Mathf.RoundToInt(progression.HeroDamage),
                     totalDamage = Mathf.RoundToInt(progression.TotalDamage),
                     damageTaken = Mathf.RoundToInt(progression.DamageTaken),
                     build = BuildOf(hero),
+                });
+            }
+            return detail;
+        }
+
+        async void Report(MatchDetailResponse snapshot)
+        {
+            if (string.IsNullOrEmpty(_matchId)) return;
+            string matchId = _matchId;
+            _matchId = null; // once
+
+            var result = new MatchResultRequest { winnerTeam = snapshot.winnerTeam, cheatsUsed = snapshot.cheatsUsed };
+            foreach (MatchDetailPlayer p in snapshot.players)
+            {
+                result.players.Add(new PlayerResult
+                {
+                    slot = p.slot,
+                    level = p.level,
+                    kills = p.kills,
+                    deaths = p.deaths,
+                    assists = p.assists,
+                    creepScore = p.creepScore,
+                    heroDamage = p.heroDamage,
+                    totalDamage = p.totalDamage,
+                    damageTaken = p.damageTaken,
+                    build = p.build,
                 });
             }
 
@@ -87,7 +125,13 @@ namespace Moba.Online
             if (error != null) Debug.LogWarning($"[Matches] Result not recorded: {error}");
         }
 
-        // Inventory (8 slots) and Q/W/E/R with their mods, by asset name.
+        string MapLayoutId() => TryGetComponent(out MapLayout layout) && layout.info != null ? layout.info.id : "unknown";
+
+        static string HeroId(HeroController hero) => hero.definition != null ? hero.definition.id : "unknown";
+
+        static bool IsBot(HeroController hero) => hero.GetComponent<BotBrain>() != null;
+
+        // Inventory (8 slots) and Q/W/E/R with their rank and mods, by asset name.
         static PlayerBuild BuildOf(HeroController hero)
         {
             var build = new PlayerBuild();

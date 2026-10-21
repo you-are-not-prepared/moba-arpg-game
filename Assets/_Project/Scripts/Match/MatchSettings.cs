@@ -32,8 +32,6 @@ namespace Moba
         public static string LayoutId;
         // Everyone in the match, the local player included. Empty when a map scene is played directly.
         public static readonly List<LobbySlot> Lineup = new();
-        // The frontend opens straight into champion select (e.g. "Play again" after a match).
-        public static bool OpenChampionSelect;
 
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
@@ -42,7 +40,6 @@ namespace Moba
             SelectedHeroId = null;
             LayoutId = null;
             Lineup.Clear();
-            OpenChampionSelect = false;
         }
     }
 }

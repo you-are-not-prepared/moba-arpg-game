@@ -29,8 +29,8 @@ MonoBehaviour:
   isolationDamageBonus: 0
   isolationRadius: 7
   ascension:
-    pathA:
-      root:
+    paths:
+    - root:
         id: brann_a
         name: Master Smith
         flavor: Better hands, better steel.
@@ -118,8 +118,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-    pathB:
-      root:
+    - root:
         id: brann_b
         name: Runesmith
         flavor: Every socket hums with power.
@@ -202,6 +201,94 @@ MonoBehaviour:
         ultimateCooldownReduction: 0
         spellDamage: 0
         extraProjectiles: 1
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+    - root:
+        id: brann_c
+        name: Bastion
+        flavor: Build it to last.
+        maxHealth: 150
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0.05
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      second:
+      - id: brann_c1
+        name: Riveted Armor
+        flavor: One more plate. Then another.
+        maxHealth: 200
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: brann_c2
+        name: Socket Ward
+        flavor: Runes that hit back.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0.1
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      third:
+      - id: brann_c3
+        name: Living Fortress
+        flavor: Grows sturdier with every fight.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 30
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: brann_c4
+        name: Rune Hammer
+        flavor: Steel and sorcery in one swing.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 15
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0.1
+        extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0

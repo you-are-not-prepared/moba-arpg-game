@@ -5,18 +5,26 @@ using UnityEngine;
 
 namespace Moba
 {
-    // A hero's ascension tree: at levels 6, 11 and 18 the player picks one of two talents. The first pick
-    // (path A or B) decides the later choices: A -> A1/A2 -> A3/A4, B -> B1/B2 -> B3/B4.
+    // A hero's ascension tree. At level 6 the player picks a path (one card per path: A, B, C...); that pick
+    // decides the later choices, two talents each at levels 11 and 18: A -> A1/A2 -> A3/A4, C -> C1/C2 -> C3/C4.
     [Serializable]
     public class AscensionTree
     {
-        public AscensionPath pathA = new();
-        public AscensionPath pathB = new();
+        public const int MinPaths = 2;
+        // Letters A-D; four cards is also what fits on screen.
+        public const int MaxPaths = 4;
+
+        [Tooltip("2-4 paths. Level 6 offers one card per path; the chosen path decides the cards at 11 and 18.")]
+        public List<AscensionPath> paths = new();
+
+        public int PathCount => paths?.Count ?? 0;
 
         public bool IsComplete =>
-            pathA.IsComplete && pathB.IsComplete;
+            PathCount is >= MinPaths and <= MaxPaths && paths.TrueForAll(p => p != null && p.IsComplete);
 
-        public AscensionPath Path(int index) => index == 0 ? pathA : pathB;
+        public AscensionPath Path(int index) => paths[index];
+
+        public static string Letter(int index) => ((char)('A' + index)).ToString();
     }
 
     [Serializable]

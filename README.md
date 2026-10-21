@@ -43,7 +43,7 @@ You can also open a map scene (`Map_Classic`, `Map_Zones`, `Map_Delve`) and pres
 - **Win** by destroying the enemy core.
   - Each lane has two towers per team; a lane's inner tower is protected while its outer tower stands.
   - The core is protected while any lane's inner tower stands.
-- **End screen:** **Play again** returns to champion select with the same mode and a new map.
+- **End screen:** **Continue** (or R) opens the **match analysis**: both teams with K/D/A, CS, damage, spells, mods and items, the same view as match history, offline too. **Back to menu** returns to the start screen.
 
 ### Maps
 | Layout | Lanes | Notes |
@@ -64,9 +64,9 @@ Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with 
 | **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
 
 ### Ascension (levels 6, 11, 18)
-At levels 6, 11 and 18 two talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
-- **Level 6** picks a path: **A**, built on the hero's passive, or **B**, built on the ultimate.
-- **Level 11** offers two talents from that path (A1/A2 or B1/B2), and **level 18** two more (A3/A4 or B3/B4).
+At levels 6, 11 and 18 talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
+- **Level 6** picks a path, one card per path: **A** builds on the hero's passive, **B** on the ultimate, and **C** is a hybrid playstyle that draws on both. The system supports 2–4 paths per hero.
+- **Level 11** offers two talents from that path (e.g. A1/A2 or C1/C2), and **level 18** two more (A3/A4 or C3/C4).
 
 Talents give stats (health, damage, attack and move speed, cooldowns, spell damage, projectiles, item stats). Some boost the hero's own kit, such as a longer Aegis Wall or Bloodrush, a longer Skybreaker stun, or more damage to isolated targets.
 
@@ -115,7 +115,7 @@ Every control except Esc can be rebound in **Options → Controls**, which also 
 | Zoom | Mouse wheel |
 | Open / close shop | B |
 | Scoreboard (hold) | Tab |
-| Restart (end screen) | R |
+| Continue (end screen) | R |
 | Options / cancel | Esc |
 
 **Quick cast**, for spells and for attack move, fires immediately at the cursor with no targeting step. Turn it on in Options.
