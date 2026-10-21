@@ -64,9 +64,9 @@ Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with 
 | **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
 
 ### Ascension (levels 6, 11, 18)
-At levels 6, 11 and 18 two talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
-- **Level 6** picks a path: **A**, built on the hero's passive, or **B**, built on the ultimate.
-- **Level 11** offers two talents from that path (A1/A2 or B1/B2), and **level 18** two more (A3/A4 or B3/B4).
+At levels 6, 11 and 18 talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
+- **Level 6** picks a path, one card per path: **A** builds on the hero's passive, **B** on the ultimate, and **C** is a hybrid playstyle that draws on both. The system supports 2–4 paths per hero.
+- **Level 11** offers two talents from that path (e.g. A1/A2 or C1/C2), and **level 18** two more (A3/A4 or C3/C4).
 
 Talents give stats (health, damage, attack and move speed, cooldowns, spell damage, projectiles, item stats). Some boost the hero's own kit, such as a longer Aegis Wall or Bloodrush, a longer Skybreaker stun, or more damage to isolated targets.
 

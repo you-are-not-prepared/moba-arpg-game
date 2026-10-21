@@ -29,8 +29,8 @@ MonoBehaviour:
   isolationDamageBonus: 0
   isolationRadius: 7
   ascension:
-    pathA:
-      root:
+    paths:
+    - root:
         id: torvald_a
         name: Juggernaut
         flavor: Grow harder to stop with every fight.
@@ -118,8 +118,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-    pathB:
-      root:
+    - root:
         id: torvald_b
         name: Aegis Warden
         flavor: Hold the wall a little longer.
@@ -200,6 +199,94 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+    - root:
+        id: torvald_c
+        name: Warlord
+        flavor: Lead the charge behind the shield.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 12
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 1
+        stunDuration: 0
+      second:
+      - id: torvald_c1
+        name: Battle Cry
+        flavor: Swing faster, push harder.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.15
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: torvald_c2
+        name: Forced March
+        flavor: Never fall behind the front line.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      third:
+      - id: torvald_c3
+        name: Shield Charge
+        flavor: The wall moves forward.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 1
+        stunDuration: 0
+      - id: torvald_c4
+        name: Warlord's Might
+        flavor: One blow ends the fight.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 25
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0

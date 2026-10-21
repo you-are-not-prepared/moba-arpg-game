@@ -31,8 +31,8 @@ MonoBehaviour:
   isolationDamageBonus: 0.15
   isolationRadius: 7
   ascension:
-    pathA:
-      root:
+    paths:
+    - root:
         id: nyx_a
         name: Lone Hunter
         flavor: Separate them, then strike.
@@ -120,8 +120,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-    pathB:
-      root:
+    - root:
         id: nyx_b
         name: Blood Frenzy
         flavor: The rush lasts longer.
@@ -207,6 +206,94 @@ MonoBehaviour:
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+    - root:
+        id: nyx_c
+        name: Shadowstep
+        flavor: In, out, gone.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0.05
+        ultimateDuration: 0
+        stunDuration: 0
+      second:
+      - id: nyx_c1
+        name: Ambush
+        flavor: The first strike is the deepest.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 15
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: nyx_c2
+        name: Night Run
+        flavor: The rush carries you further.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 1.5
+        stunDuration: 0
+      third:
+      - id: nyx_c3
+        name: Phantom
+        flavor: Too fast to pin down.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.1
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: nyx_c4
+        name: Execution
+        flavor: Alone, and out of time.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 10
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0.1
         ultimateDuration: 0
         stunDuration: 0
   ultimate: {fileID: 11400000, guid: 6868062af2eb1b3489a088ddbd33aff8, type: 2}

@@ -29,8 +29,8 @@ MonoBehaviour:
   isolationDamageBonus: 0
   isolationRadius: 7
   ascension:
-    pathA:
-      root:
+    paths:
+    - root:
         id: vesh_a
         name: Time Weaver
         flavor: Seconds bend around your spells.
@@ -118,8 +118,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-    pathB:
-      root:
+    - root:
         id: vesh_b
         name: Chronoshift
         flavor: Rewind comes around sooner.
@@ -200,6 +199,94 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0.3
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+    - root:
+        id: vesh_c
+        name: Paradox
+        flavor: Cast it all, rewind, cast it all again.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        spellDamage: 0.1
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      second:
+      - id: vesh_c1
+        name: Temporal Spike
+        flavor: A moment, sharpened to a point.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0.15
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: vesh_c2
+        name: Mana Loop
+        flavor: Spend it twice.
+        maxHealth: 0
+        maxMana: 100
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      third:
+      - id: vesh_c3
+        name: Collapse
+        flavor: Every second lands at once.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0.2
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: vesh_c4
+        name: Infinite Loop
+        flavor: There is no last cast.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0.1
+        ultimateCooldownReduction: 0.2
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0

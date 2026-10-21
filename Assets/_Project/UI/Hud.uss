@@ -1250,6 +1250,8 @@
     transform-origin: center top;
     --path-a: rgb(80, 200, 210);
     --path-b: rgb(185, 120, 255);
+    --path-c: rgb(245, 150, 70);
+    --path-d: rgb(120, 210, 120);
 }
 
 .ascension__title {
@@ -1392,4 +1394,22 @@
 
 .ascension-card:hover .ascension-card__hint {
     color: var(--gold);
+}
+
+.ascension-card--c .ascension-card__badge {
+    background-color: var(--path-c);
+}
+
+.ascension-card--c .ascension-card__glyph {
+    border-color: var(--path-c);
+    color: var(--path-c);
+}
+
+.ascension-card--d .ascension-card__badge {
+    background-color: var(--path-d);
+}
+
+.ascension-card--d .ascension-card__glyph {
+    border-color: var(--path-d);
+    color: var(--path-d);
 }

@@ -78,7 +78,8 @@ namespace Moba.Bots
 
             SpendSkillPoints();
             // Ascension: bots pick at random.
-            if (_ascension != null && _ascension.HasPendingChoice) _ascension.Choose(Random.Range(0, 2));
+            if (_ascension != null && _ascension.HasPendingChoice)
+                _ascension.Choose(Random.Range(0, _ascension.Options(_ascension.PendingTier).Count));
             if (_shop != null && _shop.CanUse(_unit)) BuyThings();
             if (!_unit.IsAlive)
             {

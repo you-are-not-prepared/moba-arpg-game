@@ -29,8 +29,8 @@ MonoBehaviour:
   isolationDamageBonus: 0
   isolationRadius: 7
   ascension:
-    pathA:
-      root:
+    paths:
+    - root:
         id: kael_a
         name: Storm of Arrows
         flavor: Every shot becomes a volley.
@@ -118,8 +118,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-    pathB:
-      root:
+    - root:
         id: kael_b
         name: Skybreaker
         flavor: The great bow is always strung.
@@ -207,4 +206,92 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+    - root:
+        id: kael_c
+        name: Windrunner
+        flavor: Never where they aim.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.1
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      second:
+      - id: kael_c1
+        name: Hit and Run
+        flavor: Shoot, step, shoot.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: kael_c2
+        name: Steady Aim
+        flavor: Every arrow counts.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 12
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      third:
+      - id: kael_c3
+        name: Gale Volley
+        flavor: The wind carries extra arrows.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        spellDamage: 0
+        extraProjectiles: 1
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+      - id: kael_c4
+        name: Sky Piercer
+        flavor: Strike from the edge of sight.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0.1
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0.5
   ultimate: {fileID: 11400000, guid: 7bd2db61be6dec244ba12523ec7649a7, type: 2}

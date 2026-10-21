@@ -4,8 +4,8 @@ using UnityEngine.UIElements;
 
 namespace Moba.UI
 {
-    // Ascension choice: at levels 6, 11 and 18 two talent cards appear in the middle of the screen and stay
-    // until one is clicked (the game keeps running). The first pick (A or B) decides the later cards.
+    // Ascension choice: at levels 6, 11 and 18 talent cards appear in the middle of the screen (one per path at
+    // level 6, then two) and stay until one is clicked (the game keeps running). The path decides the later cards.
     public partial class Hud
     {
         VisualElement _ascensionPanel, _ascensionCards;
@@ -41,21 +41,20 @@ namespace Moba.UI
                 ? $"Level {HeroAscension.Levels[tier]} · choose your path"
                 : $"Level {HeroAscension.Levels[tier]} · {_ascension.PathName} path");
 
-            (Talent first, Talent second) = _ascension.Options(tier);
-            _ascensionCards.Add(AscensionCard(first, tier, 0));
-            _ascensionCards.Add(AscensionCard(second, tier, 1));
+            IReadOnlyList<Talent> options = _ascension.Options(tier);
+            for (int i = 0; i < options.Count; i++) _ascensionCards.Add(AscensionCard(options[i], tier, i));
         }
 
         VisualElement AscensionCard(Talent talent, int tier, int option)
         {
             // Path letter: the option itself on the first choice, the chosen path afterwards.
             int path = tier == 0 ? option : _ascension.PathIndex;
-            string letter = path == 0 ? "A" : "B";
+            string letter = AscensionTree.Letter(path);
             string code = tier == 0 ? letter : $"{letter}{(tier - 1) * 2 + option + 1}";
 
             var card = new VisualElement();
             card.AddToClassList("ascension-card");
-            card.AddToClassList(path == 0 ? "ascension-card--a" : "ascension-card--b");
+            card.AddToClassList($"ascension-card--{letter.ToLowerInvariant()}");
 
             card.Add(CardText($"PATH {letter}", "ascension-card__badge"));
             card.Add(CardText(code, "ascension-card__glyph"));
