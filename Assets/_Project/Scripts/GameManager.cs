@@ -3,8 +3,8 @@ using UnityEngine.SceneManagement;
 
 namespace Moba
 {
-    // Ends the match when a core dies; the Restart key (or the HUD button) goes back to champion select for a new
-    // match on a freshly rolled map. Owns pausing.
+    // Ends the match when a core dies; the end screen's Continue (button or key) opens the menu on the match's
+    // analysis. Owns pausing and game speed.
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -53,7 +53,7 @@ namespace Moba
 
         void Update()
         {
-            if (IsOver && !_paused && GameInput.Instance.Restart.WasPressedThisFrame()) Restart();
+            if (IsOver && !_paused && GameInput.Instance.Continue.WasPressedThisFrame()) ShowMatchSummary();
         }
 
         public void SetPaused(bool paused)
@@ -62,18 +62,18 @@ namespace Moba
             ApplyTimeScale();
         }
 
-        // "Play again": champion select with a new map roll.
-        public void Restart()
+        // End screen "Continue": the menu, opened on this match's analysis (see Online.PostMatch).
+        public void ShowMatchSummary()
         {
             _paused = false;
-            MatchSettings.OpenChampionSelect = true;
+            Online.PostMatch.ShowOnMenu = Online.PostMatch.Last != null;
             SceneManager.LoadScene(MatchSettings.FrontendScene);
         }
 
         public void LeaveToMenu()
         {
             _paused = false;
-            MatchSettings.OpenChampionSelect = false;
+            Online.PostMatch.ShowOnMenu = false;
             SceneManager.LoadScene(MatchSettings.FrontendScene);
         }
 

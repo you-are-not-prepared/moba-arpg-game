@@ -113,7 +113,7 @@
 
         <ui:VisualElement name="gameOverOverlay" class="game-over hidden">
             <ui:Label name="gameOverTitle" class="game-over__title" text="VICTORY" />
-            <ui:Button name="restartButton" class="game-over__button" text="Play again" />
+            <ui:Button name="continueButton" class="game-over__button" text="Continue" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

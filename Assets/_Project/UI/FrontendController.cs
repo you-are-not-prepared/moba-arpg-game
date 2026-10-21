@@ -85,11 +85,12 @@ namespace Moba.UI
             SetUpLogin(root);
             SetUpHistory(root);
             SetUpItemTooltip(root);
+            SetUpPostMatch(root);
 
-            if (MatchSettings.OpenChampionSelect)
+            if (PostMatch.ShowOnMenu && PostMatch.Last != null)
             {
-                MatchSettings.OpenChampionSelect = false;
-                StartChampionSelect(MatchSettings.Mode);
+                PostMatch.ShowOnMenu = false;
+                ShowPostMatch(PostMatch.Last);
             }
             else if (AccountService.IsLoggedIn || AccountService.PlayingOffline)
             {
@@ -269,6 +270,7 @@ namespace Moba.UI
             _startScreen.EnableInClassList("hidden", screen != _startScreen);
             _selectScreen.EnableInClassList("hidden", screen != _selectScreen);
             _historyScreen.EnableInClassList("hidden", screen != _historyScreen);
+            _postMatchScreen.EnableInClassList("hidden", screen != _postMatchScreen);
             HideItemTooltip(_itemTooltipAnchor);
         }
 

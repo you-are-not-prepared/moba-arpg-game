@@ -105,7 +105,7 @@ namespace Moba.UI
             _tooltipBody = _root.Q<Label>("tooltipBody");
             _gameOver = _root.Q("gameOverOverlay");
             _gameOverTitle = _root.Q<Label>("gameOverTitle");
-            _root.Q<Button>("restartButton").clicked += () => _game?.Restart();
+            _root.Q<Button>("continueButton").clicked += () => _game?.ShowMatchSummary();
             Button menuButton = _root.Q<Button>("menuButton");
             menuButton.focusable = false;
             menuButton.clicked += () => OptionsMenu.Instance?.Open();

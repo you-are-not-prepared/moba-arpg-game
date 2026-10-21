@@ -118,8 +118,12 @@ namespace Moba.Online
     public class MatchDetailResponse
     {
         public string matchId;
+        public string mode;
+        public string mapLayout;
+        public int durationSeconds;
         public string winnerTeam;
         public bool won;
+        public bool cheatsUsed;
         public int slot;
         public List<MatchDetailPlayer> players = new();
     }

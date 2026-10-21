@@ -43,7 +43,7 @@ You can also open a map scene (`Map_Classic`, `Map_Zones`, `Map_Delve`) and pres
 - **Win** by destroying the enemy core.
   - Each lane has two towers per team; a lane's inner tower is protected while its outer tower stands.
   - The core is protected while any lane's inner tower stands.
-- **End screen:** **Play again** returns to champion select with the same mode and a new map.
+- **End screen:** **Continue** (or R) opens the **match analysis**: both teams with K/D/A, CS, damage, spells, mods and items, the same view as match history, offline too. **Back to menu** returns to the start screen.
 
 ### Maps
 | Layout | Lanes | Notes |
@@ -115,7 +115,7 @@ Every control except Esc can be rebound in **Options → Controls**, which also 
 | Zoom | Mouse wheel |
 | Open / close shop | B |
 | Scoreboard (hold) | Tab |
-| Restart (end screen) | R |
+| Continue (end screen) | R |
 | Options / cancel | Esc |
 
 **Quick cast**, for spells and for attack move, fires immediately at the cursor with no targeting step. Turn it on in Options.

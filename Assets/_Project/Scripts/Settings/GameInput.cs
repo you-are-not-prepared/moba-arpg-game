@@ -15,7 +15,7 @@ namespace Moba
             public readonly InputAction Action;
             public readonly string Label;
             public readonly Category Category;
-            // Context-only bindings (e.g. Restart on the end screen) may share a key with gameplay controls.
+            // Context-only bindings (e.g. Continue on the end screen) may share a key with gameplay controls.
             public readonly bool CheckConflicts;
 
             public Entry(InputAction action, string label, Category category, bool checkConflicts)
@@ -59,7 +59,7 @@ namespace Moba
         public readonly InputAction PanUp, PanDown, PanLeft, PanRight;
         public readonly InputAction OpenShop;
         public readonly InputAction Scoreboard;
-        public readonly InputAction Restart;
+        public readonly InputAction Continue;
         public readonly InputAction Menu;
 
         readonly List<Entry> _entries = new();
@@ -94,7 +94,8 @@ namespace Moba
             OpenShop = Add("openShop", "Open / close shop", Category.Interface, "<Keyboard>/b");
             Scoreboard = Add("scoreboard", "Show scoreboard (hold)", Category.Interface, "<Keyboard>/tab");
 
-            Restart = Add("restart", "Restart match (end screen)", Category.Match, "<Keyboard>/r", checkConflicts: false);
+            // Id stays "restart" so bindings saved before the rename still apply.
+            Continue = Add("restart", "Continue (end screen)", Category.Match, "<Keyboard>/r", checkConflicts: false);
 
             // Esc is also the "cancel" key while rebinding, so it isn't rebindable itself.
             Menu = Ui.AddAction("menu", InputActionType.Button, "<Keyboard>/escape");
