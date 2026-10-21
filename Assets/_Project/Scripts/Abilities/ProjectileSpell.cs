@@ -61,7 +61,7 @@ namespace Moba.Abilities
                 ForksRemaining = m.forkCount,
                 ForkAngle = m.forkAngle,
                 Pierce = pierce,
-                StunDuration = stunDuration,
+                StunDuration = stunDuration > 0f ? stunDuration + HeroAscension.StunBonusOf(caster) : 0f,
                 Speed = projectileSpeed,
                 MaxDistance = maxDistance,
                 Size = projectileSize,

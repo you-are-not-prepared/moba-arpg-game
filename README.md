@@ -63,6 +63,15 @@ Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with 
 | **Torvald**, Bulwark (melee) | +50 max HP per level, 15% slower | **Aegis Wall:** a moving shield that blocks enemy projectiles from the front for 5s (tower shots pass through) |
 | **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
 
+### Ascension (levels 6, 11, 18)
+At levels 6, 11 and 18 two talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
+- **Level 6** picks a path: **A**, built on the hero's passive, or **B**, built on the ultimate.
+- **Level 11** offers two talents from that path (A1/A2 or B1/B2), and **level 18** two more (A3/A4 or B3/B4).
+
+Talents give stats (health, damage, attack and move speed, cooldowns, spell damage, projectiles, item stats). Some boost the hero's own kit, such as a longer Aegis Wall or Bloodrush, a longer Skybreaker stun, or more damage to isolated targets.
+
+The current talents are placeholders; they're defined in `Assets/_Project/Editor/GameBuilder.Ascension.cs`. Bots pick at random. Your picks are listed in the portrait tooltip.
+
 ### Items, spells and mods
 - **The shop** works only in your base, plus anywhere while you're dead. Selling refunds 70%. Open it with **B** or the Shop button.
 - **The inventory** has 8 slots, rearranged by dragging. Items, spells and mods all take a slot until equipped.
@@ -154,7 +163,7 @@ To run the backend locally, see [moba-backend](https://github.com/tomicnikola/mo
 
 ```
 Assets/_Project/
-  Editor/      GameBuilder: generates scenes, prefabs, heroes, items and materials
+  Editor/      GameBuilder: generates scenes, prefabs, heroes, items and materials (+ ascension talents)
   Heroes/      Hero definitions, the roster and ultimates (generated)
   Items/       Items, spells, mods and the shop catalog (generated)
   Materials/   (generated)
@@ -163,7 +172,7 @@ Assets/_Project/
   Scripts/
     Abilities/  Spell framework: AbilityCaster, AbilityDefinition, spells, mods, projectiles
     Bots/       BotBrain (hero AI)
-    Heroes/     Hero mechanics: Aegis Wall shield, Bloodrush haste, isolation passive
+    Heroes/     Hero mechanics: ascension, Aegis Wall shield, Bloodrush haste, isolation passive
     Items/      Inventory, shop, item catalog, loadout (equip/swap rules)
     Match/      Heroes, roster, map layouts, MatchSettings, MatchBootstrap (spawns the lineup)
     Online/     Backend client, accounts and settings sync, match recording and history

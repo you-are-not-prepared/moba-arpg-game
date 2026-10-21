@@ -37,6 +37,10 @@ namespace Moba.Abilities
         public float cooldownMultiplier = 1f;
         [Tooltip("Extra projectiles added to every projectile spell.")]
         public int passiveExtraProjectiles;
+        [Tooltip("Multiplies the ultimate's cooldown on top of cooldownMultiplier (ascension talents).")]
+        public float ultimateCooldownMultiplier = 1f;
+        [Tooltip("Multiplies all spell damage (ascension talents).")]
+        public float spellDamageMultiplier = 1f;
         [Tooltip("The ultimate slot holds the hero's own ultimate: it can't be swapped or unequipped.")]
         public bool ultimateLocked;
 
@@ -173,6 +177,7 @@ namespace Moba.Abilities
         {
             SpellModifiers m = SpellModifiers.None;
             m.extraProjectiles += passiveExtraProjectiles;
+            m.damageMultiplier *= spellDamageMultiplier;
             for (int i = 0; i < MaxModSockets; i++)
                 if (IsModActive(index, i)) slots[index].mods[i].Apply(ref m);
             return m;
@@ -228,7 +233,8 @@ namespace Moba.Abilities
             if (!InCastRange(index, point, target)) return false;
 
             if (!NoManaCost) Mana -= a.ManaCost(s.rank);
-            s.cooldownTotal = NoCooldowns ? 0f : a.Cooldown(s.rank) * cooldownMultiplier;
+            float ultimate = index == UltimateSlot ? ultimateCooldownMultiplier : 1f;
+            s.cooldownTotal = NoCooldowns ? 0f : a.Cooldown(s.rank) * cooldownMultiplier * ultimate;
             s.cooldownRemaining = s.cooldownTotal;
 
             Vector3 facing = point - transform.position;

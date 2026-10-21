@@ -95,6 +95,12 @@
             <ui:VisualElement name="scoreEnemyRows" picking-mode="Ignore" />
         </ui:VisualElement>
 
+        <ui:VisualElement name="ascension" class="ascension hidden" picking-mode="Ignore">
+            <ui:Label name="ascensionTitle" class="ascension__title" text="ASCENSION" picking-mode="Ignore" />
+            <ui:Label name="ascensionSubtitle" class="ascension__subtitle" picking-mode="Ignore" />
+            <ui:VisualElement name="ascensionCards" class="ascension__cards" picking-mode="Ignore" />
+        </ui:VisualElement>
+
         <ui:VisualElement name="tooltip" class="panel tooltip hidden" picking-mode="Ignore">
             <ui:Label name="tooltipTitle" class="tooltip__title" picking-mode="Ignore" />
             <ui:Label name="tooltipStats" class="tooltip__stats" picking-mode="Ignore" />

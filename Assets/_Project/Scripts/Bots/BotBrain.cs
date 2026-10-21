@@ -33,6 +33,7 @@ namespace Moba.Bots
         AbilityCaster _abilities;
         HeroProgression _progression;
         Inventory _inventory;
+        HeroAscension _ascension;
         Shop _shop;
         Shop _enemyShop;
         Vector3[] _lane;
@@ -64,6 +65,7 @@ namespace Moba.Bots
         void Start()
         {
             _shop = Shop.ForTeam(_unit.team);
+            _ascension = GetComponent<HeroAscension>();
             _enemyShop = Shop.ForTeam(_unit.team == Team.Blue ? Team.Red : Team.Blue);
             _nextThink = Time.time + Random.Range(0f, thinkInterval);
         }
@@ -75,6 +77,8 @@ namespace Moba.Bots
             if (GameManager.Instance != null && GameManager.Instance.IsOver) return;
 
             SpendSkillPoints();
+            // Ascension: bots pick at random.
+            if (_ascension != null && _ascension.HasPendingChoice) _ascension.Choose(Random.Range(0, 2));
             if (_shop != null && _shop.CanUse(_unit)) BuyThings();
             if (!_unit.IsAlive)
             {

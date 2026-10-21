@@ -36,6 +36,10 @@ namespace Moba
         public float isolationDamageBonus;
         public float isolationRadius = 7f;
 
+        [Header("Ascension")]
+        [Tooltip("Talent choices at levels 6, 11 and 18: path A or B, then two options within that path.")]
+        public AscensionTree ascension = new();
+
         [Header("Ultimate")]
         [Tooltip("Locked into the R slot; bought spells go in Q/W/E.")]
         public AbilityDefinition ultimate;
@@ -56,6 +60,7 @@ namespace Moba
                 isolation.damageBonus = isolationDamageBonus;
                 isolation.radius = isolationRadius;
             }
+            if (ascension != null && ascension.IsComplete) hero.gameObject.AddComponent<HeroAscension>().Init(ascension);
             if (ultimate != null)
             {
                 caster.SetAbility(AbilityCaster.UltimateSlot, ultimate);

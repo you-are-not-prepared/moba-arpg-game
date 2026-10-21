@@ -130,6 +130,7 @@ namespace Moba.UI
             SetUpInventoryAndShop();
             SetUpCheats();
             SetUpScoreboard();
+            SetUpAscension();
 
             _bars.Clear();
             _barPool.Clear();
@@ -192,6 +193,7 @@ namespace Moba.UI
             _hudMessage.style.scale = new Scale(Vector2.one * hud);
             _cheatPanel.style.scale = new Scale(Vector2.one * hud);
             _scoreboard.style.scale = new Scale(Vector2.one * hud);
+            _ascensionPanel.style.scale = new Scale(Vector2.one * hud);
         }
 
         // Keeps the tooltip and targeting hint just above the (scaled) hero panel.
@@ -218,6 +220,7 @@ namespace Moba.UI
             UpdateInventoryAndShop();
             UpdateCheats();
             UpdateScoreboard();
+            UpdateAscension();
             UpdateTooltip();
             UpdateUnitBars();
             UpdateFloatingText();
@@ -319,7 +322,7 @@ namespace Moba.UI
             SetText(_tooltipTitle, string.IsNullOrEmpty(def.title) ? def.displayName : $"{def.displayName}, {def.title}");
             SetText(_tooltipStats, $"Passive: {def.passiveName}");
             string ult = def.ultimate != null ? $"\nUltimate: {def.ultimate.displayName}. {def.ultimate.description}" : "";
-            SetText(_tooltipBody, def.passiveDescription + ult);
+            SetText(_tooltipBody, def.passiveDescription + ult + AscensionSummary());
             return true;
         }
 
