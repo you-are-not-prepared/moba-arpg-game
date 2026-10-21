@@ -20,7 +20,8 @@ namespace Moba.Abilities
         void Reset() => targeting = AbilityTargeting.Instant;
 
         public override void Execute(in AbilityCastContext context) =>
-            ProjectileShield.Raise(context.Caster, duration, radius, arcDegrees, height, wallMaterial, blockFlashMaterial);
+            ProjectileShield.Raise(context.Caster, duration + HeroAscension.DurationBonusOf(context.Caster), radius, arcDegrees,
+                height, wallMaterial, blockFlashMaterial);
 
         public override string StatsText => $"Blocks enemy projectiles from the front for {duration:0.#}s";
 

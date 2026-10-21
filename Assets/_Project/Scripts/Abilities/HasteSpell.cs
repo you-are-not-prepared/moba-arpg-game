@@ -17,7 +17,8 @@ namespace Moba.Abilities
         void Reset() => targeting = AbilityTargeting.Instant;
 
         public override void Execute(in AbilityCastContext context) =>
-            Haste.Apply(context.Caster, duration, moveSpeedBonus, attackSpeedBonus, refreshOnHeroKill, auraMaterial);
+            Haste.Apply(context.Caster, duration + HeroAscension.DurationBonusOf(context.Caster), moveSpeedBonus,
+                attackSpeedBonus, refreshOnHeroKill, auraMaterial);
 
         public override string StatsText =>
             $"+{moveSpeedBonus * 100f:0}% movement speed, +{attackSpeedBonus * 100f:0}% attack speed for {duration:0.#}s" +

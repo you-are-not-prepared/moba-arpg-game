@@ -17,7 +17,7 @@ namespace Moba.EditorTools
     // Generates the whole game from code: shared assets (materials, items, creeps, heroes), one scene per map
     // layout (each with a baked NavMesh), the frontend scene (start screen + champion select) and the build list.
     // Re-running overwrites the generated assets, so tweak layouts and heroes here rather than by hand.
-    public static class GameBuilder
+    public static partial class GameBuilder
     {
         const string Root = "Assets/_Project";
         const string MaterialsDir = Root + "/Materials";
@@ -157,13 +157,14 @@ namespace Moba.EditorTools
             public float HealthPerLevelBonus, MoveSpeedMultiplier = 1f, IsolationDamageBonus, IsolationRadius = 7f;
             public bool Melee;
             public System.Func<Mats, AbilityDefinition> Ultimate;
+            public System.Func<AscensionTree> Ascension;
         }
 
         static List<HeroSpec> Heroes() => new()
         {
             new HeroSpec
             {
-                Id = "kael", Name = "Kael", Title = "Ranger", Glyph = "K", Color = new Color(0.35f, 0.78f, 0.45f),
+                Id = "kael", Name = "Kael", Ascension = KaelAscension, Title = "Ranger", Glyph = "K", Color = new Color(0.35f, 0.78f, 0.45f),
                 Description = "Floods the lane with projectiles and pins enemies down from long range.",
                 Health = 560f, Damage = 32f, Range = 6.5f, AttacksPerSecond = 1.25f, Speed = 6.6f, Mana = 300f,
                 PassiveName = "Split Shot", PassiveDescription = "Your projectile spells fire 1 extra projectile.",
@@ -172,7 +173,7 @@ namespace Moba.EditorTools
             },
             new HeroSpec
             {
-                Id = "vesh", Name = "Vesh", Title = "Chronomancer", Glyph = "V", Color = new Color(0.65f, 0.45f, 0.95f),
+                Id = "vesh", Name = "Vesh", Ascension = VeshAscension, Title = "Chronomancer", Glyph = "V", Color = new Color(0.65f, 0.45f, 0.95f),
                 Description = "Casts more often than anyone, then does it all again.",
                 Health = 580f, Damage = 27f, Range = 5.5f, AttacksPerSecond = 1.1f, Speed = 6.5f, Mana = 400f,
                 PassiveName = "Quickened Mind", PassiveDescription = "All your cooldowns are 20% shorter.",
@@ -181,7 +182,7 @@ namespace Moba.EditorTools
             },
             new HeroSpec
             {
-                Id = "brann", Name = "Brann", Title = "Artificer", Glyph = "B", Color = new Color(0.85f, 0.55f, 0.25f),
+                Id = "brann", Name = "Brann", Ascension = BrannAscension, Title = "Artificer", Glyph = "B", Color = new Color(0.85f, 0.55f, 0.25f),
                 Description = "Gets more out of every item and every mod.",
                 Health = 660f, Damage = 30f, Range = 5f, AttacksPerSecond = 1.15f, Speed = 6.4f, Mana = 300f,
                 PassiveName = "Masterwork Gear", PassiveDescription = "Items give 10% more stats.",
@@ -190,7 +191,7 @@ namespace Moba.EditorTools
             },
             new HeroSpec
             {
-                Id = "torvald", Name = "Torvald", Title = "Bulwark", Glyph = "T", Color = new Color(0.55f, 0.68f, 0.85f),
+                Id = "torvald", Name = "Torvald", Ascension = TorvaldAscension, Title = "Bulwark", Glyph = "T", Color = new Color(0.55f, 0.68f, 0.85f),
                 Description = "A slow, unbreakable melee tank who walls off enemy projectiles.",
                 Health = 720f, Damage = 30f, Range = 1f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 300f, Melee = true,
                 PassiveName = "Iron Hide", PassiveDescription = "+50 max health per level, but moves 15% slower.",
@@ -199,7 +200,7 @@ namespace Moba.EditorTools
             },
             new HeroSpec
             {
-                Id = "nyx", Name = "Nyx", Title = "Stalker", Glyph = "N", Color = new Color(0.85f, 0.25f, 0.4f),
+                Id = "nyx", Name = "Nyx", Ascension = NyxAscension, Title = "Stalker", Glyph = "N", Color = new Color(0.85f, 0.25f, 0.4f),
                 Description = "A melee hunter who picks off lone targets and snowballs from kill to kill.",
                 Health = 590f, Damage = 34f, Range = 1f, AttacksPerSecond = 1.2f, Speed = 6.7f, Mana = 300f, Melee = true,
                 PassiveName = "Lone Prey", PassiveDescription = "Deal 15% more damage to targets with no allied hero within 7m of them.",
@@ -653,6 +654,7 @@ namespace Moba.EditorTools
                 def.isolationDamageBonus = spec.IsolationDamageBonus;
                 def.isolationRadius = spec.IsolationRadius;
                 def.ultimate = spec.Ultimate(m);
+                def.ascension = spec.Ascension?.Invoke() ?? new AscensionTree();
                 def.prefab = CreateHeroPrefab(spec, m);
                 EditorUtility.SetDirty(def);
                 roster.heroes.Add(def);
