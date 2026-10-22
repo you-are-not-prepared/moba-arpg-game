@@ -46,9 +46,20 @@ namespace Moba
         void OnUnitDied(Unit unit, Unit killer)
         {
             if (unit.kind != UnitKind.Core || IsOver) return;
-            Winner = unit.team == Team.Blue ? Team.Red : Team.Blue;
+            EndMatch(unit.team == Team.Blue ? Team.Red : Team.Blue);
+        }
+
+        // Game-server clients: the server decided the match (see Net.NetworkMatch).
+        public void SetWinnerFromServer(Team winner)
+        {
+            if (!IsOver) EndMatch(winner);
+        }
+
+        void EndMatch(Team winner)
+        {
+            Winner = winner;
             ApplyTimeScale();
-            MatchEnded?.Invoke(Winner.Value);
+            MatchEnded?.Invoke(winner);
         }
 
         void Update()
@@ -67,6 +78,7 @@ namespace Moba
         {
             _paused = false;
             Online.PostMatch.ShowOnMenu = Online.PostMatch.Last != null;
+            Net.GameClient.Leave();
             SceneManager.LoadScene(MatchSettings.FrontendScene);
         }
 
@@ -74,6 +86,7 @@ namespace Moba
         {
             _paused = false;
             Online.PostMatch.ShowOnMenu = false;
+            Net.GameClient.Leave();
             SceneManager.LoadScene(MatchSettings.FrontendScene);
         }
 
@@ -86,6 +99,11 @@ namespace Moba
             ApplyTimeScale();
         }
 
-        void ApplyTimeScale() => Time.timeScale = _paused || IsOver ? 0f : GameSpeed;
+        // A game-server client can't pause the server's match: its options menu doesn't stop time.
+        void ApplyTimeScale()
+        {
+            bool pause = _paused && !Net.NetSession.IsRemoteClient;
+            Time.timeScale = pause || IsOver ? 0f : GameSpeed;
+        }
     }
 }

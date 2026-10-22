@@ -1,0 +1,16 @@
+# Local game server.  Build it in Unity first (MOBA > Build Linux Server), then:  docker compose up -d --build
+# It runs one match at a time and restarts itself (fresh map) when a match ends.
+# The UDP port is bound to 127.0.0.1, so only this PC can join.
+name: moba-game
+
+services:
+  game-server:
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    restart: unless-stopped
+    environment:
+      MOBA_MAP: random   # classic | zones | delve | random
+      MOBA_BOTS: "3"     # bots per team (blue gets one fewer; players join blue)
+    ports:
+      - "127.0.0.1:7777:7777/udp"

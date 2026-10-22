@@ -86,6 +86,12 @@ namespace Moba.UI
             SetUpHistory(root);
             SetUpItemTooltip(root);
             SetUpPostMatch(root);
+            Net.GameClient.ConnectFailed += OnConnectFailed;
+            // Dropped from a game server mid-match: say why on the start screen.
+            var startMessage = root.Q<Label>("startMessage");
+            startMessage.text = Net.GameClient.LastError ?? "";
+            startMessage.EnableInClassList("hidden", Net.GameClient.LastError == null);
+            Net.GameClient.LastError = null;
 
             if (PostMatch.ShowOnMenu && PostMatch.Last != null)
             {
@@ -106,7 +112,11 @@ namespace Moba.UI
             }
         }
 
-        void OnDisable() => AccountService.Changed -= RefreshAccountBar;
+        void OnDisable()
+        {
+            AccountService.Changed -= RefreshAccountBar;
+            Net.GameClient.ConnectFailed -= OnConnectFailed;
+        }
 
         // ---------- Login / register ----------
 
@@ -310,7 +320,7 @@ namespace Moba.UI
             ShowOnly(_selectScreen);
             _modeLabel.text = mode == MatchMode.PvE
                 ? $"PvE · {MatchSettings.TeamSize}v{MatchSettings.TeamSize} against bots"
-                : "PvP · online play isn't available yet: the match starts without other players";
+                : $"PvP · game server at {Net.NetSession.ServerAddress}";
 
             // Every visit rolls a new map.
             _layout = layouts != null && layouts.layouts.Count > 0
@@ -319,6 +329,13 @@ namespace Moba.UI
             _mapName.text = _layout != null ? _layout.displayName : "No map";
             _mapDescription.text = _layout != null ? _layout.description : "";
             _preview.Show(_layout);
+            if (mode == MatchMode.PvP)
+            {
+                // The game server picks its own map.
+                _mapName.text = "Chosen by the server";
+                _mapDescription.text = "The game server rolls the map for its match. You join the blue team.";
+                _preview.Show(null);
+            }
 
             BuildSeats(mode);
             _hovered = null;
@@ -564,9 +581,24 @@ namespace Moba.UI
             }
 
             RefreshSeats();
-            _status.text = $"Loading {_layout.displayName}…";
             _lockButton.SetEnabled(false);
+            if (MatchSettings.Mode == MatchMode.PvP)
+            {
+                // The game server loads its map on this client once connected.
+                _status.text = $"Connecting to the game server at {Net.NetSession.ServerAddress}…";
+                string name = AccountService.IsLoggedIn ? AccountService.Profile.username : "Player";
+                Net.GameClient.Connect(_selected.id, name);
+                return;
+            }
+            _status.text = $"Loading {_layout.displayName}…";
             SceneManager.LoadScene(_layout.sceneName);
+        }
+
+        void OnConnectFailed(string message)
+        {
+            if (this == null) return;
+            _status.text = message;
+            _lockButton.SetEnabled(_selected != null);
         }
 
         static void Quit()

@@ -4,7 +4,7 @@ A MOBA with ARPG builds, made in Unity. It has classic MOBA structure (lanes, cr
 
 **Status:** early prototype.
 - **Playable:** PvE (3v3 against bots), 5 heroes, 3 map layouts, accounts with match history.
-- **Not yet built:** online PvP. Picking PvP in the menu starts a match with no other players.
+- **Game server (stage 1):** PvP joins a local game server in Docker that runs the match (see below). Spells, shop and more over the network come next.
 
 The backend (accounts, settings sync, match history) lives in a separate repo: [tomicnikola/moba-backend](https://github.com/tomicnikola/moba-backend).
 
@@ -35,7 +35,7 @@ You can also open a map scene (`Map_Classic`, `Map_Zones`, `Map_Delve`) and pres
 
 ### Match flow
 - **Start screen:** log in, play offline, see your match history.
-- **Find a match:** choose **PvE** (3v3 against bots; your teammates are bots too) or **PvP** (no online play yet, so you play the map alone).
+- **Find a match:** choose **PvE** (3v3 against bots; your teammates are bots too) or **PvP** (join the local game server; see [Game server](#game-server-local-docker)).
 - **Champion select:**
   - Each visit rolls a random map.
   - Both teams' picks are visible, and bots lock in one at a time.
@@ -146,6 +146,51 @@ To run the backend locally, see [moba-backend](https://github.com/tomicnikola/mo
 
 ---
 
+## Game server (local, Docker)
+
+The game can run as a **server that runs the whole match**: movement, creeps, towers, bots, combat and respawns. The game connects to it as a client: it sends your orders (move, attack, attack move, stop) and shows what the server says is happening. It uses Unity Netcode for GameObjects; the server is a headless Linux build of this same project.
+
+**Run it**
+1. In Unity: **MOBA → Build Linux Server**. This needs the *Linux Dedicated Server Build Support* module and writes to `Builds/LinuxServer` (ignored by git).
+2. In this folder: `docker compose up -d --build`
+3. In the game: **Find a match → PvP**, pick a hero, **Lock in**. You join the blue team on the server's map.
+
+Without the Editor open, you can also build from the command line:
+```bash
+unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBuilder.BuildLinuxServerBatch .
+```
+
+**How the server behaves**
+- It picks the map and fills both teams with bots. Players join blue.
+- The match stays paused until the first player joins.
+- When a core falls, the server quits after 15 seconds, and Docker restarts it with a fresh match.
+- It listens on UDP 7777, bound to `127.0.0.1`, so only this PC can join.
+
+**Settings** (in `docker-compose.yml`)
+- `MOBA_MAP`: `classic`, `zones`, `delve` or `random`.
+- `MOBA_BOTS`: bots per team.
+- `MOBA_PORT`: the UDP port.
+
+**Useful commands**
+- `docker compose logs -f game-server` follows the server log.
+- `docker compose down` stops the server.
+- PlayerPrefs `moba.gameserver.address` (`host:port`) points the game at a different server.
+
+**Stage 1 status:** movement, attacks, creeps, towers, cores, health, gold, XP, levels, K/D/A, CS, deaths and respawns, the match result, and attack visuals all come from the server.
+
+Not over the network yet (next stages):
+- spells and the ultimate;
+- the shop and inventory;
+- ascension choices;
+- the creep wave timer;
+- the server recording match results.
+
+On the server, the cheat menu is hidden and the shop and spells say they're coming. PvE stays fully offline as before.
+
+**Important**
+- **Re-run Build Linux Server after rebuilding the scenes:** in-scene objects are matched between server and client by IDs saved in the scenes.
+- **Keep the Editor's build target on Windows:** if the Editor's build target is ever left on Linux Server, the Editor itself compiles as a server. The build helpers switch it back automatically.
+
 ## Testing helpers
 
 - **Cheat menu** (in a match, right side under Options):
@@ -175,9 +220,11 @@ Assets/_Project/
     Heroes/     Hero mechanics: ascension, Aegis Wall shield, Bloodrush haste, isolation passive
     Items/      Inventory, shop, item catalog, loadout (equip/swap rules)
     Match/      Heroes, roster, map layouts, MatchSettings, MatchBootstrap (spawns the lineup)
+    Net/        Game server: NetSession, GameServer (server boot), GameClient (joining), NetworkUnit/Hero/Match
     Online/     Backend client, accounts and settings sync, match recording and history
     Settings/   GameSettings (options) and GameInput (rebindable controls)
     *.cs        Core: Unit, Attacker, HeroController, CreepAI, TowerAI, FogOfWar, GameManager...
+  Resources/   NetworkPrefabs (generated): prefabs the game server spawns
   Shaders/     Fog of war overlay, shield wall, ground ring
   UI/          UI Toolkit: HUD (+ inventory, cheats, scoreboard), options menu, frontend (+ history)
 ```

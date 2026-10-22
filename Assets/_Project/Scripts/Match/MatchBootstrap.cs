@@ -8,7 +8,8 @@ namespace Moba
     // Spawns everyone in the match lineup: the local player's hero (the roster's first hero when a map scene is
     // played directly) and, in PvE, the bots with their lanes. Hands the player's hero to the systems that follow it.
     // Runs right after NavMeshSurface (-102) has loaded the NavMesh, so agents can be placed, and before everything
-    // else that reads the heroes.
+    // else that reads the heroes. On a game server the server spawns bots in Start and players as they join
+    // (SpawnPlayer); its clients receive them over the network.
     [DefaultExecutionOrder(-101)]
     public class MatchBootstrap : MonoBehaviour
     {
@@ -22,20 +23,35 @@ namespace Moba
 
         MapLayoutInfo _layout;
         Transform _redSpawn;
+        readonly Dictionary<Team, int> _spawnIndex = new() { [Team.Blue] = 0, [Team.Red] = 0 };
+        readonly Dictionary<Team, int> _botIndex = new() { [Team.Blue] = 0, [Team.Red] = 0 };
+        int _perTeam = MatchSettings.TeamSize;
 
         void Awake()
         {
             _layout = game.TryGetComponent(out MapLayout layout) ? layout.info : null;
             _redSpawn = CreateRedSpawn();
+            // Snapshots the match when it ends (and records it on the account when logged in, offline play).
+            game.gameObject.AddComponent<Online.MatchReporter>();
+
+            // On a game server the heroes are spawned in Start (bots) and as players join (SpawnPlayer);
+            // its clients get them from the server.
+            if (Net.NetSession.IsNetworked) return;
 
             List<LobbySlot> lineup = MatchSettings.Lineup.Count > 0
                 ? MatchSettings.Lineup
                 : new List<LobbySlot> { new() { team = Team.Blue, heroId = MatchSettings.SelectedHeroId, isLocal = true } };
+            SpawnLineup(lineup);
+        }
 
-            var spawnIndex = new Dictionary<Team, int> { [Team.Blue] = 0, [Team.Red] = 0 };
-            var botIndex = new Dictionary<Team, int> { [Team.Blue] = 0, [Team.Red] = 0 };
-            int perTeam = Mathf.Max(MatchSettings.TeamSize, lineup.Count(s => s.team == Team.Blue), lineup.Count(s => s.team == Team.Red));
+        void Start()
+        {
+            if (Net.NetSession.IsNetworked && Net.NetSession.HasAuthority) SpawnLineup(MatchSettings.Lineup);
+        }
 
+        void SpawnLineup(List<LobbySlot> lineup)
+        {
+            _perTeam = Mathf.Max(MatchSettings.TeamSize, lineup.Count(s => s.team == Team.Blue), lineup.Count(s => s.team == Team.Red));
             foreach (LobbySlot slot in lineup)
             {
                 HeroDefinition definition = roster.Find(slot.heroId);
@@ -46,8 +62,7 @@ namespace Moba
                     continue;
                 }
 
-                HeroController hero = Spawn(definition, slot.team, spawnIndex[slot.team]++, perTeam, slot.isBot);
-                game.heroes.Add(hero);
+                HeroController hero = Spawn(definition, slot.team, _spawnIndex[slot.team]++, _perTeam, slot.isBot);
                 if (slot.isLocal)
                 {
                     game.hero = hero;
@@ -56,12 +71,30 @@ namespace Moba
                 }
                 else if (slot.isBot)
                 {
-                    hero.gameObject.AddComponent<BotBrain>().Init(LaneFor(slot.team, botIndex[slot.team]++));
+                    hero.gameObject.AddComponent<BotBrain>().Init(LaneFor(slot.team, _botIndex[slot.team]++));
+                }
+
+                if (Net.NetSession.IsNetworked)
+                {
+                    hero.GetComponent<Net.NetworkHero>().Init(definition.id, slot.isBot ? "Bot" : "");
+                    hero.GetComponent<Unity.Netcode.NetworkObject>().Spawn(destroyWithScene: true);
+                }
+                else
+                {
+                    game.heroes.Add(hero);
                 }
             }
+        }
 
-            // Records the match on the player's account (when logged in).
-            game.gameObject.AddComponent<Online.MatchReporter>();
+        // Game server: a player who joined gets their hero on the blue team (players own their hero object).
+        public void SpawnPlayer(ulong clientId, string heroId, string playerName)
+        {
+            HeroDefinition definition = roster.Find(heroId) ?? roster.heroes.FirstOrDefault(h => h != null);
+            if (definition == null || definition.prefab == null) return;
+            HeroController hero = Spawn(definition, Team.Blue, _spawnIndex[Team.Blue]++, _perTeam, isBot: false);
+            hero.isPlayer = false; // input arrives from the client
+            hero.GetComponent<Net.NetworkHero>().Init(definition.id, playerName);
+            hero.GetComponent<Unity.Netcode.NetworkObject>().SpawnAsPlayerObject(clientId, destroyWithScene: true);
         }
 
         HeroController Spawn(HeroDefinition definition, Team team, int index, int perTeam, bool isBot)

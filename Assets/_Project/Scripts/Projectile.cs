@@ -9,12 +9,14 @@ namespace Moba
         Unit _target;
         Team _team;
         bool _blockable;
+        bool _visualOnly;
         Renderer _renderer;
         float _damage;
         float _speed;
 
+        // visualOnly: just the shot (game-server clients); the damage is dealt by the server.
         public static void Launch(Vector3 from, Unit source, Unit target, float damage, float speed, float size,
-            Material material)
+            Material material, bool visualOnly = false)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             go.name = "Projectile";
@@ -32,6 +34,7 @@ namespace Moba
             p._target = target;
             p._damage = damage;
             p._speed = speed;
+            p._visualOnly = visualOnly;
         }
 
         void Update()
@@ -53,7 +56,7 @@ namespace Moba
             _renderer.enabled = FogOfWar.ShouldShow(_team, transform.position);
             if ((transform.position - aim).sqrMagnitude < 0.04f)
             {
-                _target.TakeDamage(_damage, _source);
+                if (!_visualOnly) _target.TakeDamage(_damage, _source);
                 Destroy(gameObject);
             }
         }

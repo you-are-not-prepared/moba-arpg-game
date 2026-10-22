@@ -24,6 +24,8 @@ namespace Moba
 
         IEnumerator Start()
         {
+            // On a game-server client the server spawns the creeps.
+            if (Net.NetSession.IsRemoteClient) yield break;
             _nextWaveTime = Time.time + firstWaveDelay;
             yield return new WaitForSeconds(firstWaveDelay);
             while (true)
@@ -53,10 +55,20 @@ namespace Moba
             CreepAI creep = Instantiate(prefab, transform.position, transform.rotation);
             creep.name = $"{prefab.name}_{team}";
             creep.GetComponent<Unit>().team = team;
-            foreach (Renderer r in creep.GetComponentsInChildren<Renderer>()) r.sharedMaterial = teamMaterial;
-            Attacker attacker = creep.GetComponent<Attacker>();
-            if (attacker.projectileSpeed > 0f) attacker.projectileMaterial = teamMaterial;
+            if (creep.TryGetComponent(out TeamColors colors))
+            {
+                colors.Apply(team);
+            }
+            else
+            {
+                foreach (Renderer r in creep.GetComponentsInChildren<Renderer>()) r.sharedMaterial = teamMaterial;
+                Attacker attacker = creep.GetComponent<Attacker>();
+                if (attacker.projectileSpeed > 0f) attacker.projectileMaterial = teamMaterial;
+            }
             creep.Init(lane);
+            // On the game server, every client gets the creep too.
+            if (Net.NetSession.IsNetworked && creep.TryGetComponent(out Unity.Netcode.NetworkObject networkObject))
+                networkObject.Spawn(destroyWithScene: true);
         }
 
         void OnDrawGizmos()

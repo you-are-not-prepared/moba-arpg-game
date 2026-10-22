@@ -3,9 +3,12 @@ using System.IO;
 using System.Linq;
 using Moba.Abilities;
 using Moba.Items;
+using Moba.Net;
 using Moba.UI;
 using Unity.AI.Navigation;
 using Unity.Cinemachine;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -335,6 +338,7 @@ namespace Moba.EditorTools
             CreateCreepPrefab("Creep_Melee", m, ranged: false);
             CreateCreepPrefab("Creep_Ranged", m, ranged: true);
             CreateHeroes(m);
+            CreateNetworkPrefabs();
             CreatePanelSettings();
 
             List<LayoutSpec> specs = Layouts();
@@ -446,6 +450,8 @@ namespace Moba.EditorTools
 
             // --- Game, layout, fog, HUD ---
             var game = new GameObject("Game").AddComponent<GameManager>();
+            game.gameObject.AddComponent<NetworkObject>();
+            game.gameObject.AddComponent<NetworkMatch>();
             game.playerSpawner = playerSpawner;
             game.playerShop = blueShop;
             game.gameObject.AddComponent<MapLayout>().info = Info(spec);
@@ -507,6 +513,7 @@ namespace Moba.EditorTools
             AssetDatabase.CreateAsset(surface.navMeshData, navMeshPath);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
+            FixSceneNetworkIds(scenePath);
             return scenePath;
         }
 
@@ -690,6 +697,9 @@ namespace Moba.EditorTools
             hero.attackMoveMarkerMaterial = m.AttackMarker;
             hero.rangeIndicatorMaterial = m.RangeIndicator;
 
+            MakeNetworked(go, moving: true);
+            go.AddComponent<NetworkHero>();
+
             return SavePrefab(go, $"Hero_{spec.Name}").GetComponent<HeroController>();
         }
 
@@ -714,6 +724,10 @@ namespace Moba.EditorTools
             ConfigureAgent(go, radius, height, speed: 3.5f);
             var ai = go.AddComponent<CreepAI>();
             ai.aggroRange = 6f;
+            var colors = go.AddComponent<TeamColors>();
+            colors.blue = m.Blue;
+            colors.red = m.Red;
+            MakeNetworked(go, moving: true);
 
             return SavePrefab(go, name).GetComponent<CreepAI>();
         }
@@ -740,6 +754,7 @@ namespace Moba.EditorTools
             attacker.faceTarget = false;
             go.AddComponent<TowerAI>();
             AddObstacle(go, radius, height);
+            MakeNetworked(go, moving: false);
             return unit;
         }
 
@@ -757,6 +772,7 @@ namespace Moba.EditorTools
             Unit unit = ConfigureUnit(go, team, UnitKind.Core, health: 2500f, radius: radius, barHeight: height + 1f);
             unit.sightRadius = CoreSight;
             AddObstacle(go, radius, height);
+            MakeNetworked(go, moving: false);
             return unit;
         }
 
