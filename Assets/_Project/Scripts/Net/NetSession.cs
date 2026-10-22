@@ -50,12 +50,25 @@ namespace Moba.Net
 
         public static UnityTransport Transport => EnsureManager().GetComponent<UnityTransport>();
 
-        // What a client tells the server when it connects (the hero it picked and its name).
+        // What a client tells the server when it connects: the hero it picked, its name, and (logged in) a join ticket
+        // the server redeems with the backend to learn the account.
         [System.Serializable]
         public class JoinRequest
         {
             public string heroId;
             public string playerName;
+            public string ticket;
+            // Only asking what the server is running (see GameClient.QueryServer); not joining.
+            public bool probe;
+        }
+
+        // The server's answer to a probe (sent as the refusal reason).
+        [System.Serializable]
+        public class ServerInfo
+        {
+            // Map layout id ("classic", "zones", "delve").
+            public string map;
+            public int players;
         }
 
         public static byte[] Encode(JoinRequest request) => Encoding.UTF8.GetBytes(JsonUtility.ToJson(request));

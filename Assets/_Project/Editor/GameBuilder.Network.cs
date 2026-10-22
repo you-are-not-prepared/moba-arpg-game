@@ -21,7 +21,8 @@ namespace Moba.EditorTools
         public const string ServerBuildDir = "Builds/LinuxServer";
         public const string ServerExecutable = "MobaServer.x86_64";
 
-        // Replicated by the game server: identity, (for moving units) position and facing, team and health.
+        // Replicated by the game server: identity, (for moving units) position, team and health. Facing goes through
+        // NetworkUnit instead, unsmoothed (no turn rate).
         static void MakeNetworked(GameObject go, bool moving)
         {
             go.AddComponent<NetworkObject>();
@@ -29,7 +30,7 @@ namespace Moba.EditorTools
             {
                 var transform = go.AddComponent<NetworkTransform>();
                 transform.SyncScaleX = transform.SyncScaleY = transform.SyncScaleZ = false;
-                transform.SyncRotAngleX = transform.SyncRotAngleZ = false;
+                transform.SyncRotAngleX = transform.SyncRotAngleY = transform.SyncRotAngleZ = false;
                 transform.UseHalfFloatPrecision = true;
                 transform.Interpolate = true;
             }
@@ -110,7 +111,21 @@ namespace Moba.EditorTools
             // dedicated server (UNITY_SERVER); put the target back afterwards.
             BuildTarget previousTarget = EditorUserBuildSettings.activeBuildTarget;
             StandaloneBuildSubtarget previousSubtarget = EditorUserBuildSettings.standaloneBuildSubtarget;
-            BuildReport report = BuildPipeline.BuildPlayer(options);
+            // The server records matches on the backend running on the same PC, over plain http (HTTPS comes with
+            // online hosting). Allowed for the server build only.
+            InsecureHttpOption previousHttp = PlayerSettings.insecureHttpOption;
+            PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;
+            BuildReport report;
+            try
+            {
+                report = BuildPipeline.BuildPlayer(options);
+            }
+            finally
+            {
+                // The build saved the project settings with the server's value; save them back.
+                PlayerSettings.insecureHttpOption = previousHttp;
+                AssetDatabase.SaveAssets();
+            }
             if (EditorUserBuildSettings.activeBuildTarget != previousTarget
                 || EditorUserBuildSettings.standaloneBuildSubtarget != previousSubtarget)
             {

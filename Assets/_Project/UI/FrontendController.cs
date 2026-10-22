@@ -87,6 +87,7 @@ namespace Moba.UI
             SetUpItemTooltip(root);
             SetUpPostMatch(root);
             Net.GameClient.ConnectFailed += OnConnectFailed;
+            Net.GameClient.ServerInfoReceived += OnServerInfo;
             // Dropped from a game server mid-match: say why on the start screen.
             var startMessage = root.Q<Label>("startMessage");
             startMessage.text = Net.GameClient.LastError ?? "";
@@ -116,6 +117,7 @@ namespace Moba.UI
         {
             AccountService.Changed -= RefreshAccountBar;
             Net.GameClient.ConnectFailed -= OnConnectFailed;
+            Net.GameClient.ServerInfoReceived -= OnServerInfo;
         }
 
         // ---------- Login / register ----------
@@ -331,10 +333,11 @@ namespace Moba.UI
             _preview.Show(_layout);
             if (mode == MatchMode.PvP)
             {
-                // The game server picks its own map.
-                _mapName.text = "Chosen by the server";
+                // The game server picks its own map: ask it which one.
+                _mapName.text = "Asking the server…";
                 _mapDescription.text = "The game server rolls the map for its match. You join the blue team.";
                 _preview.Show(null);
+                Net.GameClient.QueryServer();
             }
 
             BuildSeats(mode);
@@ -592,6 +595,26 @@ namespace Moba.UI
             }
             _status.text = $"Loading {_layout.displayName}…";
             SceneManager.LoadScene(_layout.sceneName);
+        }
+
+        // The game server's answer to "which map?" (null: it couldn't be reached).
+        void OnServerInfo(Net.NetSession.ServerInfo info)
+        {
+            if (this == null || MatchSettings.Mode != MatchMode.PvP) return;
+            MapLayoutInfo layout = info != null && layouts != null ? layouts.layouts.Find(l => l.id == info.map) : null;
+            if (layout == null)
+            {
+                _mapName.text = "Chosen by the server";
+                _mapDescription.text = info == null
+                    ? $"Couldn't reach the game server at {Net.NetSession.ServerAddress}. Is it running? " +
+                      "(docker compose up in the moba-test folder)"
+                    : "The game server rolls the map for its match. You join the blue team.";
+                return;
+            }
+            _layout = layout;
+            _mapName.text = layout.displayName;
+            _mapDescription.text = $"{layout.description} Picked by the game server; you join the blue team.";
+            _preview.Show(layout);
         }
 
         void OnConnectFailed(string message)

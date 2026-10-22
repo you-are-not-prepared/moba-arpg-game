@@ -4,8 +4,9 @@ using UnityEngine;
 
 namespace Moba.Net
 {
-    // Match-wide state on the game server (on the scene's Game object): the winner, and visuals for attack and
-    // spell projectiles and explosions (the server applies the damage; clients only see the shots).
+    // Match-wide state on the game server (on the scene's Game object): the winner, the match clock, the next creep
+    // wave, whether cheats are allowed, and visuals for attack and spell projectiles and explosions (the server
+    // applies the damage; clients only see the shots).
     [RequireComponent(typeof(GameManager))]
     public class NetworkMatch : NetworkBehaviour
     {
@@ -17,6 +18,12 @@ namespace Moba.Net
         // -1 = still running, otherwise (int)Team.
         readonly NetworkVariable<int> _winner = new(-1);
         readonly NetworkVariable<bool> _cheats = new();
+        // Server times: when the match clock read 0, and when the blue team's next creep wave comes.
+        readonly NetworkVariable<float> _clockStart = new();
+        readonly NetworkVariable<float> _nextWave = new();
+
+        // Smaller drifts aren't worth a message.
+        const float ClockTolerance = 0.25f;
 
         GameManager _game;
         int _nextProjectileId;
@@ -43,6 +50,27 @@ namespace Moba.Net
             }
             _winner.OnValueChanged += (_, winner) => ApplyWinner(winner);
             ApplyWinner(_winner.Value);
+        }
+
+        void Update()
+        {
+            if (!IsSpawned) return;
+            float now = NetworkManager.ServerTime.TimeAsFloat;
+            CreepSpawner spawner = _game.playerSpawner;
+            if (IsServer)
+            {
+                float start = now - _game.MatchTime;
+                if (Mathf.Abs(start - _clockStart.Value) > ClockTolerance) _clockStart.Value = start;
+                if (spawner != null)
+                {
+                    float wave = now + spawner.NextWaveIn;
+                    if (Mathf.Abs(wave - _nextWave.Value) > ClockTolerance) _nextWave.Value = wave;
+                }
+                return;
+            }
+            if (_game.IsOver) return; // the clock stops at the end
+            _game.SetMatchTimeFromServer(Mathf.Max(0f, now - _clockStart.Value));
+            if (spawner != null) spawner.SetNextWaveFromServer(Mathf.Max(0f, _nextWave.Value - now));
         }
 
         void ApplyWinner(int winner)

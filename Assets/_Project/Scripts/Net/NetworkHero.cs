@@ -11,11 +11,13 @@ namespace Moba.Net
     public enum CheatAction : byte { Level, Gold, NoManaCost, NoCooldowns }
 
     // A hero on the game server.
-    //  - Server -> clients: which hero it is, level, XP, gold, K/D/A, CS, the respawn timer, its kit (inventory,
-    //    spells, mods, ranks, skill points), cooldowns, mana, ascension talents and timed buffs (haste, shield).
+    //  - Server -> clients: which hero it is, level, XP, gold, K/D/A, CS, damage, the respawn timer, its kit
+    //    (inventory, spells, mods, ranks, skill points), cooldowns, mana, ascension talents and timed buffs.
     //  - Owning client -> server: the player's orders (move, attack, attack move, stop, cast, learn a rank),
-    //    shop, inventory and ascension choices, and cheats when the server allows them. The server checks them and runs them through the same code
-    //    offline play uses.
+    //    shop, inventory and ascension choices, and cheats when the server allows them. The server checks them
+    //    and runs them through the same code offline play uses.
+    // A player who leaves keeps their hero in the match (owned by the server, standing still); logging back in to
+    // the same server hands it back to them (see GameServer).
     [RequireComponent(typeof(HeroController))]
     public class NetworkHero : NetworkBehaviour
     {
@@ -33,6 +35,7 @@ namespace Moba.Net
 
         readonly NetworkVariable<FixedString32Bytes> _heroId = new();
         readonly NetworkVariable<FixedString64Bytes> _playerName = new();
+        readonly NetworkVariable<bool> _isBot = new();
         readonly NetworkVariable<int> _level = new(1);
         readonly NetworkVariable<float> _xp = new();
         readonly NetworkVariable<int> _gold = new();
@@ -40,6 +43,10 @@ namespace Moba.Net
         readonly NetworkVariable<int> _deaths = new();
         readonly NetworkVariable<int> _assists = new();
         readonly NetworkVariable<int> _creepScore = new();
+        // Damage dealt to heroes, dealt in total, and taken (whole numbers; for the scoreboard and match analysis).
+        readonly NetworkVariable<int> _heroDamage = new();
+        readonly NetworkVariable<int> _totalDamage = new();
+        readonly NetworkVariable<int> _damageTaken = new();
         readonly NetworkVariable<float> _respawn = new();
         readonly NetworkVariable<float> _mana = new();
         readonly NetworkVariable<float> _maxMana = new();
@@ -62,8 +69,9 @@ namespace Moba.Net
 
         public string HeroId => _heroId.Value.ToString();
         public string PlayerName => _playerName.Value.ToString();
-        // Bots are spawned by the server and owned by it; players own their hero.
-        public bool IsBot => OwnerClientId == NetworkManager.ServerClientId;
+        public bool IsBot => _isBot.Value;
+        // Server only: the player's backend account ("" for bots and players who weren't logged in).
+        public string AccountId { get; set; } = "";
 
         float ServerNow => NetworkManager.ServerTime.TimeAsFloat;
 
@@ -79,12 +87,24 @@ namespace Moba.Net
         }
 
         string _initHeroId = "", _initPlayerName = "";
+        bool _initIsBot;
 
         // Server, before Spawn(): applied in OnNetworkSpawn, once the network variables can be written.
-        public void Init(string heroId, string playerName)
+        public void Init(string heroId, string playerName, bool isBot)
         {
             _initHeroId = heroId ?? "";
             _initPlayerName = playerName ?? "";
+            _initIsBot = isBot;
+        }
+
+        // Server: the name everyone sees (the account's username once the server knows it).
+        public void SetPlayerName(string playerName) => _playerName.Value = Truncate(playerName);
+
+        static FixedString64Bytes Truncate(string text)
+        {
+            text ??= "";
+            if (text.Length > 30) text = text[..30];
+            return new FixedString64Bytes(text);
         }
 
         public override void OnNetworkSpawn()
@@ -94,11 +114,13 @@ namespace Moba.Net
             if (IsServer)
             {
                 _heroId.Value = _initHeroId;
-                _playerName.Value = _initPlayerName;
+                _playerName.Value = Truncate(_initPlayerName);
+                _isBot.Value = _initIsBot;
                 _hero.isPlayer = false; // no local input on the server
                 _ascension = GetComponent<HeroAscension>();
                 for (int i = 0; i < KitSize; i++) _kit.Add(NetItems.None);
                 for (int i = 0; i < AbilityCaster.SlotCount * 2; i++) _cooldowns.Add(0f);
+                _progression.BountyEarned += SendBounty;
                 PushState();
                 return;
             }
@@ -113,28 +135,55 @@ namespace Moba.Net
                 _hero.name = IsBot ? $"{definition.displayName} (bot)" : definition.displayName;
             }
             _ascension = GetComponent<HeroAscension>();
-            _hero.isPlayer = IsOwner;
-            if (IsOwner)
-            {
-                _hero.Remote = this;
-                if (game != null)
-                {
-                    game.hero = _hero;
-                    if (game.cameraRig != null)
-                    {
-                        game.cameraRig.hero = _hero;
-                        game.cameraRig.transform.position = transform.position;
-                    }
-                }
-            }
+            _hero.isPlayer = false;
+            if (IsOwner) TakeControl();
             ApplyState();
+        }
+
+        // Client: this hero is ours (spawned for us, or handed back when we rejoin).
+        void TakeControl()
+        {
+            _hero.isPlayer = true;
+            _hero.Remote = this;
+            GameManager game = GameManager.Instance;
+            if (game == null) return;
+            game.hero = _hero;
+            if (game.cameraRig != null)
+            {
+                game.cameraRig.hero = _hero;
+                game.cameraRig.transform.position = transform.position;
+            }
+        }
+
+        public override void OnGainedOwnership()
+        {
+            if (!IsServer) TakeControl();
+        }
+
+        // Server: its player left; the hero stays in the match and stops where it is.
+        public override void OnLostOwnership()
+        {
+            if (IsServer && OwnerClientId == NetworkManager.ServerClientId) _hero.Stop();
         }
 
         public override void OnNetworkDespawn()
         {
+            if (IsServer) _progression.BountyEarned -= SendBounty;
             GameManager game = GameManager.Instance;
             if (game != null) game.heroes.Remove(_hero);
         }
+
+        // Server: the gold and XP pop-ups, for the player who earned them.
+        void SendBounty(int gold, float xp, Vector3 worldPos)
+        {
+            if (OwnerClientId == NetworkManager.ServerClientId) return; // a bot, or a player who left
+            var target = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } };
+            BountyClientRpc(gold, xp, worldPos, target);
+        }
+
+        [ClientRpc]
+        void BountyClientRpc(int gold, float xp, Vector3 worldPos, ClientRpcParams target = default) =>
+            _progression.RaiseBountyFromServer(gold, xp, worldPos);
 
         void Update()
         {
@@ -154,6 +203,9 @@ namespace Moba.Net
             _deaths.Value = _progression.Deaths;
             _assists.Value = _progression.Assists;
             _creepScore.Value = _progression.CreepScore;
+            _heroDamage.Value = Mathf.RoundToInt(_progression.HeroDamage);
+            _totalDamage.Value = Mathf.RoundToInt(_progression.TotalDamage);
+            _damageTaken.Value = Mathf.RoundToInt(_progression.DamageTaken);
             _respawn.Value = _hero.Unit.IsAlive ? 0f : Mathf.Max(0f, _hero.RespawnRemaining);
             _mana.Value = Mathf.Round(_caster.Mana);
             _maxMana.Value = _caster.maxMana;
@@ -202,6 +254,7 @@ namespace Moba.Net
         {
             _progression.SetFromServer(_level.Value, _xp.Value, _gold.Value, _kills.Value, _deaths.Value,
                 _assists.Value, _creepScore.Value);
+            _progression.SetDamageFromServer(_heroDamage.Value, _totalDamage.Value, _damageTaken.Value);
             _hero.SetRespawnFromServer(_hero.Unit.IsAlive, _respawn.Value);
             _caster.SetManaFromServer(_mana.Value, _maxMana.Value);
             _caster.NoManaCost = (_cheatToggles.Value & 1) != 0;
