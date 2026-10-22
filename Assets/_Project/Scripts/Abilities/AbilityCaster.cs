@@ -246,6 +246,27 @@ namespace Moba.Abilities
             return true;
         }
 
+        // ---------- Game-server clients: the server's numbers (see NetworkHero) ----------
+
+        public void SetRankFromServer(int index, int rank)
+        {
+            if (slots[index].rank == rank) return;
+            slots[index].rank = rank;
+            RankLearned?.Invoke(index);
+        }
+
+        public void SetCooldownFromServer(int index, float remaining, float total)
+        {
+            slots[index].cooldownRemaining = remaining;
+            slots[index].cooldownTotal = total;
+        }
+
+        public void SetManaFromServer(float mana, float max)
+        {
+            maxMana = max;
+            Mana = Mathf.Clamp(mana, 0f, max);
+        }
+
         public void RestoreMana() => Mana = maxMana;
 
         public void RestoreMana(float amount) => Mana = Mathf.Min(maxMana, Mana + amount);

@@ -193,15 +193,14 @@ namespace Moba
         // cast straight at the cursor (no indicator); HUD clicks always use normal targeting.
         public void BeginCast(int slot, bool fromHud = false)
         {
-            if (Remote != null)
-            {
-                Hud.Instance?.ShowHudMessage("Spells on the game server come in the next stage.");
-                return;
-            }
             if (_abilities.GetCastBlock(slot) != CastBlock.None) return;
             AbilityDefinition ability = _abilities.GetSlot(slot).ability;
             CancelTargeting();
-            if (ability.targeting == AbilityTargeting.Instant) _abilities.TryCast(slot, transform.position, null);
+            if (ability.targeting == AbilityTargeting.Instant)
+            {
+                if (Remote != null) Remote.SendCast(slot, transform.position, null);
+                else _abilities.TryCast(slot, transform.position, null);
+            }
             else if (GameSettings.Current.spellQuickCast && !fromHud && Mouse.current != null)
                 QuickCast(slot, ability, Mouse.current.position.ReadValue());
             else _targetingSlot = slot;
@@ -245,7 +244,15 @@ namespace Moba
             _attackTarget = target;
         }
 
-        // Cast a slot at a point or unit, walking into range first (bots; the player uses BeginCast).
+        // Spends a skill point on a slot's rank (on a game server, the server does).
+        public void LevelUp(int slot)
+        {
+            if (Remote == null) _abilities.TryLevelUp(slot);
+            else if (_abilities.CanLevelUp(slot)) Remote.SendLevelUp(slot);
+        }
+
+        // Cast a slot at a point or unit, walking into range first (bots, and players' casts on the game server;
+        // the local player uses BeginCast).
         public bool OrderCast(int slot, Vector3 point, Unit target)
         {
             if (!_unit.IsAlive || _abilities.GetCastBlock(slot) != CastBlock.None) return false;
@@ -277,7 +284,7 @@ namespace Moba
             for (int i = 0; i < AbilityCaster.SlotCount; i++)
             {
                 if (!input.Abilities[i].WasPressedThisFrame()) continue;
-                if (levelUp) _abilities.TryLevelUp(i);
+                if (levelUp) LevelUp(i);
                 else BeginCast(i);
             }
 
@@ -374,6 +381,11 @@ namespace Moba
         void QueueCast(int slot, Vector3 point, Unit target)
         {
             CancelTargeting();
+            if (Remote != null)
+            {
+                Remote.SendCast(slot, point, target);
+                return;
+            }
             ClearOrders();
             _pendingCastSlot = slot;
             _pendingCastPoint = point;

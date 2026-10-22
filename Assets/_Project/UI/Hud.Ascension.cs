@@ -12,6 +12,8 @@ namespace Moba.UI
         Label _ascensionTitle, _ascensionSubtitle;
         HeroAscension _ascension;
         int _shownAscensionTier = -1;
+        // On a game server: the tier whose choice was sent and hasn't come back yet (its cards stay hidden).
+        int _sentAscensionTier = -1;
 
         static readonly string[] TierNumerals = { "I", "II", "III" };
 
@@ -27,6 +29,8 @@ namespace Moba.UI
         {
             if (_ascension == null && _hero != null) _ascension = _hero.GetComponent<HeroAscension>();
             int tier = _ascension != null && !_game.IsOver ? _ascension.PendingTier : -1;
+            if (tier != _sentAscensionTier) _sentAscensionTier = -1;
+            else tier = -1;
             _ascensionPanel.EnableInClassList("hidden", tier < 0);
             if (tier == _shownAscensionTier) return;
             _shownAscensionTier = tier;
@@ -76,7 +80,15 @@ namespace Moba.UI
 
             card.RegisterCallback<ClickEvent>(_ =>
             {
-                _ascension.Choose(option);
+                if (_hero.Remote != null)
+                {
+                    _hero.Remote.SendAscend(tier, option);
+                    _sentAscensionTier = tier;
+                }
+                else
+                {
+                    _ascension.Choose(option);
+                }
                 _shownAscensionTier = -1; // rebuild for the next due choice, if any
             });
             return card;

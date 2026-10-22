@@ -17,6 +17,18 @@ namespace Moba
             stun.enabled = true;
         }
 
+        // Game-server clients: stunned for as long as the server says (no timer of its own).
+        public static void SetFromServer(Unit unit, bool stunned)
+        {
+            if (!unit.TryGetComponent(out Stun stun))
+            {
+                if (!stunned) return;
+                stun = unit.gameObject.AddComponent<Stun>();
+            }
+            stun._remaining = stunned ? float.PositiveInfinity : 0f;
+            stun.enabled = stunned;
+        }
+
         public static bool IsStunned(Unit unit) =>
             unit != null && unit.TryGetComponent(out Stun stun) && stun.enabled && stun._remaining > 0f;
 

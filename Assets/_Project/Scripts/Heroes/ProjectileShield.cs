@@ -37,6 +37,20 @@ namespace Moba
             shield.Setup(duration, radius, arcDegrees, height, wallMaterial, flashMaterial);
         }
 
+        // Game-server clients: show the shield the server reports (`remaining` 0 = none). The server does the blocking.
+        public static void SyncFromServer(Unit owner, float remaining, float radius, float arcDegrees, float height,
+            Material wallMaterial)
+        {
+            bool raised = IsRaised(owner);
+            if (remaining <= 0f)
+            {
+                if (raised) owner.GetComponent<ProjectileShield>()._remaining = 0f; // lowered next frame
+                return;
+            }
+            if (raised) owner.GetComponent<ProjectileShield>()._remaining = remaining;
+            else Raise(owner, remaining, radius, arcDegrees, height, wallMaterial, null);
+        }
+
         // True if a projectile of `team` moving from `from` to `to` this frame runs into an enemy shield's front.
         // `hitPoint` is where it struck the wall.
         public static bool TryBlock(Team team, Vector3 from, Vector3 to, out Vector3 hitPoint)

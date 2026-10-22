@@ -2,10 +2,41 @@ using Moba.Abilities;
 
 namespace Moba.Items
 {
+    // The drag-and-drop moves by name, as a game-server client sends them (see Loadout.Perform).
+    public enum LoadoutAction : byte { MoveItem, Equip, UnequipSpell, UnequipMod, MoveSpell, MoveMod }
+
     // Moving spells and mods between the inventory and spell slots (the HUD's drag and drop).
     // Every operation returns null on success, or a short message explaining why it didn't happen.
     public static class Loadout
     {
+        // One move by name: (from, to) for items and spells, (spell slot, socket, to) for mods. The indexes are
+        // checked first, since on the game server they come from the network.
+        public static string Perform(Inventory inventory, AbilityCaster caster, LoadoutAction action, int a, int b, int c)
+        {
+            static bool Item(int i) => i >= 0 && i < Inventory.SlotCount;
+            static bool Spell(int i) => i >= 0 && i < AbilityCaster.SlotCount;
+            static bool Socket(int i) => i >= 0 && i < AbilityCaster.MaxModSockets;
+
+            switch (action)
+            {
+                case LoadoutAction.MoveItem when Item(a) && Item(b):
+                    inventory.Move(a, b);
+                    return null;
+                case LoadoutAction.Equip when Item(a) && Spell(b):
+                    return EquipFromInventory(inventory, caster, a, b);
+                case LoadoutAction.UnequipSpell when Spell(a) && Item(b):
+                    return UnequipSpell(inventory, caster, a, b);
+                case LoadoutAction.UnequipMod when Spell(a) && Socket(b) && Item(c):
+                    return UnequipMod(inventory, caster, a, b, c);
+                case LoadoutAction.MoveSpell when Spell(a) && Spell(b):
+                    return MoveSpell(caster, a, b);
+                case LoadoutAction.MoveMod when Spell(a) && Socket(b) && Spell(c):
+                    return MoveMod(caster, a, b, c);
+                default:
+                    return "That move isn't possible.";
+            }
+        }
+
         // Inventory slot -> spell slot. Spells swap with the slot's current spell; mods go into the first free socket.
         public static string EquipFromInventory(Inventory inventory, AbilityCaster caster, int inventorySlot, int spellSlot)
         {

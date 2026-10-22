@@ -32,6 +32,20 @@ namespace Moba
             haste.Begin(duration, moveBonus, attackSpeedBonus, refreshOnHeroKill, auraMaterial);
         }
 
+        // Game-server clients: show the buff the server reports (`remaining` 0 = none). Only the aura matters
+        // here; the server applies the speed.
+        public static void SyncFromServer(Unit unit, float remaining, Material auraMaterial)
+        {
+            bool active = unit.TryGetComponent(out Haste haste) && haste.enabled;
+            if (remaining <= 0f)
+            {
+                if (active) haste._remaining = 0f; // ends next frame
+                return;
+            }
+            if (active) haste._remaining = remaining;
+            else Apply(unit, remaining, 0f, 0f, false, auraMaterial);
+        }
+
         void Awake()
         {
             _unit = GetComponent<Unit>();

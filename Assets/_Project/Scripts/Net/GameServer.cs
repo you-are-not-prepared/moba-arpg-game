@@ -18,8 +18,12 @@ namespace Moba.Net
     //   map    classic | zones | delve | random (default random)
     //   port   UDP port to listen on (default 7777)
     //   bots   number of bots per team besides players; blue gets one fewer (default 3)
+    //   cheats on | off: whether players may use the cheat menu (default off; for local testing)
     public class GameServer : MonoBehaviour
     {
+        // Read by NetworkMatch, which tells the clients.
+        public static bool CheatsAllowed { get; private set; }
+
         const float QuitDelayAfterMatch = 15f;
 
         static readonly Dictionary<ulong, NetSession.JoinRequest> s_Joining = new();
@@ -70,6 +74,7 @@ namespace Moba.Net
             MapLayoutInfo layout = PickLayout(Setting("map", "random"));
             ushort port = ushort.TryParse(Setting("port", NetSession.DefaultPort.ToString()), out ushort p) ? p : NetSession.DefaultPort;
             int bots = int.TryParse(Setting("bots", "3"), out int b) ? Mathf.Clamp(b, 0, 5) : 3;
+            CheatsAllowed = Setting("cheats", "off").ToLowerInvariant() is "on" or "1" or "true";
             PrepareBots(bots);
 
             _manager = NetSession.EnsureManager();
@@ -85,7 +90,8 @@ namespace Moba.Net
             _manager.SceneManager.OnSynchronizeComplete += SpawnJoinedPlayer;
             _manager.SceneManager.OnLoadEventCompleted += (_, _, _, _) => OnMapLoaded();
             _manager.SceneManager.LoadScene(layout.sceneName, LoadSceneMode.Single);
-            Debug.Log($"[GameServer] Listening on UDP {port}. Map: {layout.displayName}, {bots} bots per team.");
+            Debug.Log($"[GameServer] Listening on UDP {port}. Map: {layout.displayName}, {bots} bots per team, " +
+                      $"cheats {(CheatsAllowed ? "on" : "off")}.");
         }
 
         // Players may connect while the match runs, with a hero the roster knows.

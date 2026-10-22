@@ -3,10 +3,11 @@ using UnityEngine.UIElements;
 namespace Moba.UI
 {
     // Cheat menu (right side, under Options) for testing: +1 level, +10000 gold, no mana costs, no cooldowns,
-    // and game speed (1x / 2x / 4x / 8x).
+    // and game speed (1x / 2x / 4x / 8x). On a game server that allows cheats the buttons go to the server
+    // (game speed stays offline only: it would speed up everyone's match).
     public partial class Hud
     {
-        const int CheatGold = 10000;
+        public const int CheatGold = 10000;
         static readonly float[] CheatSpeeds = { 1f, 2f, 4f, 8f };
 
         VisualElement _cheatPanel;
@@ -30,21 +31,25 @@ namespace Moba.UI
             };
             _cheatLevel.clicked += () =>
             {
+                if (SendCheat(Net.CheatAction.Level)) return;
                 MarkCheated();
                 _progression?.GainLevel();
             };
             gold.clicked += () =>
             {
+                if (SendCheat(Net.CheatAction.Gold)) return;
                 MarkCheated();
                 _progression?.AddGold(CheatGold);
             };
             _cheatMana.clicked += () =>
             {
+                if (SendCheat(Net.CheatAction.NoManaCost)) return;
                 MarkCheated();
                 if (_abilities != null) _abilities.NoManaCost = !_abilities.NoManaCost;
             };
             _cheatCooldowns.clicked += () =>
             {
+                if (SendCheat(Net.CheatAction.NoCooldowns)) return;
                 MarkCheated();
                 if (_abilities != null) _abilities.NoCooldowns = !_abilities.NoCooldowns;
             };
@@ -61,6 +66,14 @@ namespace Moba.UI
             _cheatPanel.Query<Button>().ForEach(b => b.focusable = false);
         }
 
+        // On a game server the cheat runs there (which marks the match as cheated). True if it was sent.
+        bool SendCheat(Net.CheatAction cheat)
+        {
+            if (_hero == null || _hero.Remote == null) return false;
+            _hero.Remote.SendCheat(cheat);
+            return true;
+        }
+
         // A match where any cheat was used is recorded as such and left out of the player's stats.
         void MarkCheated()
         {
@@ -69,8 +82,10 @@ namespace Moba.UI
 
         void UpdateCheats()
         {
-            // Cheats change only this copy of the game, so they make no sense on a game server.
-            _cheatPanel.EnableInClassList("hidden", Net.NetSession.IsRemoteClient);
+            // On a game server only if it allows cheats, and without game speed.
+            bool remote = Net.NetSession.IsRemoteClient;
+            _cheatPanel.EnableInClassList("hidden", remote && !Net.NetworkMatch.CheatsAllowed);
+            _cheatSpeed.EnableInClassList("hidden", remote);
             _cheatLevel.SetEnabled(_progression != null && !_progression.IsMaxLevel);
             bool noMana = _abilities != null && _abilities.NoManaCost;
             bool noCooldowns = _abilities != null && _abilities.NoCooldowns;

@@ -4,7 +4,7 @@ A MOBA with ARPG builds, made in Unity. It has classic MOBA structure (lanes, cr
 
 **Status:** early prototype.
 - **Playable:** PvE (3v3 against bots), 5 heroes, 3 map layouts, accounts with match history.
-- **Game server (stage 1):** PvP joins a local game server in Docker that runs the match (see below). Spells, shop and more over the network come next.
+- **Game server (stage 2):** PvP joins a local game server in Docker that runs the match (see below), spells, shop, inventory and ascension included.
 
 The backend (accounts, settings sync, match history) lives in a separate repo: [tomicnikola/moba-backend](https://github.com/tomicnikola/moba-backend).
 
@@ -148,7 +148,7 @@ To run the backend locally, see [moba-backend](https://github.com/tomicnikola/mo
 
 ## Game server (local, Docker)
 
-The game can run as a **server that runs the whole match**: movement, creeps, towers, bots, combat and respawns. The game connects to it as a client: it sends your orders (move, attack, attack move, stop) and shows what the server says is happening. It uses Unity Netcode for GameObjects; the server is a headless Linux build of this same project.
+The game can run as a **server that runs the whole match**: movement, creeps, towers, bots, combat and respawns. The game connects to it as a client: it sends your orders (move, attack, attack move, stop, casts, rank-ups) and choices (buying, selling, drag and drop, ascension), and shows what the server says is happening. It uses Unity Netcode for GameObjects; the server is a headless Linux build of this same project.
 
 **Run it**
 1. In Unity: **MOBA → Build Linux Server**. This needs the *Linux Dedicated Server Build Support* module and writes to `Builds/LinuxServer` (ignored by git).
@@ -170,22 +170,25 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 - `MOBA_MAP`: `classic`, `zones`, `delve` or `random`.
 - `MOBA_BOTS`: bots per team.
 - `MOBA_PORT`: the UDP port.
+- `MOBA_CHEATS`: `on` lets players use the cheat menu (without game speed). On in `docker-compose.yml` for local testing; set it to `off` before others play.
 
 **Useful commands**
 - `docker compose logs -f game-server` follows the server log.
 - `docker compose down` stops the server.
 - PlayerPrefs `moba.gameserver.address` (`host:port`) points the game at a different server.
 
-**Stage 1 status:** movement, attacks, creeps, towers, cores, health, gold, XP, levels, K/D/A, CS, deaths and respawns, the match result, and attack visuals all come from the server.
+**What comes from the server**
+- Stage 1: movement, attacks, creeps, towers, cores, health, gold, XP, levels, K/D/A, CS, deaths and respawns, the match result, and attack visuals.
+- Stage 2:
+  - spells and ultimates: casting (walking into range first), mana, cooldowns, ranks and skill points;
+  - spell visuals: projectiles, explosions, the shield wall and the haste aura, plus stuns and burns;
+  - the shop (buy and sell), the inventory and spell/mod drag and drop. The HUD shows a drag at once, and the server's result follows;
+  - ascension choices;
+  - every hero's kit, so the Tab scoreboard shows everyone's items and spells.
 
-Not over the network yet (next stages):
-- spells and the ultimate;
-- the shop and inventory;
-- ascension choices;
-- the creep wave timer;
-- the server recording match results.
+Not over the network yet (next stage): the creep wave timer, and the server recording match results.
 
-On the server, the cheat menu is hidden and the shop and spells say they're coming. PvE stays fully offline as before.
+PvE stays fully offline as before.
 
 **Important**
 - **Re-run Build Linux Server after rebuilding the scenes:** in-scene objects are matched between server and client by IDs saved in the scenes.
@@ -198,8 +201,8 @@ On the server, the cheat menu is hidden and the shop and spells say they're comi
   - no mana costs and no cooldowns;
   - game speed: 1x / 2x / 4x / 8x.
 
-  Using any cheat marks the match.
-- **Test prices:** while `TestPrices` is `true` in `Assets/_Project/Editor/GameBuilder.cs`, every item, spell and mod costs **1 gold**. Bots then buy everything at once and hit very hard, so PvE matches end quickly. Set it to `false` and rebuild for real prices.
+  Using any cheat marks the match. On the game server the menu works when `MOBA_CHEATS` is `on`.
+- **Test prices:** while `TestPrices` is `true` in `Assets/_Project/Editor/GameBuilder.cs`, every item, spell and mod costs **1 gold**. Bots then buy everything at once and hit very hard, so PvE matches end quickly. The same goes for the bots on the game server. Set it to `false` and rebuild for real prices.
 - **Test colours:** `TestKindColors` colours inventory tiles by kind (items orange, spells blue, mods green).
 
 ---
@@ -220,7 +223,7 @@ Assets/_Project/
     Heroes/     Hero mechanics: ascension, Aegis Wall shield, Bloodrush haste, isolation passive
     Items/      Inventory, shop, item catalog, loadout (equip/swap rules)
     Match/      Heroes, roster, map layouts, MatchSettings, MatchBootstrap (spawns the lineup)
-    Net/        Game server: NetSession, GameServer (server boot), GameClient (joining), NetworkUnit/Hero/Match
+    Net/        Game server: NetSession, GameServer (server boot), GameClient (joining), NetworkUnit/Hero/Match, NetItems (item ids)
     Online/     Backend client, accounts and settings sync, match recording and history
     Settings/   GameSettings (options) and GameInput (rebindable controls)
     *.cs        Core: Unit, Attacker, HeroController, CreepAI, TowerAI, FogOfWar, GameManager...

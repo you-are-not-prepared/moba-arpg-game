@@ -18,12 +18,15 @@ namespace Moba
         AscensionTree _tree;
         HeroProgression _progression;
         readonly List<Talent> _picked = new();
+        readonly List<int> _pickedOptions = new();
         int _path = -1;
 
         // Raised after a talent is picked (and when a new choice becomes due).
         public event Action Changed;
 
         public IReadOnlyList<Talent> Picked => _picked;
+        // The option index chosen at each tier (what a game server sends its clients).
+        public IReadOnlyList<int> PickedOptions => _pickedOptions;
         // 0 = path A, 1 = path B, 2 = path C..., -1 before the first pick.
         public int PathIndex => _path;
         public string PathName => _path >= 0 ? _tree.Path(_path).root.name : null;
@@ -78,12 +81,23 @@ namespace Moba
         public void Choose(int option)
         {
             int tier = PendingTier;
-            if (tier < 0) return;
+            if (tier >= 0) Pick(tier, option);
+        }
+
+        // Game-server clients: the next choice the server made (the level it needed was reached there).
+        public void ChooseFromServer(int option)
+        {
+            if (_tree != null && _picked.Count < Levels.Length) Pick(_picked.Count, option);
+        }
+
+        void Pick(int tier, int option)
+        {
             IReadOnlyList<Talent> options = Options(tier);
             if (option < 0 || option >= options.Count) return;
             Talent talent = options[option];
             if (tier == 0) _path = option;
             _picked.Add(talent);
+            _pickedOptions.Add(option);
             Apply(talent);
             Changed?.Invoke();
         }
