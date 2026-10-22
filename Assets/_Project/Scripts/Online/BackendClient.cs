@@ -14,7 +14,11 @@ namespace Moba.Online
         const string UrlPrefsKey = "moba.backend.url";
         const int TimeoutSeconds = 10;
 
-        public static string BaseUrl => PlayerPrefs.GetString(UrlPrefsKey, DefaultUrl).TrimEnd('/');
+        // Set by the game server (its "backend" setting); otherwise PlayerPrefs, then the default.
+        public static string UrlOverride { get; set; }
+
+        public static string BaseUrl =>
+            (string.IsNullOrEmpty(UrlOverride) ? PlayerPrefs.GetString(UrlPrefsKey, DefaultUrl) : UrlOverride).TrimEnd('/');
 
         public readonly struct Response
         {
@@ -70,7 +74,9 @@ namespace Moba.Online
             }
         }
 
-        public static async Task<Response> Send(string method, string path, string jsonBody = null, string token = null)
+        // `serverKey`: the game server's key for the backend's /server endpoints.
+        public static async Task<Response> Send(string method, string path, string jsonBody = null, string token = null,
+            string serverKey = null)
         {
             using var request = new UnityWebRequest(BaseUrl + path, method)
             {
@@ -83,6 +89,7 @@ namespace Moba.Online
                 request.SetRequestHeader("Content-Type", "application/json");
             }
             if (!string.IsNullOrEmpty(token)) request.SetRequestHeader("Authorization", "Bearer " + token);
+            if (!string.IsNullOrEmpty(serverKey)) request.SetRequestHeader("X-Game-Server-Key", serverKey);
 
             string failure = null;
             try

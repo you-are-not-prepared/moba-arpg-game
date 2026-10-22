@@ -4,7 +4,7 @@ A MOBA with ARPG builds, made in Unity. It has classic MOBA structure (lanes, cr
 
 **Status:** early prototype.
 - **Playable:** PvE (3v3 against bots), 5 heroes, 3 map layouts, accounts with match history.
-- **Game server (stage 2):** PvP joins a local game server in Docker that runs the match (see below), spells, shop, inventory and ascension included.
+- **Game server (stage 3):** PvP joins a local game server in Docker that runs the whole match (see below) and records it on your account.
 
 The backend (accounts, settings sync, match history) lives in a separate repo: [tomicnikola/moba-backend](https://github.com/tomicnikola/moba-backend).
 
@@ -163,7 +163,9 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 **How the server behaves**
 - It picks the map and fills both teams with bots. Players join blue.
 - The match stays paused until the first player joins.
-- When a core falls, the server quits after 15 seconds, and Docker restarts it with a fresh match.
+- **Leaving:** a player who leaves keeps their hero in the match, standing still. Logging back in to the same server hands it back.
+- **Recording:** logged-in players are identified with the backend through a join ticket. When a core falls, the server records the match on everyone's account; it then shows in their match history and stats.
+- **Next match:** the server quits 15 seconds after the match ends, and Docker restarts it with a fresh one. Players still on the end screen go straight to the match analysis.
 - It listens on UDP 7777, bound to `127.0.0.1`, so only this PC can join.
 
 **Settings** (in `docker-compose.yml`)
@@ -171,6 +173,10 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 - `MOBA_BOTS`: bots per team.
 - `MOBA_PORT`: the UDP port.
 - `MOBA_CHEATS`: `on` lets players use the cheat menu (without game speed). On in `docker-compose.yml` for local testing; set it to `off` before others play.
+- `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY`: where to record matches, and the backend's game-server key.
+  - The defaults match the local backend on this PC (moba-backend's `docker compose up`).
+  - Without a key, nothing is recorded.
+  - On a real server, set `GAME_SERVER_KEY` in a `.env` file here and in moba-backend (git ignores `.env`).
 
 **Useful commands**
 - `docker compose logs -f game-server` follows the server log.
@@ -185,8 +191,10 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
   - the shop (buy and sell), the inventory and spell/mod drag and drop. The HUD shows a drag at once, and the server's result follows;
   - ascension choices;
   - every hero's kit, so the Tab scoreboard shows everyone's items and spells.
-
-Not over the network yet (next stage): the creep wave timer, and the server recording match results.
+- Stage 3:
+  - the match clock and the creep wave timer;
+  - damage numbers, for the scoreboard and analysis;
+  - match recording on the backend, as described above.
 
 PvE stays fully offline as before.
 

@@ -27,7 +27,9 @@ namespace Moba
         public bool CheatsUsed { get; set; }
         public bool IsOver => Winner.HasValue;
         public bool IsPaused => _paused;
-        public float MatchTime => Time.timeSinceLevelLoad;
+        public float MatchTime => Time.timeSinceLevelLoad + _clockOffset;
+        // Game-server clients follow the server's clock (see Net.NetworkMatch).
+        float _clockOffset;
 
         void Awake()
         {
@@ -48,6 +50,8 @@ namespace Moba
             if (unit.kind != UnitKind.Core || IsOver) return;
             EndMatch(unit.team == Team.Blue ? Team.Red : Team.Blue);
         }
+
+        public void SetMatchTimeFromServer(float seconds) => _clockOffset = seconds - Time.timeSinceLevelLoad;
 
         // Game-server clients: the server decided the match (see Net.NetworkMatch).
         public void SetWinnerFromServer(Team winner)

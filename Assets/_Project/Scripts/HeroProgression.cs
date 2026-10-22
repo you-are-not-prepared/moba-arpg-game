@@ -123,6 +123,16 @@ namespace Moba
             CreepScore = creepScore;
         }
 
+        // Game-server clients: a bounty the server paid this hero (for the HUD's pop-ups).
+        public void RaiseBountyFromServer(int gold, float xp, Vector3 worldPos) => BountyEarned?.Invoke(gold, xp, worldPos);
+
+        public void SetDamageFromServer(float heroDamage, float totalDamage, float damageTaken)
+        {
+            HeroDamage = heroDamage;
+            TotalDamage = totalDamage;
+            DamageTaken = damageTaken;
+        }
+
         public bool TrySpendGold(int amount)
         {
             if (Gold < amount) return false;

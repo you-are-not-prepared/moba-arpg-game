@@ -8,6 +8,7 @@ namespace Moba.Online
     // When a core falls, takes a snapshot of every player (level, K/D/A, CS, damage, build) for the post-match
     // analysis screen. While logged in it also records the match on the account: registered with the server when
     // the match starts, the snapshot sent when it ends. Matches that are left early stay unfinished there.
+    // On a game server the server records the match instead, for every logged-in player in it (its clients don't).
     [RequireComponent(typeof(GameManager))]
     public class MatchReporter : MonoBehaviour
     {
@@ -20,7 +21,7 @@ namespace Moba.Online
         {
             _game = GetComponent<GameManager>();
             _game.MatchEnded += OnMatchEnded;
-            // On a game server the server will record the match (next stage), not its clients.
+            // On a game server the server records the match when it ends (RecordFromServer).
             if (!AccountService.IsLoggedIn || _game.heroes.Count == 0 || Net.NetSession.IsNetworked) return;
 
             var request = new StartMatchRequest { mode = MatchSettings.Mode.ToString(), mapLayout = MapLayoutId() };
@@ -51,6 +52,11 @@ namespace Moba.Online
         void OnMatchEnded(Team winner)
         {
             MatchDetailResponse snapshot = Snapshot(winner);
+            if (Net.NetSession.IsNetworked && Net.NetSession.HasAuthority)
+            {
+                RecordFromServer(snapshot);
+                return;
+            }
             PostMatch.Last = snapshot;
             if (_startPending) _pendingReport = snapshot;
             else Report(snapshot);
@@ -82,7 +88,7 @@ namespace Moba.Online
                     team = hero.Unit.team.ToString(),
                     heroId = HeroId(hero),
                     isBot = IsBot(hero),
-                    username = isLocal && AccountService.IsLoggedIn ? AccountService.Profile.username : null,
+                    username = Username(hero, isLocal),
                     level = progression.Level,
                     kills = progression.Kills,
                     deaths = progression.Deaths,
@@ -124,6 +130,62 @@ namespace Moba.Online
 
             string error = await MatchService.Report(matchId, result);
             if (error != null) Debug.LogWarning($"[Matches] Result not recorded: {error}");
+        }
+
+        // Game server: the snapshot, with each player's account (from their join ticket). Not sent when nobody in the
+        // match was logged in, since it wouldn't show up anywhere.
+        async void RecordFromServer(MatchDetailResponse snapshot)
+        {
+            string key = Net.GameServer.BackendKey;
+            if (string.IsNullOrEmpty(key)) return;
+
+            var request = new ServerMatchRequest
+            {
+                mode = snapshot.mode,
+                mapLayout = snapshot.mapLayout,
+                durationSeconds = snapshot.durationSeconds,
+                winnerTeam = snapshot.winnerTeam,
+                cheatsUsed = snapshot.cheatsUsed,
+            };
+            bool anyAccount = false;
+            for (int slot = 0; slot < snapshot.players.Count; slot++)
+            {
+                MatchDetailPlayer p = snapshot.players[slot];
+                string account = _game.heroes[slot].TryGetComponent(out Net.NetworkHero net) ? net.AccountId : "";
+                anyAccount |= account.Length > 0;
+                request.players.Add(new ServerMatchPlayer
+                {
+                    team = p.team,
+                    heroId = p.heroId,
+                    isBot = p.isBot,
+                    accountId = account,
+                    level = p.level,
+                    kills = p.kills,
+                    deaths = p.deaths,
+                    assists = p.assists,
+                    creepScore = p.creepScore,
+                    heroDamage = p.heroDamage,
+                    totalDamage = p.totalDamage,
+                    damageTaken = p.damageTaken,
+                    build = p.build,
+                });
+            }
+            if (!anyAccount)
+            {
+                Debug.Log("[Matches] Nobody in this match was logged in; not recorded.");
+                return;
+            }
+
+            string error = await MatchService.RecordFromServer(request, key);
+            if (error == null) Debug.Log("[Matches] Match recorded on the backend.");
+            else Debug.LogWarning($"[Matches] Match not recorded: {error}");
+        }
+
+        // On a game server every player has a name (bots none); offline only the local player, when logged in.
+        static string Username(HeroController hero, bool isLocal)
+        {
+            if (hero.TryGetComponent(out Net.NetworkHero net) && net.IsSpawned) return net.IsBot ? null : net.PlayerName;
+            return isLocal && AccountService.IsLoggedIn ? AccountService.Profile.username : null;
         }
 
         string MapLayoutId() => TryGetComponent(out MapLayout layout) && layout.info != null ? layout.info.id : "unknown";

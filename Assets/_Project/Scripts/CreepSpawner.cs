@@ -22,6 +22,9 @@ namespace Moba
 
         public float NextWaveIn => Mathf.Max(0f, _nextWaveTime - Time.time);
 
+        // Game-server clients: the server's countdown (see Net.NetworkMatch).
+        public void SetNextWaveFromServer(float seconds) => _nextWaveTime = Time.time + seconds;
+
         IEnumerator Start()
         {
             // On a game-server client the server spawns the creeps.

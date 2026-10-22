@@ -5,9 +5,38 @@ using UnityEngine;
 
 namespace Moba.Online
 {
-    // Match records on the backend: starting/finishing a match, and the player's history and stats.
+    // Match records on the backend: starting/finishing a match, and the player's history and stats. A game server
+    // records its own matches (RecordFromServer); its players prove who they are with a join ticket.
     public static class MatchService
     {
+        // Player: a short-lived ticket for joining a game server as this account (null when logged out or offline).
+        public static async Task<string> JoinTicket()
+        {
+            if (!AccountService.IsLoggedIn) return null;
+            BackendClient.Response response = await BackendClient.Send("POST", "/me/join-ticket", token: AccountService.SessionToken);
+            if (response.Ok) return response.Read<JoinTicketResponse>()?.ticket;
+            Debug.LogWarning($"[Matches] No join ticket: {response.ErrorMessage}");
+            return null;
+        }
+
+        // Game server: the account a player's join ticket belongs to (null if it isn't valid).
+        public static async Task<RedeemTicketResponse> RedeemTicket(string ticket, string serverKey)
+        {
+            BackendClient.Response response = await BackendClient.Send("POST", "/server/join-tickets/redeem",
+                JsonUtility.ToJson(new RedeemTicketRequest { ticket = ticket }), serverKey: serverKey);
+            if (response.Ok) return response.Read<RedeemTicketResponse>();
+            Debug.LogWarning($"[Matches] Join ticket not accepted: {response.ErrorMessage}");
+            return null;
+        }
+
+        // Game server: the finished match. Returns null on success, otherwise the reason.
+        public static async Task<string> RecordFromServer(ServerMatchRequest request, string serverKey)
+        {
+            BackendClient.Response response = await BackendClient.Send("POST", "/server/matches",
+                JsonUtility.ToJson(request), serverKey: serverKey);
+            return response.Ok ? null : response.ErrorMessage;
+        }
+
         // Returns the new match's id, or null (logged out, offline, or the server refused).
         public static async Task<string> Start(StartMatchRequest request)
         {
@@ -71,6 +100,56 @@ namespace Moba.Online
     public class StartMatchResponse
     {
         public string matchId;
+    }
+
+    [Serializable]
+    public class JoinTicketResponse
+    {
+        public string ticket;
+    }
+
+    [Serializable]
+    public class RedeemTicketRequest
+    {
+        public string ticket;
+    }
+
+    [Serializable]
+    public class RedeemTicketResponse
+    {
+        public string accountId;
+        public string username;
+    }
+
+    // A game server's finished match: the lineup in slot order with everyone's numbers.
+    [Serializable]
+    public class ServerMatchRequest
+    {
+        public string mode;
+        public string mapLayout;
+        public int durationSeconds;
+        public string winnerTeam;
+        public bool cheatsUsed;
+        public List<ServerMatchPlayer> players = new();
+    }
+
+    [Serializable]
+    public class ServerMatchPlayer
+    {
+        public string team;
+        public string heroId;
+        public bool isBot;
+        // "" for bots and players who weren't logged in.
+        public string accountId;
+        public int level;
+        public int kills;
+        public int deaths;
+        public int assists;
+        public int creepScore;
+        public int heroDamage;
+        public int totalDamage;
+        public int damageTaken;
+        public PlayerBuild build;
     }
 
     [Serializable]

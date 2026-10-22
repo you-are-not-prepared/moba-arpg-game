@@ -76,7 +76,7 @@ namespace Moba
 
                 if (Net.NetSession.IsNetworked)
                 {
-                    hero.GetComponent<Net.NetworkHero>().Init(definition.id, slot.isBot ? "Bot" : "");
+                    hero.GetComponent<Net.NetworkHero>().Init(definition.id, slot.isBot ? "Bot" : "", slot.isBot);
                     hero.GetComponent<Unity.Netcode.NetworkObject>().Spawn(destroyWithScene: true);
                 }
                 else
@@ -86,15 +86,20 @@ namespace Moba
             }
         }
 
-        // Game server: a player who joined gets their hero on the blue team (players own their hero object).
-        public void SpawnPlayer(ulong clientId, string heroId, string playerName)
+        // Game server: a player who joined gets their hero on the blue team (players own their hero object). If they
+        // leave, the hero stays in the match.
+        public void SpawnPlayer(ulong clientId, string heroId, string playerName, string accountId)
         {
             HeroDefinition definition = roster.Find(heroId) ?? roster.heroes.FirstOrDefault(h => h != null);
             if (definition == null || definition.prefab == null) return;
             HeroController hero = Spawn(definition, Team.Blue, _spawnIndex[Team.Blue]++, _perTeam, isBot: false);
             hero.isPlayer = false; // input arrives from the client
-            hero.GetComponent<Net.NetworkHero>().Init(definition.id, playerName);
-            hero.GetComponent<Unity.Netcode.NetworkObject>().SpawnAsPlayerObject(clientId, destroyWithScene: true);
+            var net = hero.GetComponent<Net.NetworkHero>();
+            net.Init(definition.id, playerName, isBot: false);
+            net.AccountId = accountId ?? "";
+            var networkObject = hero.GetComponent<Unity.Netcode.NetworkObject>();
+            networkObject.DontDestroyWithOwner = true;
+            networkObject.SpawnAsPlayerObject(clientId, destroyWithScene: true);
         }
 
         HeroController Spawn(HeroDefinition definition, Team team, int index, int perTeam, bool isBot)

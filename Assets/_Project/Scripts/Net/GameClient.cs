@@ -12,12 +12,37 @@ namespace Moba.Net
         // Shown on the menu after being disconnected (cleared once shown).
         public static string LastError { get; set; }
         public static event Action<string> ConnectFailed;
+        // The answer to QueryServer: what the server runs, or null if it couldn't be reached.
+        public static event Action<NetSession.ServerInfo> ServerInfoReceived;
 
         static bool s_Connected;
+        static bool s_Probing;
 
-        public static void Connect(string heroId, string playerName)
+        // Asks the game server which map it's running, without joining: the server refuses the connection and puts
+        // the answer in the reason.
+        public static void QueryServer()
         {
             NetworkManager manager = NetSession.EnsureManager();
+            if (manager.IsListening) return;
+            NetSession.TryParseAddress(NetSession.ServerAddress, out string host, out ushort port);
+            NetSession.Transport.SetConnectionData(host, port);
+            manager.NetworkConfig.ConnectionData = NetSession.Encode(new NetSession.JoinRequest { probe = true });
+            Listen(manager);
+            s_Probing = true;
+            if (!manager.StartClient())
+            {
+                s_Probing = false;
+                ServerInfoReceived?.Invoke(null);
+            }
+        }
+
+        // Logged in, it first gets a join ticket so the server can record the match on this account.
+        public static async void Connect(string heroId, string playerName)
+        {
+            MatchSettings.Mode = MatchMode.PvP;
+            string ticket = await Online.MatchService.JoinTicket();
+            NetworkManager manager = NetSession.EnsureManager();
+            s_Probing = false;
             if (manager.IsListening) manager.Shutdown();
 
             NetSession.TryParseAddress(NetSession.ServerAddress, out string host, out ushort port);
@@ -26,15 +51,20 @@ namespace Moba.Net
             {
                 heroId = heroId,
                 playerName = playerName,
+                ticket = ticket ?? "",
             });
 
+            Listen(manager);
+            s_Connected = false;
+            if (!manager.StartClient()) Fail("Couldn't start the network connection.");
+        }
+
+        static void Listen(NetworkManager manager)
+        {
             manager.OnClientConnectedCallback -= OnConnected;
             manager.OnClientConnectedCallback += OnConnected;
             manager.OnClientDisconnectCallback -= OnDisconnected;
             manager.OnClientDisconnectCallback += OnDisconnected;
-
-            s_Connected = false;
-            if (!manager.StartClient()) Fail("Couldn't start the network connection.");
         }
 
         public static void Leave()
@@ -53,6 +83,12 @@ namespace Moba.Net
             NetworkManager manager = NetworkManager.Singleton;
             if (manager == null || manager.IsServer || clientId != manager.LocalClientId) return;
             string reason = string.IsNullOrEmpty(manager.DisconnectReason) ? null : manager.DisconnectReason;
+            if (s_Probing)
+            {
+                s_Probing = false;
+                ServerInfoReceived?.Invoke(ReadInfo(reason));
+                return;
+            }
             bool wasConnected = s_Connected;
             s_Connected = false;
 
@@ -63,10 +99,30 @@ namespace Moba.Net
                 return;
             }
 
-            // Lost the server mid-match (it ended, restarted, or crashed): back to the menu.
+            // The match is over and the server closed for the next one: same as Continue on the end screen.
+            GameManager game = GameManager.Instance;
+            if (game != null && game.IsOver)
+            {
+                game.ShowMatchSummary();
+                return;
+            }
+
+            // Lost the server mid-match (it restarted or crashed): back to the menu.
             LastError = reason ?? "Lost the connection to the game server.";
             if (SceneManager.GetActiveScene().name != MatchSettings.FrontendScene)
                 SceneManager.LoadScene(MatchSettings.FrontendScene);
+        }
+
+        static NetSession.ServerInfo ReadInfo(string reason)
+        {
+            try
+            {
+                return string.IsNullOrEmpty(reason) ? null : JsonUtility.FromJson<NetSession.ServerInfo>(reason);
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
         }
 
         static void Fail(string message)
@@ -80,7 +136,9 @@ namespace Moba.Net
         {
             LastError = null;
             ConnectFailed = null;
+            ServerInfoReceived = null;
             s_Connected = false;
+            s_Probing = false;
         }
     }
 }
