@@ -111,6 +111,18 @@ namespace Moba
 
         public void AddGold(int amount) => Gold += amount;
 
+        // Game-server clients: the server's numbers (see NetworkHero). This component is disabled there.
+        public void SetFromServer(int level, float xp, int gold, int kills, int deaths, int assists, int creepScore)
+        {
+            Level = level;
+            Xp = xp;
+            Gold = gold;
+            Kills = kills;
+            Deaths = deaths;
+            Assists = assists;
+            CreepScore = creepScore;
+        }
+
         public bool TrySpendGold(int amount)
         {
             if (Gold < amount) return false;

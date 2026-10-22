@@ -20,7 +20,8 @@ namespace Moba.Online
         {
             _game = GetComponent<GameManager>();
             _game.MatchEnded += OnMatchEnded;
-            if (!AccountService.IsLoggedIn || _game.heroes.Count == 0) return;
+            // On a game server the server will record the match (next stage), not its clients.
+            if (!AccountService.IsLoggedIn || _game.heroes.Count == 0 || Net.NetSession.IsNetworked) return;
 
             var request = new StartMatchRequest { mode = MatchSettings.Mode.ToString(), mapLayout = MapLayoutId() };
             // Slots follow game.heroes (the lineup order MatchBootstrap spawned them in).
@@ -129,7 +130,8 @@ namespace Moba.Online
 
         static string HeroId(HeroController hero) => hero.definition != null ? hero.definition.id : "unknown";
 
-        static bool IsBot(HeroController hero) => hero.GetComponent<BotBrain>() != null;
+        static bool IsBot(HeroController hero) =>
+            hero.TryGetComponent(out Net.NetworkHero net) && net.IsSpawned ? net.IsBot : hero.GetComponent<BotBrain>() != null;
 
         // Inventory (8 slots) and Q/W/E/R with their rank and mods, by asset name.
         static PlayerBuild BuildOf(HeroController hero)

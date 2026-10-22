@@ -253,6 +253,11 @@ namespace Moba.UI
         void TryBuy(InventoryItem item)
         {
             if (_shop == null || _progression == null || _inventory == null) return;
+            if (Net.NetSession.IsRemoteClient)
+            {
+                ShowShopMessage("Buying on the game server comes in the next stage.");
+                return;
+            }
             ShopResult result = _shop.TryBuy(_hero.Unit, _progression, _inventory, item);
             ShowShopMessage(result switch
             {
@@ -269,6 +274,7 @@ namespace Moba.UI
         void TrySellSlot(int slot)
         {
             if (_shop == null || _inventory == null || _progression == null) return;
+            if (Net.NetSession.IsRemoteClient) return;
             InventoryItem item = _inventory.Get(slot);
             if (item == null) return;
             if (!IsShopOpen)

@@ -1,0 +1,3 @@
+# Only the server build goes into the image (the Unity project itself is huge).
+*
+!Builds/LinuxServer

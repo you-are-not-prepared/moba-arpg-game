@@ -22,6 +22,9 @@ namespace Moba
         public HeroDefinition definition;
         [Tooltip("Reads mouse/keyboard input and shows targeting indicators. Off for bots.")]
         public bool isPlayer = true;
+        // Set when this is the local player's hero on a game server: orders are sent there instead of run here.
+        [System.NonSerialized] public Net.NetworkHero Remote;
+        bool _present = true;
         public float respawnSeconds = 5f;
         public Transform spawnPoint;
         public Material moveMarkerMaterial;
@@ -102,6 +105,21 @@ namespace Moba
 
         void Update()
         {
+            // Connected to a game server: this copy only reads the player's input and sends it (see Remote);
+            // the server moves, fights and respawns the hero.
+            if (Net.NetSession.IsRemoteClient)
+            {
+                GameManager game = GameManager.Instance;
+                bool blocked = game != null && (game.IsOver || game.IsPaused);
+                if (isPlayer && _unit.IsAlive && !blocked)
+                {
+                    HandleKeys();
+                    HandleMouse();
+                }
+                UpdateIndicators();
+                return;
+            }
+
             if (!_unit.IsAlive)
             {
                 RespawnRemaining -= Time.deltaTime;
@@ -140,6 +158,12 @@ namespace Moba
         {
             if (!_unit.IsAlive) return;
             if (!NavMesh.SamplePosition(worldPoint, out NavMeshHit navHit, 4f, NavMesh.AllAreas)) return;
+            if (Remote != null)
+            {
+                Remote.SendMove(navHit.position);
+                if (showMarker && isPlayer) MoveMarker.Spawn(navHit.position, moveMarkerMaterial);
+                return;
+            }
             ClearOrders();
             _agent.SetDestination(navHit.position);
             if (showMarker && isPlayer) MoveMarker.Spawn(navHit.position, moveMarkerMaterial);
@@ -147,6 +171,11 @@ namespace Moba
 
         public void Stop()
         {
+            if (Remote != null)
+            {
+                Remote.SendStop();
+                return;
+            }
             ClearOrders();
             if (_agent.isOnNavMesh) _agent.ResetPath();
         }
@@ -164,6 +193,11 @@ namespace Moba
         // cast straight at the cursor (no indicator); HUD clicks always use normal targeting.
         public void BeginCast(int slot, bool fromHud = false)
         {
+            if (Remote != null)
+            {
+                Hud.Instance?.ShowHudMessage("Spells on the game server come in the next stage.");
+                return;
+            }
             if (_abilities.GetCastBlock(slot) != CastBlock.None) return;
             AbilityDefinition ability = _abilities.GetSlot(slot).ability;
             CancelTargeting();
@@ -201,6 +235,11 @@ namespace Moba
         public void OrderAttack(Unit target)
         {
             if (!_unit.IsAlive || target == null || !target.IsTargetable) return;
+            if (Remote != null)
+            {
+                Remote.SendAttack(target);
+                return;
+            }
             if (_attackTarget == target && !_attackMoving && _pendingCastSlot == NoSlot) return;
             ClearOrders();
             _attackTarget = target;
@@ -297,8 +336,7 @@ namespace Moba
                 Unit enemy = FirstEnemyHit(count);
                 if (enemy != null)
                 {
-                    ClearOrders();
-                    _attackTarget = enemy;
+                    OrderAttack(enemy);
                     return;
                 }
             }
@@ -359,6 +397,14 @@ namespace Moba
         public void IssueAttackMove(Vector3 point, Unit direct = null)
         {
             if (!_unit.IsAlive) return;
+            if (Remote != null)
+            {
+                Remote.SendAttackMove(point, direct);
+                if (isPlayer && NavMesh.SamplePosition(point, out NavMeshHit markHit, 4f, NavMesh.AllAreas))
+                    MoveMarker.Spawn(markHit.position, attackMoveMarkerMaterial != null ? attackMoveMarkerMaterial : moveMarkerMaterial);
+                CancelTargeting();
+                return;
+            }
             Unit target = direct != null ? direct : FindEnemyNear(point, attackMoveCursorRadius);
             Vector3 destination = NavMesh.SamplePosition(point, out NavMeshHit navHit, 4f, NavMesh.AllAreas)
                 ? navHit.position
@@ -580,9 +626,18 @@ namespace Moba
 
         void SetPresent(bool present)
         {
-            _agent.enabled = present;
+            _present = present;
+            // Game-server clients never move the hero themselves, so their agent stays off.
+            if (!Net.NetSession.IsRemoteClient) _agent.enabled = present;
             foreach (Renderer r in GetComponentsInChildren<Renderer>()) r.enabled = present;
             foreach (Collider c in GetComponentsInChildren<Collider>()) c.enabled = present;
+        }
+
+        // Game-server clients: alive/dead and the respawn timer come from the server (see NetworkHero).
+        public void SetRespawnFromServer(bool alive, float remaining)
+        {
+            RespawnRemaining = remaining;
+            if (alive != _present) SetPresent(alive);
         }
 
         class HitDistanceComparer : System.Collections.Generic.IComparer<RaycastHit>

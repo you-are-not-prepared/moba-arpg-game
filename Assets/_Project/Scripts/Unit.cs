@@ -74,7 +74,8 @@ namespace Moba
 
         public void TakeDamage(float amount, Unit source)
         {
-            if (!IsTargetable) return;
+            // On a game-server client the server deals all damage; health arrives through NetworkUnit.
+            if (!IsTargetable || Net.NetSession.IsRemoteClient) return;
             if (source != null) amount = source.ModifyOutgoingDamage(this, amount);
             if (kind == UnitKind.Hero && source != null && source.kind == UnitKind.Hero && source.team != team)
                 _lastHitByHero[source] = Time.time;
@@ -82,6 +83,13 @@ namespace Moba
             Health = Mathf.Max(0f, Health - amount);
             if (dealt > 0f) AnyDamaged?.Invoke(this, source, dealt);
             if (Health <= 0f) Die(source);
+        }
+
+        // Game-server clients: the server's current numbers (see NetworkUnit).
+        public void SetHealthFromServer(float health, float max)
+        {
+            maxHealth = max;
+            Health = Mathf.Clamp(health, 0f, max);
         }
 
         public void AddDamageModifier(IOutgoingDamageModifier modifier)

@@ -64,6 +64,8 @@ namespace Moba.UI
         {
             if (hero == _game.hero)
                 return AccountService.IsLoggedIn ? $"{AccountService.Profile.username} (you)" : "You";
+            if (hero.TryGetComponent(out Net.NetworkHero net) && net.IsSpawned)
+                return net.IsBot ? "Bot" : string.IsNullOrEmpty(net.PlayerName) ? "Player" : net.PlayerName;
             return hero.GetComponent<BotBrain>() != null ? "Bot" : "Player";
         }
 

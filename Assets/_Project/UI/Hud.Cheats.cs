@@ -69,6 +69,8 @@ namespace Moba.UI
 
         void UpdateCheats()
         {
+            // Cheats change only this copy of the game, so they make no sense on a game server.
+            _cheatPanel.EnableInClassList("hidden", Net.NetSession.IsRemoteClient);
             _cheatLevel.SetEnabled(_progression != null && !_progression.IsMaxLevel);
             bool noMana = _abilities != null && _abilities.NoManaCost;
             bool noCooldowns = _abilities != null && _abilities.NoCooldowns;

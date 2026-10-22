@@ -50,6 +50,8 @@ namespace Moba
             else
                 Projectile.Launch(transform.TransformPoint(projectileOrigin), _self, target, TotalDamage,
                     projectileSpeed, projectileSize, projectileMaterial);
+            // On the game server, clients see the shot too.
+            if (projectileSpeed > 0f) Net.NetworkMatch.Instance?.BroadcastProjectile(_self, target);
             return true;
         }
     }
