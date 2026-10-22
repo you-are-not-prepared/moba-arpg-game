@@ -119,7 +119,7 @@ namespace Moba.UI
                 {
                     if (_hoveredSlot == slot) _hoveredSlot = -1;
                 });
-                view.LevelUp.clicked += () => _abilities?.TryLevelUp(slot);
+                view.LevelUp.clicked += () => { if (_hero != null) _hero.LevelUp(slot); };
                 view.LevelUp.focusable = false;
                 _slots[i] = view;
                 RegisterSpellSlotDragAndDrop(view, slot);

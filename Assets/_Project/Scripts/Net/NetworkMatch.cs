@@ -1,19 +1,25 @@
+using Moba.Abilities;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace Moba.Net
 {
-    // Match-wide state on the game server (on the scene's Game object): the winner, and visuals for basic-attack
-    // projectiles (the server applies the damage; clients only see the shot).
+    // Match-wide state on the game server (on the scene's Game object): the winner, and visuals for attack and
+    // spell projectiles and explosions (the server applies the damage; clients only see the shots).
     [RequireComponent(typeof(GameManager))]
     public class NetworkMatch : NetworkBehaviour
     {
         public static NetworkMatch Instance { get; private set; }
 
+        // Whether this game server lets players use the cheat menu (GameServer's "cheats" setting).
+        public static bool CheatsAllowed => Instance != null && Instance.IsSpawned && Instance._cheats.Value;
+
         // -1 = still running, otherwise (int)Team.
         readonly NetworkVariable<int> _winner = new(-1);
+        readonly NetworkVariable<bool> _cheats = new();
 
         GameManager _game;
+        int _nextProjectileId;
 
         void Awake()
         {
@@ -31,6 +37,7 @@ namespace Moba.Net
         {
             if (IsServer)
             {
+                _cheats.Value = GameServer.CheatsAllowed;
                 _game.MatchEnded += winner => _winner.Value = (int)winner;
                 return;
             }
@@ -60,6 +67,55 @@ namespace Moba.Net
             if (!from.TryGetComponent(out Attacker attacker) || !to.TryGetComponent(out Unit targetUnit)) return;
             Projectile.Launch(from.transform.TransformPoint(attacker.projectileOrigin), from.GetComponent<Unit>(), targetUnit,
                 0f, attacker.projectileSpeed, attacker.projectileSize, attacker.projectileMaterial, visualOnly: true);
+        }
+
+        // Server: show a spell projectile on every client. Returns its id for BroadcastSpellProjectileEnd (0 = not sent).
+        public int BroadcastSpellProjectile(Vector3 position, Vector3 direction, in SpellProjectile.Payload p)
+        {
+            if (!IsSpawned || !IsServer) return 0;
+            int id = ++_nextProjectileId;
+            SpellProjectileClientRpc(id, position, direction, p.Speed, p.MaxDistance, p.Size, (byte)p.Team,
+                NetItems.MaterialId(p.ProjectileMaterial));
+            return id;
+        }
+
+        public void BroadcastSpellProjectileEnd(int id, Vector3 position)
+        {
+            if (IsSpawned && IsServer) SpellProjectileEndClientRpc(id, position);
+        }
+
+        // Server: show an explosion (or a shield's block flash) on every client.
+        public void BroadcastExplosion(Vector3 center, float radius, Material material)
+        {
+            if (IsSpawned && IsServer) ExplosionClientRpc(center, radius, NetItems.MaterialId(material));
+        }
+
+        [ClientRpc]
+        void SpellProjectileClientRpc(int id, Vector3 position, Vector3 direction, float speed, float maxDistance, float size,
+            byte team, short material)
+        {
+            if (IsServer) return;
+            var payload = new SpellProjectile.Payload
+            {
+                Team = (Team)team,
+                Speed = speed,
+                MaxDistance = maxDistance,
+                Size = size,
+                ProjectileMaterial = NetItems.Material(material),
+            };
+            SpellProjectile.LaunchVisual(id, position, direction, payload);
+        }
+
+        [ClientRpc]
+        void SpellProjectileEndClientRpc(int id, Vector3 position)
+        {
+            if (!IsServer) SpellProjectile.EndVisual(id, position);
+        }
+
+        [ClientRpc]
+        void ExplosionClientRpc(Vector3 center, float radius, short material)
+        {
+            if (!IsServer) SpellExplosion.Spawn(center, radius, NetItems.Material(material));
         }
     }
 }

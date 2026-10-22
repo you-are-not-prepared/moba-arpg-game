@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Moba.Abilities
 {
-    // Short expanding blast showing an explosion's radius. Visual only.
+    // Short expanding blast showing an explosion's radius. Visual only; a game server shows it on its clients too.
     public class SpellExplosion : MonoBehaviour
     {
         const float Lifetime = 0.25f;
@@ -19,6 +19,7 @@ namespace Moba.Abilities
             var e = go.AddComponent<SpellExplosion>();
             e._radius = radius;
             e.UpdateScale();
+            if (Net.NetworkMatch.Instance != null) Net.NetworkMatch.Instance.BroadcastExplosion(center, radius, material);
         }
 
         void Update()

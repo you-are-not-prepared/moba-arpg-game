@@ -23,7 +23,8 @@ namespace Moba.Items
 
         void Update()
         {
-            if (regenFractionPerSecond <= 0f) return;
+            // On a game-server client the server heals; health and mana arrive from there.
+            if (regenFractionPerSecond <= 0f || Net.NetSession.IsRemoteClient) return;
             float fraction = regenFractionPerSecond * Time.deltaTime;
             foreach (Unit u in Unit.All)
             {

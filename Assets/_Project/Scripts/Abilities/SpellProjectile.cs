@@ -6,6 +6,8 @@ namespace Moba.Abilities
     // A straight-flying spell projectile. On the first enemy it touches it explodes (area damage + burn + stun),
     // then, if it has forks left, splits into two projectiles leaving the target at ±ForkAngle.
     // A piercing projectile keeps flying, hitting each enemy along its path once (forks only on the first hit).
+    // On a game server every projectile is also shown on the clients (LaunchVisual), which only fly it until the
+    // server says it has ended.
     public class SpellProjectile : MonoBehaviour
     {
         public struct Payload
@@ -29,6 +31,8 @@ namespace Moba.Abilities
         }
 
         static readonly List<Unit> s_Targets = new();
+        // Game-server clients: the projectiles shown, by the server's id.
+        static readonly Dictionary<int, SpellProjectile> s_Visuals = new();
 
         Payload _p;
         Vector3 _dir;
@@ -36,23 +40,57 @@ namespace Moba.Abilities
         Unit _ignore;
         Renderer _renderer;
         HashSet<Unit> _pierced;
+        int _netId;
+        bool _visualOnly;
 
         // `ignore` can't be hit by this projectile (forks never hit the target they split from).
         public static void Launch(Vector3 groundOrigin, Vector3 direction, in Payload payload, Unit ignore)
         {
+            SpellProjectile p = Create(groundOrigin + Vector3.up * payload.Height, direction, payload);
+            p._ignore = ignore;
+            p._netId = Net.NetworkMatch.Instance != null
+                ? Net.NetworkMatch.Instance.BroadcastSpellProjectile(p.transform.position, p._dir, payload)
+                : 0;
+        }
+
+        // Game-server clients: a projectile the server launched. It only flies; the server ends it (EndVisual).
+        public static void LaunchVisual(int netId, Vector3 position, Vector3 direction, in Payload payload)
+        {
+            SpellProjectile p = Create(position, direction, payload);
+            p._visualOnly = true;
+            p._netId = netId;
+            s_Visuals[netId] = p;
+        }
+
+        public static void EndVisual(int netId, Vector3 position)
+        {
+            if (!s_Visuals.Remove(netId, out SpellProjectile p) || p == null) return;
+            p.transform.position = position;
+            Destroy(p.gameObject);
+        }
+
+        static SpellProjectile Create(Vector3 position, Vector3 direction, in Payload payload)
+        {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             go.name = "SpellProjectile";
             DestroyImmediate(go.GetComponent<Collider>());
-            go.transform.SetPositionAndRotation(groundOrigin + Vector3.up * payload.Height, Quaternion.LookRotation(direction));
+            go.transform.SetPositionAndRotation(position, Quaternion.LookRotation(direction));
             go.transform.localScale = Vector3.one * payload.Size;
             if (payload.ProjectileMaterial != null) go.GetComponent<Renderer>().sharedMaterial = payload.ProjectileMaterial;
 
             var p = go.AddComponent<SpellProjectile>();
             p._p = payload;
             p._dir = direction.normalized;
-            p._ignore = ignore;
             p._renderer = go.GetComponent<Renderer>();
             p._renderer.enabled = FogOfWar.ShouldShow(payload.Team, go.transform.position);
+            return p;
+        }
+
+        void OnDestroy()
+        {
+            if (_netId == 0) return;
+            if (_visualOnly) s_Visuals.Remove(_netId);
+            else if (Net.NetworkMatch.Instance != null) Net.NetworkMatch.Instance.BroadcastSpellProjectileEnd(_netId, transform.position);
         }
 
         void Update()
@@ -60,6 +98,15 @@ namespace Moba.Abilities
             float step = _p.Speed * Time.deltaTime;
             Vector3 from = transform.position;
             Vector3 to = from + _dir * step;
+
+            if (_visualOnly)
+            {
+                transform.position = to;
+                _renderer.enabled = FogOfWar.ShouldShow(_p.Team, to);
+                _travelled += step;
+                if (_travelled >= _p.MaxDistance) Destroy(gameObject);
+                return;
+            }
 
             Unit hit = FirstHit(from, to, out float t);
             // A shield in the way stops the projectile before anything behind it is hit.

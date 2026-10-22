@@ -12,5 +12,6 @@ services:
     environment:
       MOBA_MAP: random   # classic | zones | delve | random
       MOBA_BOTS: "3"     # bots per team (blue gets one fewer; players join blue)
+      MOBA_CHEATS: "on"  # cheat menu for testing; set "off" before letting others play
     ports:
       - "127.0.0.1:7777:7777/udp"

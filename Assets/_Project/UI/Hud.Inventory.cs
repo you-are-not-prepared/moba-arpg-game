@@ -253,12 +253,17 @@ namespace Moba.UI
         void TryBuy(InventoryItem item)
         {
             if (_shop == null || _progression == null || _inventory == null) return;
-            if (Net.NetSession.IsRemoteClient)
+            // On a game server: checked here for the message, bought there (the item arrives from the server).
+            ShopResult result;
+            if (_hero.Remote != null)
             {
-                ShowShopMessage("Buying on the game server comes in the next stage.");
-                return;
+                result = _shop.CanBuy(_hero.Unit, _progression, _inventory, item);
+                if (result == ShopResult.Ok) _hero.Remote.SendBuy(item);
             }
-            ShopResult result = _shop.TryBuy(_hero.Unit, _progression, _inventory, item);
+            else
+            {
+                result = _shop.TryBuy(_hero.Unit, _progression, _inventory, item);
+            }
             ShowShopMessage(result switch
             {
                 ShopResult.Ok => item is ItemDefinition
@@ -274,7 +279,6 @@ namespace Moba.UI
         void TrySellSlot(int slot)
         {
             if (_shop == null || _inventory == null || _progression == null) return;
-            if (Net.NetSession.IsRemoteClient) return;
             InventoryItem item = _inventory.Get(slot);
             if (item == null) return;
             if (!IsShopOpen)
@@ -283,7 +287,16 @@ namespace Moba.UI
                 return;
             }
             int price = _shop.SellPrice(item);
-            ShopResult result = _shop.TrySell(_hero.Unit, _progression, _inventory, slot);
+            ShopResult result;
+            if (_hero.Remote != null)
+            {
+                result = _shop.CanUse(_hero.Unit) ? ShopResult.Ok : ShopResult.NotInShopRange;
+                if (result == ShopResult.Ok) _hero.Remote.SendSell(slot);
+            }
+            else
+            {
+                result = _shop.TrySell(_hero.Unit, _progression, _inventory, slot);
+            }
             ShowShopMessage(result == ShopResult.Ok
                 ? $"Sold {item.displayName} for {price}g."
                 : "Return to your base to sell.");
@@ -382,9 +395,9 @@ namespace Moba.UI
             {
                 error = from.Kind switch
                 {
-                    DragKind.Inventory => Move(from.Index, inventorySlot),
-                    DragKind.Spell => Loadout.UnequipSpell(_inventory, _abilities, from.Index, inventorySlot),
-                    DragKind.Mod => Loadout.UnequipMod(_inventory, _abilities, from.Index, from.Socket, inventorySlot),
+                    DragKind.Inventory => PerformLoadout(LoadoutAction.MoveItem, from.Index, inventorySlot),
+                    DragKind.Spell => PerformLoadout(LoadoutAction.UnequipSpell, from.Index, inventorySlot),
+                    DragKind.Mod => PerformLoadout(LoadoutAction.UnequipMod, from.Index, from.Socket, inventorySlot),
                     _ => null,
                 };
             }
@@ -392,19 +405,22 @@ namespace Moba.UI
             {
                 error = from.Kind switch
                 {
-                    DragKind.Inventory => Loadout.EquipFromInventory(_inventory, _abilities, from.Index, spellSlot),
-                    DragKind.Spell => Loadout.MoveSpell(_abilities, from.Index, spellSlot),
-                    DragKind.Mod => Loadout.MoveMod(_abilities, from.Index, from.Socket, spellSlot),
+                    DragKind.Inventory => PerformLoadout(LoadoutAction.Equip, from.Index, spellSlot),
+                    DragKind.Spell => PerformLoadout(LoadoutAction.MoveSpell, from.Index, spellSlot),
+                    DragKind.Mod => PerformLoadout(LoadoutAction.MoveMod, from.Index, from.Socket, spellSlot),
                     _ => null,
                 };
             }
             ShowHudMessage(error);
         }
 
-        string Move(int from, int to)
+        // Makes the move here at once (so the HUD responds immediately) and, on a game server, sends it there too;
+        // the server's result replaces this copy shortly after.
+        string PerformLoadout(LoadoutAction action, int a, int b, int c = 0)
         {
-            _inventory.Move(from, to);
-            return null;
+            string error = Loadout.Perform(_inventory, _abilities, action, a, b, c);
+            if (error == null && _hero.Remote != null) _hero.Remote.SendLoadout(action, a, b, c);
+            return error;
         }
 
         void CancelDrag()

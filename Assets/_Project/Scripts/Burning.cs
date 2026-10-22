@@ -23,6 +23,19 @@ namespace Moba
             burn.Refresh(damagePerSecond, duration, source);
         }
 
+        // Game-server clients: shown burning for as long as the server says (the server deals the damage).
+        public static void SetFromServer(Unit unit, bool burning)
+        {
+            if (!unit.TryGetComponent(out Burning burn))
+            {
+                if (!burning) return;
+                burn = unit.gameObject.AddComponent<Burning>();
+            }
+            burn._dps = 0f;
+            burn._remaining = burning ? float.PositiveInfinity : 0f;
+            burn.enabled = burning;
+        }
+
         public static bool IsBurning(Unit unit) =>
             unit != null && unit.TryGetComponent(out Burning burn) && burn.enabled && burn._remaining > 0f;
 
