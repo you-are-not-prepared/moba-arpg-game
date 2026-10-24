@@ -1,0 +1,346 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55224470eb2f97458b7a9126a49ec1e, type: 3}
+  m_Name: Hero_Thessa
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.HeroDefinition
+  id: thessa
+  displayName: Thessa
+  title: Windrunner
+  description: A ranged skirmisher who casts, repositions and casts again; her ultimate
+    turns a fight into a spell storm.
+  color: {r: 0.4, g: 0.85, b: 0.8, a: 1}
+  glyph: Th
+  prefab: {fileID: 4925609322593931462, guid: 0f0d4a7b929406f4186d3fd22a1290d2, type: 3}
+  passiveName: Tailwind
+  passiveDescription: Each spell you cast gives 25% movement speed for 2s (casting
+    again refreshes it).
+  extraProjectiles: 0
+  cooldownMultiplier: 1
+  itemStatMultiplier: 1
+  healthPerLevelBonus: 0
+  moveSpeedMultiplier: 1
+  isolationDamageBonus: 0
+  isolationRadius: 7
+  tailwindSpeed: 0.25
+  tailwindDuration: 2
+  ascension:
+    paths:
+    - root:
+        id: thessa_a
+        name: Gale
+        flavor: The wind never quite lets go.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0.5
+        tailwindAttackSpeed: 0
+      second:
+      - id: thessa_a1
+        name: Jet Stream
+        flavor: Ride the gust.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0.1
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      - id: thessa_a2
+        name: Updraft
+        flavor: One spell carries her further.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 1
+        tailwindAttackSpeed: 0
+      third:
+      - id: thessa_a3
+        name: Slipstream
+        flavor: Strike while the wind is behind you.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0.2
+      - id: thessa_a4
+        name: Second Gust
+        flavor: The wind keeps blowing.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 1.5
+        tailwindAttackSpeed: 0
+    - root:
+        id: thessa_b
+        name: Hurricane
+        flavor: The storm gathers a little longer.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 1
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      second:
+      - id: thessa_b1
+        name: Eye Widens
+        flavor: A longer calm at the centre.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 2
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      - id: thessa_b2
+        name: Charged Air
+        flavor: Every spell crackles.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0.15
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      third:
+      - id: thessa_b3
+        name: Ceaseless
+        flavor: Spells come back faster, always.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0.1
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      - id: thessa_b4
+        name: Calm Before
+        flavor: The next storm is never far.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+    - root:
+        id: thessa_c
+        name: Skirmisher
+        flavor: Never stand still.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.1
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      second:
+      - id: thessa_c1
+        name: Quickdraw
+        flavor: Faster hands.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.15
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      - id: thessa_c2
+        name: Light Feet
+        flavor: Faster feet.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0.1
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      third:
+      - id: thessa_c3
+        name: Crosswind
+        flavor: One more on the wind.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 1
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+      - id: thessa_c4
+        name: Windward
+        flavor: Spells come back faster.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0.1
+        ultimateCooldownReduction: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+  ultimate: {fileID: 11400000, guid: 9aaf3937c991b5c4894a1efff74baacc, type: 2}

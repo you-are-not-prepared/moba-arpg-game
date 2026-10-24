@@ -59,7 +59,7 @@ namespace Moba.EditorTools
         class Mats
         {
             public Material Rock, Stone, Blue, Red, BluePad, RedPad, Marker, AttackMarker, RangeIndicator, Fire, Explosion, Arrow,
-                ShieldWall, ShieldFlash, HasteAura, MeleeSlash;
+                ShieldWall, ShieldFlash, HasteAura, StormAura, MeleeSlash;
         }
 
         // ---------- Map layouts ----------
@@ -158,6 +158,7 @@ namespace Moba.EditorTools
             public int ExtraProjectiles;
             public float CooldownMultiplier = 1f, ItemStatMultiplier = 1f;
             public float HealthPerLevelBonus, MoveSpeedMultiplier = 1f, IsolationDamageBonus, IsolationRadius = 7f;
+            public float TailwindSpeed, TailwindDuration = 2f;
             public bool Melee;
             public System.Func<Mats, AbilityDefinition> Ultimate;
             public System.Func<AscensionTree> Ascension;
@@ -209,6 +210,15 @@ namespace Moba.EditorTools
                 PassiveName = "Lone Prey", PassiveDescription = "Deal 15% more damage to targets with no allied hero within 7m of them.",
                 IsolationDamageBonus = 0.15f, IsolationRadius = 7f,
                 Ultimate = m => Bloodrush(m),
+            },
+            new HeroSpec
+            {
+                Id = "thessa", Name = "Thessa", Ascension = ThessaAscension, Title = "Windrunner", Glyph = "Th", Color = new Color(0.4f, 0.85f, 0.8f),
+                Description = "A ranged skirmisher who casts, repositions and casts again; her ultimate turns a fight into a spell storm.",
+                Health = 550f, Damage = 30f, Range = 6f, AttacksPerSecond = 1.2f, Speed = 6.8f, Mana = 320f,
+                PassiveName = "Tailwind", PassiveDescription = "Each spell you cast gives 25% movement speed for 2s (casting again refreshes it).",
+                TailwindSpeed = 0.25f, TailwindDuration = 2f,
+                Ultimate = m => EyeOfTheStorm(m),
             },
         };
 
@@ -297,6 +307,26 @@ namespace Moba.EditorTools
             spell.attackSpeedBonus = 0.2f;
             spell.refreshOnHeroKill = true;
             spell.auraMaterial = m.HasteAura;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition EyeOfTheStorm(Mats m)
+        {
+            var spell = LoadOrCreate<SpellStormSpell>($"{HeroesDir}/Ult_EyeOfTheStorm.asset");
+            spell.displayName = "Eye of the Storm";
+            spell.description = "For a few seconds your spells cost no mana and their cooldowns are 50% shorter.";
+            spell.cost = 0;
+            spell.glyph = "ES";
+            spell.color = new Color(0.4f, 0.85f, 0.8f);
+            spell.targeting = AbilityTargeting.Instant;
+            spell.range = 0f;
+            spell.cooldownByRank = new[] { 80f, 70f, 60f };
+            spell.manaCostByRank = new[] { 0f };
+            spell.durationByRank = new[] { 6f, 7f, 8f };
+            spell.cooldownReduction = 0.5f;
+            spell.manaCostReduction = 1f;
+            spell.auraMaterial = m.StormAura;
             EditorUtility.SetDirty(spell);
             return spell;
         }
@@ -660,6 +690,8 @@ namespace Moba.EditorTools
                 def.moveSpeedMultiplier = spec.MoveSpeedMultiplier;
                 def.isolationDamageBonus = spec.IsolationDamageBonus;
                 def.isolationRadius = spec.IsolationRadius;
+                def.tailwindSpeed = spec.TailwindSpeed;
+                def.tailwindDuration = spec.TailwindDuration;
                 def.ultimate = spec.Ultimate(m);
                 def.ascension = spec.Ascension?.Invoke() ?? new AscensionTree();
                 def.prefab = CreateHeroPrefab(spec, m);
@@ -1077,6 +1109,7 @@ namespace Moba.EditorTools
             ShieldWall = ShaderMat("ShieldWall", "Moba/ShieldWall"),
             ShieldFlash = EmissiveMat("ShieldFlash", new Color(0.6f, 0.85f, 1f), 2f),
             HasteAura = ShaderMat("HasteAura", "Moba/GroundRing", new Color(1f, 0.25f, 0.35f, 1f)),
+            StormAura = ShaderMat("StormAura", "Moba/GroundRing", new Color(0.35f, 0.95f, 0.9f, 1f)),
             MeleeSlash = ShaderMat("MeleeSlash", "Moba/MeleeSlash", new Color(1f, 0.95f, 0.8f, 0.9f)),
         };
 

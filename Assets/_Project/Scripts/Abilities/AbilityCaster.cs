@@ -47,6 +47,9 @@ namespace Moba.Abilities
         Unit _unit;
         HeroProgression _progression;
         bool _noCooldowns;
+        // Timed buffs (SpellStorm): multiply new cooldowns and mana costs while they last.
+        float _temporaryCooldownMultiplier = 1f;
+        float _temporaryManaCostMultiplier = 1f;
 
         public float Mana { get; private set; }
 
@@ -65,6 +68,19 @@ namespace Moba.Abilities
             }
         }
         public int SkillPoints { get; set; }
+
+        public void SetTemporaryMultipliers(float cooldown, float manaCost)
+        {
+            _temporaryCooldownMultiplier = cooldown;
+            _temporaryManaCostMultiplier = manaCost;
+        }
+
+        // What casting this slot costs right now (timed buffs included).
+        public float ManaCostOf(int index)
+        {
+            Slot s = slots[index];
+            return s.ability != null ? s.ability.ManaCost(s.rank) * _temporaryManaCostMultiplier : 0f;
+        }
         public Unit Unit => _unit;
         int HeroLevel => _progression != null ? _progression.Level : 1;
 
@@ -194,7 +210,7 @@ namespace Moba.Abilities
             if (s.rank <= 0) return CastBlock.NotLearned;
             if (s.ability.IsPassive) return CastBlock.Passive;
             if (s.cooldownRemaining > 0f) return CastBlock.OnCooldown;
-            if (!NoManaCost && Mana < s.ability.ManaCost(s.rank)) return CastBlock.NotEnoughMana;
+            if (!NoManaCost && Mana < ManaCostOf(index)) return CastBlock.NotEnoughMana;
             return CastBlock.None;
         }
 
@@ -232,9 +248,9 @@ namespace Moba.Abilities
             }
             if (!InCastRange(index, point, target)) return false;
 
-            if (!NoManaCost) Mana -= a.ManaCost(s.rank);
+            if (!NoManaCost) Mana -= ManaCostOf(index);
             float ultimate = index == UltimateSlot ? ultimateCooldownMultiplier : 1f;
-            s.cooldownTotal = NoCooldowns ? 0f : a.Cooldown(s.rank) * cooldownMultiplier * ultimate;
+            s.cooldownTotal = NoCooldowns ? 0f : a.Cooldown(s.rank) * cooldownMultiplier * ultimate * _temporaryCooldownMultiplier;
             s.cooldownRemaining = s.cooldownTotal;
 
             Vector3 facing = point - transform.position;

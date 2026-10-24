@@ -28,6 +28,8 @@ MonoBehaviour:
   moveSpeedMultiplier: 1
   isolationDamageBonus: 0
   isolationRadius: 7
+  tailwindSpeed: 0
+  tailwindDuration: 2
   ascension:
     paths:
     - root:
@@ -48,6 +50,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: brann_a1
         name: Tempered Steel
@@ -66,6 +71,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: brann_a2
         name: Reinforced Plating
         flavor: Rivets in all the right places.
@@ -83,6 +91,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: brann_a3
         name: Perfect Alloy
@@ -101,6 +112,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: brann_a4
         name: Heavy Hands
         flavor: Swing the hammer faster.
@@ -118,6 +132,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: brann_b
         name: Runesmith
@@ -136,6 +153,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: brann_b1
         name: Arcane Battery
@@ -154,6 +174,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: brann_b2
         name: Efficient Runes
         flavor: Waste nothing.
@@ -171,6 +194,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: brann_b3
         name: Overload
@@ -189,6 +215,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: brann_b4
         name: Splitting Rune
         flavor: One spell, many paths.
@@ -206,6 +235,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: brann_c
         name: Bastion
@@ -224,6 +256,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: brann_c1
         name: Riveted Armor
@@ -242,6 +277,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: brann_c2
         name: Socket Ward
         flavor: Runes that hit back.
@@ -259,6 +297,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: brann_c3
         name: Living Fortress
@@ -277,6 +318,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: brann_c4
         name: Rune Hammer
         flavor: Steel and sorcery in one swing.
@@ -294,4 +338,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
   ultimate: {fileID: 11400000, guid: bae89fe7b40dd634b9c21c569170aa15, type: 2}

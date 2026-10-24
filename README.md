@@ -62,6 +62,7 @@ Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with 
 | **Brann**, Artificer | Items give 10% more stats | **Overcharged Sockets:** a 4th mod socket on Q/W/E (passive once learned) |
 | **Torvald**, Bulwark (melee) | +50 max HP per level, 15% slower | **Aegis Wall:** a moving shield that blocks enemy projectiles from the front for 5s (tower shots pass through) |
 | **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
+| **Thessa**, Windrunner | Each spell cast gives +25% move speed for 2s | **Eye of the Storm:** for 6s (7/8 at higher ranks) spells cost no mana and have 50% shorter cooldowns |
 
 Melee heroes and creeps show each attack as a swing: the model lunges at the target while a slash arc sweeps across in front (`MeleeSwing`, shader `Moba/MeleeSlash`). On the game server, every player sees it.
 

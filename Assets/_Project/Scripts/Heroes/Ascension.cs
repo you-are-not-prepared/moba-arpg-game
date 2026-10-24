@@ -67,6 +67,9 @@ namespace Moba
         [Tooltip("Added to an isolation passive's bonus (0.1 = +10% damage to isolated targets).")] public float isolationDamage;
         [Tooltip("Seconds added to timed ultimates (shield wall, haste).")] public float ultimateDuration;
         [Tooltip("Seconds added to stuns from projectile spells.")] public float stunDuration;
+        [Tooltip("Added to a Tailwind passive's speed (0.1 = +10% movement speed).")] public float tailwindSpeed;
+        [Tooltip("Seconds added to a Tailwind passive.")] public float tailwindDuration;
+        [Tooltip("Attack speed while Tailwind lasts (0.2 = +20%).")] public float tailwindAttackSpeed;
 
         public bool IsSet => !string.IsNullOrEmpty(name);
 
@@ -92,6 +95,9 @@ namespace Moba
             Pct(isolationDamage, "damage to isolated targets");
             Secs(ultimateDuration, "ultimate duration");
             Secs(stunDuration, "stun duration");
+            Pct(tailwindSpeed, "Tailwind movement speed");
+            Secs(tailwindDuration, "Tailwind duration");
+            Pct(tailwindAttackSpeed, "attack speed during Tailwind");
             return lines;
         }
 

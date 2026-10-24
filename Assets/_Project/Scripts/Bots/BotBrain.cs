@@ -227,6 +227,7 @@ namespace Moba.Bots
                         if (enemyHero != null && AnyBasicOnCooldown(2f) && _hero.OrderCast(slot, default, null)) return true;
                         break;
                     case ShieldWallSpell:
+                    case SpellStormSpell:
                         if (enemyHero != null && _hero.OrderCast(slot, default, null)) return true;
                         break;
                     case HasteSpell:

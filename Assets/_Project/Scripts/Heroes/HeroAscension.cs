@@ -123,6 +123,12 @@ namespace Moba
                 inventory.SetStatMultiplier(inventory.StatMultiplier + t.itemStats);
             if (_progression != null) _progression.healthPerLevel += t.healthPerLevel;
             if (t.isolationDamage != 0f && TryGetComponent(out IsolationPassive isolation)) isolation.damageBonus += t.isolationDamage;
+            if (TryGetComponent(out TailwindPassive tailwind))
+            {
+                tailwind.moveSpeedBonus += t.tailwindSpeed;
+                tailwind.duration += t.tailwindDuration;
+                tailwind.attackSpeedBonus += t.tailwindAttackSpeed;
+            }
             UltimateDurationBonus += t.ultimateDuration;
             StunDurationBonus += t.stunDuration;
         }

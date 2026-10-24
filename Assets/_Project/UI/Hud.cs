@@ -578,7 +578,7 @@ namespace Moba.UI
                     SetText(_cooldownText, "");
                 }
 
-                float cost = a != null && slot.rank > 0 ? a.ManaCost(slot.rank) : 0f;
+                float cost = a != null && slot.rank > 0 ? caster.ManaCostOf(index) : 0f;
                 SetText(_cost, cost > 0f ? cost.ToString("0") : "");
             }
 
