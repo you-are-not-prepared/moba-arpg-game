@@ -28,7 +28,7 @@ build_server() {
   revert_noise
 }
 
-# (Re)starts the container with the current build and waits for the map to load. Extra args are extra compose
+# (Re)starts the container with the current build and waits until it's ready for players. Extra args are extra compose
 # files, e.g.:  deploy "$(nobots_override)"
 deploy() {
   local files=(-f docker-compose.yml)
@@ -36,7 +36,7 @@ deploy() {
   docker compose "${files[@]}" up -d --build 2>&1 | tail -1
   for i in $(seq 1 20); do
     sleep 2
-    docker compose logs --tail 30 game-server 2>&1 | grep -q "Map loaded" && break
+    docker compose logs --tail 30 game-server 2>&1 | grep -q "Waiting for players" && break
   done
   server_log 4
 }

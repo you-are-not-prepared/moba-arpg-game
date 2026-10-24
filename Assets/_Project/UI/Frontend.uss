@@ -622,6 +622,10 @@
     color: var(--text-dim);
 }
 
+.select__start-now {
+    margin-right: 12px;
+}
+
 /* ---------- Match history ---------- */
 
 .history {

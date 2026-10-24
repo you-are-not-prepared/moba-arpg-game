@@ -7,9 +7,10 @@ using UnityEngine.UIElements;
 namespace Moba.UI
 {
     // Start screen, mode choice (PvE / PvP) and champion select.
-    // Champion select rolls a random map and shows every slot of both teams: in PvE the bots pick random heroes one
-    // after another (never a hero their own team already has); in PvP the other slots stay open, since online play
-    // doesn't exist yet. Locking in loads the map with the lineup (see MatchSettings / MatchBootstrap).
+    // PvE: champion select rolls a random map and shows every slot of both teams; the bots pick random heroes one
+    // after another (never a hero their own team already has). Locking in loads the map with the lineup (see
+    // MatchSettings / MatchBootstrap). PvP: the same screen shows the game server's queue and champion select
+    // (FrontendController.Lobby).
     [RequireComponent(typeof(UIDocument))]
     public partial class FrontendController : MonoBehaviour
     {
@@ -28,6 +29,10 @@ namespace Moba.UI
             public bool IsLocal;
             public bool IsBot;
             public int BotNumber;
+            // PvP: another player's seat (-1 otherwise), their name, and whether their pick is locked in.
+            public long ClientId = -1;
+            public string Name;
+            public bool Locked;
             public HeroDefinition Hero;
             public float PickAt;
             public VisualElement Root;
@@ -74,8 +79,12 @@ namespace Moba.UI
             root.Q<Button>("quitButton").clicked += Quit;
             root.Q<Button>("modeBackButton").clicked += ShowStart;
             root.Q("pveCard").RegisterCallback<ClickEvent>(_ => StartChampionSelect(MatchMode.PvE));
-            root.Q("pvpCard").RegisterCallback<ClickEvent>(_ => StartChampionSelect(MatchMode.PvP));
-            root.Q<Button>("backButton").clicked += ShowModeMenu;
+            root.Q("pvpCard").RegisterCallback<ClickEvent>(_ => StartPvP());
+            root.Q<Button>("backButton").clicked += () =>
+            {
+                if (MatchSettings.Mode == MatchMode.PvP) LeaveLobby();
+                ShowModeMenu();
+            };
             _lockButton.clicked += LockIn;
             root.Query<Button>().ForEach(b => b.focusable = false);
 
@@ -86,8 +95,8 @@ namespace Moba.UI
             SetUpHistory(root);
             SetUpItemTooltip(root);
             SetUpPostMatch(root);
+            SetUpLobby(root);
             Net.GameClient.ConnectFailed += OnConnectFailed;
-            Net.GameClient.ServerInfoReceived += OnServerInfo;
             // Dropped from a game server mid-match: say why on the start screen.
             var startMessage = root.Q<Label>("startMessage");
             startMessage.text = Net.GameClient.LastError ?? "";
@@ -117,7 +126,7 @@ namespace Moba.UI
         {
             AccountService.Changed -= RefreshAccountBar;
             Net.GameClient.ConnectFailed -= OnConnectFailed;
-            Net.GameClient.ServerInfoReceived -= OnServerInfo;
+            TearDownLobby();
         }
 
         // ---------- Login / register ----------
@@ -290,9 +299,16 @@ namespace Moba.UI
         {
             if (_selectScreen.ClassListContains("hidden")) return;
 
-            // Bots lock in one after another.
-            foreach (Seat seat in _seats)
-                if (seat.IsBot && seat.Hero == null && Time.unscaledTime >= seat.PickAt) PickForBot(seat);
+            // PvE: bots lock in one after another. PvP: the server's queue and champion select.
+            if (MatchSettings.Mode == MatchMode.PvE)
+            {
+                foreach (Seat seat in _seats)
+                    if (seat.IsBot && seat.Hero == null && Time.unscaledTime >= seat.PickAt) PickForBot(seat);
+            }
+            else
+            {
+                UpdateLobbyStatus();
+            }
 
             RefreshSeats();
             RefreshTiles();
@@ -320,9 +336,7 @@ namespace Moba.UI
         {
             MatchSettings.Mode = mode;
             ShowOnly(_selectScreen);
-            _modeLabel.text = mode == MatchMode.PvE
-                ? $"PvE · {MatchSettings.TeamSize}v{MatchSettings.TeamSize} against bots"
-                : $"PvP · game server at {Net.NetSession.ServerAddress}";
+            _modeLabel.text = $"PvE · {MatchSettings.TeamSize}v{MatchSettings.TeamSize} against bots";
 
             // Every visit rolls a new map.
             _layout = layouts != null && layouts.layouts.Count > 0
@@ -331,14 +345,6 @@ namespace Moba.UI
             _mapName.text = _layout != null ? _layout.displayName : "No map";
             _mapDescription.text = _layout != null ? _layout.description : "";
             _preview.Show(_layout);
-            if (mode == MatchMode.PvP)
-            {
-                // The game server picks its own map: ask it which one.
-                _mapName.text = "Asking the server…";
-                _mapDescription.text = "The game server rolls the map for its match. You join the team with fewer players.";
-                _preview.Show(null);
-                Net.GameClient.QueryServer();
-            }
 
             BuildSeats(mode);
             _hovered = null;
@@ -372,7 +378,7 @@ namespace Moba.UI
                         seat.BotNumber = ++botNumber;
                         bots.Add(seat);
                     }
-                    CreateSeatView(seat);
+                    CreateSeatView(seat, ally: team == Team.Blue);
                     (team == Team.Blue ? _allyList : _enemyList).Add(seat.Root);
                     _seats.Add(seat);
                 }
@@ -392,18 +398,19 @@ namespace Moba.UI
             }
         }
 
-        void CreateSeatView(Seat seat)
+        void CreateSeatView(Seat seat, bool ally)
         {
             seat.Root = new VisualElement();
             seat.Root.AddToClassList("team-slot");
-            seat.Root.AddToClassList(seat.Team == Team.Blue ? "team-slot--ally" : "team-slot--enemy");
+            seat.Root.AddToClassList(ally ? "team-slot--ally" : "team-slot--enemy");
             seat.Root.EnableInClassList("team-slot--local", seat.IsLocal);
-            seat.Root.EnableInClassList("team-slot--open", !seat.IsLocal && !seat.IsBot);
+            seat.Root.EnableInClassList("team-slot--open", !seat.IsLocal && !seat.IsBot && seat.ClientId < 0);
 
             seat.Glyph = Text("", "team-slot__glyph");
             seat.Root.Add(seat.Glyph);
             var texts = new VisualElement { pickingMode = PickingMode.Ignore };
-            seat.Who = Text(seat.IsLocal ? "YOU" : seat.IsBot ? $"BOT {seat.BotNumber}" : "OPEN SLOT", "team-slot__who");
+            seat.Who = Text(seat.IsLocal ? "YOU" : seat.IsBot ? $"BOT {seat.BotNumber}"
+                : seat.ClientId >= 0 ? (seat.Name ?? "PLAYER").ToUpperInvariant() : "OPEN SLOT", "team-slot__who");
             seat.HeroName = Text("", "team-slot__hero");
             texts.Add(seat.Who);
             texts.Add(seat.HeroName);
@@ -415,12 +422,13 @@ namespace Moba.UI
             foreach (Seat seat in _seats)
             {
                 HeroDefinition hero = seat.IsLocal ? _selected : seat.Hero;
+                bool picking = seat.IsLocal || seat.IsBot || seat.ClientId >= 0;
                 string name = hero != null ? hero.displayName
-                    : seat.IsLocal || seat.IsBot ? "Picking…"
+                    : picking ? "Picking…"
                     : "Waiting for a player";
                 if (seat.HeroName.text != name) seat.HeroName.text = name;
                 seat.HeroName.EnableInClassList("team-slot__hero--pending", hero == null);
-                string glyph = hero != null ? hero.glyph : seat.IsLocal || seat.IsBot ? "?" : "";
+                string glyph = hero != null ? hero.glyph : picking ? "?" : "";
                 if (seat.Glyph.text != glyph) seat.Glyph.text = glyph;
                 // Hero colour is data, so it's set here rather than in USS.
                 seat.Glyph.style.backgroundColor = hero != null ? new StyleColor(hero.color) : new StyleColor(StyleKeyword.Null);
@@ -482,7 +490,7 @@ namespace Moba.UI
         }
 
         // Taken by someone else on the local player's team, so the player can't pick it.
-        bool TakenByAlly(HeroDefinition hero) => TakenByTeam(hero, Team.Blue, LocalSeat);
+        bool TakenByAlly(HeroDefinition hero) => TakenByTeam(hero, LocalSeat?.Team ?? Team.Blue, LocalSeat);
 
         void RefreshTiles()
         {
@@ -553,14 +561,21 @@ namespace Moba.UI
         void Select(HeroDefinition hero)
         {
             if (hero != null && TakenByAlly(hero)) hero = null;
+            // Once locked in on the game server, the pick stays.
+            if (MatchSettings.Mode == MatchMode.PvP && LocalSeat is { Locked: true }) return;
             _selected = hero;
             _detailDirty = true;
-            _lockButton.SetEnabled(hero != null && _layout != null);
+            _lockButton.SetEnabled(CanLockIn);
             _status.text = hero != null ? $"{hero.displayName} selected" : "Pick a hero";
         }
 
         void LockIn()
         {
+            if (MatchSettings.Mode == MatchMode.PvP)
+            {
+                SendLockIn();
+                return;
+            }
             if (_selected == null || _layout == null) return;
 
             // Bots still choosing pick right away.
@@ -585,43 +600,17 @@ namespace Moba.UI
 
             RefreshSeats();
             _lockButton.SetEnabled(false);
-            if (MatchSettings.Mode == MatchMode.PvP)
-            {
-                // The game server loads its map on this client once connected.
-                _status.text = $"Connecting to the game server at {Net.NetSession.ServerAddress}…";
-                string name = AccountService.IsLoggedIn ? AccountService.Profile.username : "Player";
-                Net.GameClient.Connect(_selected.id, name);
-                return;
-            }
             _status.text = $"Loading {_layout.displayName}…";
             SceneManager.LoadScene(_layout.sceneName);
-        }
-
-        // The game server's answer to "which map?" (null: it couldn't be reached).
-        void OnServerInfo(Net.NetSession.ServerInfo info)
-        {
-            if (this == null || MatchSettings.Mode != MatchMode.PvP) return;
-            MapLayoutInfo layout = info != null && layouts != null ? layouts.layouts.Find(l => l.id == info.map) : null;
-            if (layout == null)
-            {
-                _mapName.text = "Chosen by the server";
-                _mapDescription.text = info == null
-                    ? $"Couldn't reach the game server at {Net.NetSession.ServerAddress}. Is it running? " +
-                      "(docker compose up in the moba-test folder)"
-                    : "The game server rolls the map for its match. You join the team with fewer players.";
-                return;
-            }
-            _layout = layout;
-            _mapName.text = layout.displayName;
-            _mapDescription.text = $"{layout.description} Picked by the game server; you join the team with fewer players.";
-            _preview.Show(layout);
         }
 
         void OnConnectFailed(string message)
         {
             if (this == null) return;
+            _lobbyMessage = message;
             _status.text = message;
-            _lockButton.SetEnabled(_selected != null);
+            _startNowButton.AddToClassList("hidden");
+            _lockButton.SetEnabled(false);
         }
 
         static void Quit()

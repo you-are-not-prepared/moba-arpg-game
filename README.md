@@ -4,7 +4,7 @@ A MOBA with ARPG builds, made in Unity. It has classic MOBA structure (lanes, cr
 
 **Status:** early prototype.
 - **Playable:** PvE (3v3 against bots), 5 heroes, 3 map layouts, accounts with match history.
-- **Game server (stage 3):** PvP joins a local game server in Docker that runs the whole match (see below) and records it on your account.
+- **Game server (stage 4b):** PvP finds a match on a local game server in Docker. It has a queue and a shared champion select, runs the whole match, and records it on your account (see below).
 
 The backend (accounts, settings sync, match history) lives in a separate repo: [tomicnikola/moba-backend](https://github.com/tomicnikola/moba-backend).
 
@@ -35,7 +35,7 @@ You can also open a map scene (`Map_Classic`, `Map_Zones`, `Map_Delve`) and pres
 
 ### Match flow
 - **Start screen:** log in, play offline, see your match history.
-- **Find a match:** choose **PvE** (3v3 against bots; your teammates are bots too) or **PvP** (join the local game server; see [Game server](#game-server-local-docker)).
+- **Find a match:** choose **PvE** (3v3 against bots; your teammates are bots too) or **PvP** (find a match on the local game server: a short search, then champion select with the other players; see [Game server](#game-server-local-docker)).
 - **Champion select:**
   - Each visit rolls a random map.
   - Both teams' picks are visible, and bots lock in one at a time.
@@ -153,7 +153,7 @@ The game can run as a **server that runs the whole match**: movement, creeps, to
 **Run it**
 1. In Unity: **MOBA → Build Linux Server**. This needs the *Linux Dedicated Server Build Support* module and writes to `Builds/LinuxServer` (ignored by git).
 2. In this folder: `docker compose up -d --build`
-3. In the game: **Find a match → PvP**, pick a hero, **Lock in**. You join the server's map on the team with fewer players.
+3. In the game: **Find a match → PvP**. You wait briefly while the server gathers players, then pick a hero in champion select and **Lock in**.
 
 Without the Editor open, you can also build from the command line:
 ```bash
@@ -161,8 +161,14 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 ```
 
 **How the server behaves**
-- It picks the map and fills both teams with bots. Each player who joins takes a bot's place on the team with fewer players (blue on a tie), so two players end up on opposite teams. The server turns players away only when both teams are full of players.
-- **Map:** with `MOBA_MAP: random`, a server nobody has joined yet rolls a new map each time someone opens PvP champion select, the way PvE rolls one per visit. The card shows that map, and joining loads it. Once a player is in, the map stays until the match ends.
+- **Queue:** the first player starts a 15-second wait for more players ("Searching… · 2 players found"). It ends early when the match is full (6 players).
+- **Champion select:**
+  - Players are dealt onto both teams in the order they joined, and bots take the free seats (up to `MOBA_BOTS` per team) and pick a moment apart.
+  - Everyone sees every pick live, and nobody can take a hero their own team already has.
+  - It ends 5 seconds after everyone has locked in, when the 60-second timer runs out (random heroes for anyone still picking), or when a player presses **Start now**.
+  - Someone joining now takes a free or bot seat; someone leaving gives their seat to a bot.
+- **Match:** only then does the server load the map, on everyone's screen. A running match only takes back players who left it (logged in, same account); anyone else is told to try again when it ends.
+- **Map:** with `MOBA_MAP: random`, the server rolls a map when it starts, and again whenever the queue empties. Champion select shows it.
 - The match stays paused until the first player joins.
 - **Leaving:** a player who leaves keeps their hero in the match, standing still. Logging back in to the same server hands it back.
 - **Recording:** logged-in players are identified with the backend through a join ticket. When a core falls, the server records the match on everyone's account; it then shows in their match history and stats.
@@ -171,7 +177,7 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 
 **Settings** (in `docker-compose.yml`)
 - `MOBA_MAP`: `classic`, `zones`, `delve` or `random`.
-- `MOBA_BOTS`: bots per team before anyone joins (players replace them).
+- `MOBA_BOTS`: bots per team for the seats players don't fill (0 = players only).
 - `MOBA_PORT`: the UDP port.
 - `MOBA_CHEATS`: `on` lets players use the cheat menu (without game speed). On in `docker-compose.yml` for local testing; set it to `off` before others play.
 - `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY`: where to record matches, and the backend's game-server key.
@@ -181,12 +187,12 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 
 **Two players on one PC**
 1. In Unity: **MOBA → Build Windows Client**. This writes `Builds/WindowsClient/MobaTest.exe` (ignored by git).
-2. Start it as a second player. It joins straight away, with no login (an anonymous player):
+2. Start it as a second player. It looks for a match straight away, with no login (an anonymous player), and locks in the hero you name (or another one if its team already has it):
    ```bash
    Builds/WindowsClient/MobaTest.exe -screen-fullscreen 0 -screen-width 1280 -screen-height 720 -join vesh -name "Player 2"
    ```
    Without `-join`, it starts at the login screen like the normal game.
-3. Join from the Editor (or another copy) as usual. The two players land on opposite teams.
+3. Within 15 seconds, search from the Editor (or another copy) as usual. Both players meet in the same champion select, on opposite teams.
 
 **Useful commands**
 - `docker compose logs -f game-server` follows the server log.

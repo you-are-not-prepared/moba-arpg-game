@@ -12,21 +12,22 @@ using Random = UnityEngine.Random;
 namespace Moba.Net
 {
     // Runs this process as the game server: the Linux server build (in Docker) or any build started with -server.
-    // It loads a map, fills both teams with bots, and gives every player who connects the hero they picked on the
-    // team with fewer players, in a bot's place (see PickTeam). It runs the whole match.
-    // The match stays paused until the first player joins. Logged-in players are identified with the backend
-    // (join tickets), and the finished match is recorded there for them (see Online.MatchReporter). When it ends
-    // the server quits after a short delay, and Docker restarts it for a fresh match.
+    // One match per run:
+    //   queue    players connect and wait in the menu while the server gathers them (see GameServer.Lobby);
+    //   lobby    champion select on the server: players on both teams, bots in the free seats;
+    //   match    the map loads on every client, each player gets the hero they locked in, and the server runs it.
+    // Logged-in players are identified with the backend (join tickets), and the finished match is recorded there for
+    // them (see Online.MatchReporter). A player who leaves keeps their hero in the match and can rejoin it. When the
+    // match ends the server quits after a short delay, and Docker restarts it for the next one.
     //
     // Settings (command line "-map classic" / environment MOBA_MAP=classic):
-    //   map    classic | zones | delve | random (default random). With random, a server nobody has joined yet rolls a
-    //          new map each time a menu asks which map it runs (PvP champion select), as offline play does per visit.
+    //   map    classic | zones | delve | random (default random, rolled again whenever the queue empties)
     //   port   UDP port to listen on (default 7777)
-    //   bots   bots per team before anyone joins; each player replaces one (default 3, max 5)
+    //   bots   bots per team for the free seats (default 3; 0 = players only)
     //   cheats on | off: whether players may use the cheat menu (default off; for local testing)
     //   backend_url   the moba-backend API (default http://localhost:8080)
     //   backend_key   the backend's game-server key; without it matches aren't recorded
-    public class GameServer : MonoBehaviour
+    public partial class GameServer : MonoBehaviour
     {
         // Read by NetworkMatch, which tells the clients.
         public static bool CheatsAllowed { get; private set; }
@@ -35,21 +36,21 @@ namespace Moba.Net
 
         const float QuitDelayAfterMatch = 15f;
 
-        static readonly Dictionary<ulong, NetSession.JoinRequest> s_Joining = new();
-        // Join tickets being checked with the backend, by client.
-        static readonly Dictionary<ulong, Task<RedeemTicketResponse>> s_Redeeming = new();
+        enum Phase { Queue, Lobby, Loading, Match }
 
         HeroRoster _roster;
         MapLayoutCatalog _layouts;
         MapLayoutInfo _layout;
-        bool _randomMap;
+        string _mapSetting;
         int _bots;
-        // A map is loading (at start, or a re-roll): joins wait for it (their approval is held until it's loaded).
-        bool _loadingMap;
-        MapLayoutInfo _mapToLoad;
-        readonly List<NetworkManager.ConnectionApprovalResponse> _heldJoins = new();
         NetworkManager _manager;
-        bool _started;
+        Phase _phase = Phase.Queue;
+
+        // What each connected player asked for, and their backend account (checked from their join ticket).
+        readonly Dictionary<ulong, NetSession.JoinRequest> _joins = new();
+        readonly Dictionary<ulong, Task<RedeemTicketResponse>> _accounts = new();
+        // Players rejoining a running match, with the hero they left behind.
+        readonly Dictionary<ulong, NetworkHero> _rejoining = new();
 
         public static bool IsServerProcess
         {
@@ -69,7 +70,8 @@ namespace Moba.Net
         static void Boot()
         {
             if (!IsServerProcess) return;
-            // The first scene (Frontend) knows the roster and the map layouts.
+            // The first scene (Frontend) knows the roster and the map layouts. The server stays in it, unseen, until
+            // the match starts: clients connecting from their menu don't have to load anything.
             var frontend = FindFirstObjectByType<FrontendController>();
             if (frontend == null)
             {
@@ -89,167 +91,163 @@ namespace Moba.Net
             _layouts = layouts;
             Application.targetFrameRate = 30;
 
-            string mapSetting = Setting("map", "random");
-            _randomMap = _layouts.layouts.Find(l => l.id == mapSetting) == null;
-            MapLayoutInfo layout = _layout = PickLayout(mapSetting);
+            _mapSetting = Setting("map", "random");
+            _layout = PickLayout(_mapSetting);
             ushort port = ushort.TryParse(Setting("port", NetSession.DefaultPort.ToString()), out ushort p) ? p : NetSession.DefaultPort;
-            int bots = int.TryParse(Setting("bots", "3"), out int b) ? Mathf.Clamp(b, 0, 5) : 3;
+            _bots = int.TryParse(Setting("bots", "3"), out int b) ? Mathf.Clamp(b, 0, MatchSettings.TeamSize) : MatchSettings.TeamSize;
             CheatsAllowed = Setting("cheats", "off").ToLowerInvariant() is "on" or "1" or "true";
             BackendClient.UrlOverride = Setting("backend_url", BackendClient.DefaultUrl);
             BackendKey = Setting("backend_key", "");
-            _bots = bots;
-            PrepareBots(bots);
 
             _manager = NetSession.EnsureManager();
             NetSession.Transport.SetConnectionData("0.0.0.0", port, "0.0.0.0");
             _manager.ConnectionApprovalCallback = Approve;
-            _manager.OnClientDisconnectCallback += id => Debug.Log($"[GameServer] Client {id} left.");
+            _manager.OnClientConnectedCallback += OnClientConnected;
+            _manager.OnClientDisconnectCallback += OnClientDisconnected;
             if (!_manager.StartServer())
             {
                 Debug.LogError($"[GameServer] Couldn't listen on UDP port {port}.");
                 Application.Quit(1);
                 return;
             }
-            _manager.SceneManager.OnSynchronizeComplete += SpawnJoinedPlayer;
+            _manager.SceneManager.OnSynchronizeComplete += OnClientSynchronized;
             _manager.SceneManager.OnLoadEventCompleted += (_, _, _, _) => OnMapLoaded();
-            _loadingMap = true;
-            _manager.SceneManager.LoadScene(layout.sceneName, LoadSceneMode.Single);
-            Debug.Log($"[GameServer] Listening on UDP {port}. Map: {layout.displayName}, {bots} bots per team, " +
+            _manager.CustomMessagingManager.RegisterNamedMessageHandler(NetLobby.PickMessage, OnPickMessage);
+            _manager.CustomMessagingManager.RegisterNamedMessageHandler(NetLobby.StartNowMessage, OnStartNowMessage);
+            Debug.Log($"[GameServer] Listening on UDP {port}. Map: {_layout.displayName}, up to {_bots} bots per team, " +
                       $"cheats {(CheatsAllowed ? "on" : "off")}, " +
                       (BackendKey.Length > 0 ? $"recording matches at {BackendClient.BaseUrl}." : "not recording matches (no backend_key)."));
+            Debug.Log("[GameServer] Waiting for players.");
         }
 
-        // Players may connect while the match runs, with a hero the roster knows.
+        // ---------- Connections ----------
+
         void Approve(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             NetSession.JoinRequest join = NetSession.Decode(request.Payload);
-            // A menu asking which map this server runs: answered in the refusal reason.
-            if (join is { probe: true })
-            {
-                if (CanReroll) RerollMap();
-                response.Approved = false;
-                response.Reason = JsonUtility.ToJson(new NetSession.ServerInfo
-                {
-                    map = _layout.id,
-                    players = _manager.ConnectedClientsIds.Count,
-                });
-                return;
-            }
-            bool knownHero = join != null && _roster != null && _roster.Find(join.heroId) != null;
-            bool running = GameManager.Instance == null || !GameManager.Instance.IsOver;
-            bool room = _loadingMap || PickTeam(out _, out _);
-            response.Approved = knownHero && running && room;
+            ulong clientId = request.ClientNetworkId;
             response.CreatePlayerObject = false;
-            if (!knownHero) response.Reason = "The server doesn't know that hero.";
-            else if (!running) response.Reason = "The match on this server has just ended. Try again in a few seconds.";
-            else if (!room) response.Reason = "This match is full.";
-            if (!response.Approved) return;
-            s_Joining[request.ClientNetworkId] = join;
-            if (_loadingMap)
+            if (join == null)
             {
-                response.Pending = true;
-                _heldJoins.Add(response);
-            }
-            // Checked while the client loads the map.
-            if (!string.IsNullOrEmpty(join.ticket) && BackendKey.Length > 0)
-                s_Redeeming[request.ClientNetworkId] = MatchService.RedeemTicket(join.ticket, BackendKey);
-        }
-
-        // Once a client has loaded the map, give it its hero: the one it left behind if the same account rejoins,
-        // otherwise a new one.
-        async void SpawnJoinedPlayer(ulong clientId)
-        {
-            if (!s_Joining.Remove(clientId, out NetSession.JoinRequest join)) return;
-            RedeemTicketResponse account = s_Redeeming.Remove(clientId, out Task<RedeemTicketResponse> redeeming)
-                ? await redeeming
-                : null;
-            MatchBootstrap bootstrap = FindFirstObjectByType<MatchBootstrap>();
-            if (this == null || bootstrap == null || !_manager.ConnectedClients.ContainsKey(clientId)) return;
-
-            string accountId = account?.accountId ?? "";
-            string name = account?.username ?? join.playerName;
-            NetworkHero left = accountId.Length > 0 ? LeftBehindBy(accountId) : null;
-            if (left != null)
-            {
-                left.GetComponent<NetworkObject>().ChangeOwnership(clientId);
-                Debug.Log($"[GameServer] Client {clientId} ({name}) rejoined and took back {left.HeroId}.");
-            }
-            else if (PickTeam(out Team team, out NetworkHero bot))
-            {
-                Transform spot = null;
-                string replaced = "";
-                if (bot != null)
-                {
-                    spot = bot.GetComponent<HeroController>().spawnPoint;
-                    replaced = $", in place of the bot {bot.HeroId}";
-                    bot.GetComponent<NetworkObject>().Despawn(destroy: true);
-                }
-                bootstrap.SpawnPlayer(clientId, join.heroId, name, accountId, team, spot);
-                Debug.Log($"[GameServer] Client {clientId} ({name}{(accountId.Length > 0 ? ", logged in" : "")}) joined " +
-                          $"{team} as {join.heroId}{replaced}.");
-            }
-            else
-            {
-                _manager.DisconnectClient(clientId, "This match is full.");
+                response.Approved = false;
+                response.Reason = "The game server didn't understand the request. Is the game up to date?";
                 return;
             }
-            if (!_started && GameManager.Instance != null)
+
+            Task<RedeemTicketResponse> account = !string.IsNullOrEmpty(join.ticket) && BackendKey.Length > 0
+                ? MatchService.RedeemTicket(join.ticket, BackendKey)
+                : null;
+
+            switch (_phase)
             {
-                _started = true;
-                GameManager.Instance.SetPaused(false);
-                Debug.Log("[GameServer] First player in: the match starts.");
+                case Phase.Queue:
+                case Phase.Lobby:
+                    response.Approved = HumanCount < MatchSettings.TeamSize * 2;
+                    if (!response.Approved) response.Reason = "This match is full.";
+                    break;
+                case Phase.Loading:
+                    response.Approved = false;
+                    response.Reason = "The match on this server is starting. Try again when it's over.";
+                    break;
+                default:
+                    // A running match only takes back players who left it (their account still has a hero there).
+                    response.Approved = false;
+                    response.Reason = "A match is already running on this server. Try again when it ends.";
+                    if (account != null && GameManager.Instance != null && !GameManager.Instance.IsOver)
+                    {
+                        response.Pending = true;
+                        ApproveRejoin(clientId, account, response);
+                    }
+                    return;
             }
+            if (!response.Approved) return;
+            _joins[clientId] = join;
+            if (account != null) _accounts[clientId] = account;
         }
 
-        // The team for the next player: the one with fewer players (blue on a tie). A full team gives up a bot for them;
-        // false when both teams are full of players.
-        bool PickTeam(out Team team, out NetworkHero bot)
+        async void ApproveRejoin(ulong clientId, Task<RedeemTicketResponse> account, NetworkManager.ConnectionApprovalResponse response)
         {
-            int size = Mathf.Max(MatchSettings.TeamSize, _bots);
-            var players = new Dictionary<Team, int> { [Team.Blue] = 0, [Team.Red] = 0 };
-            var heroes = new Dictionary<Team, int> { [Team.Blue] = 0, [Team.Red] = 0 };
-            var bots = new Dictionary<Team, NetworkHero>();
-            foreach (NetworkHero hero in FindObjectsByType<NetworkHero>(FindObjectsSortMode.None))
+            RedeemTicketResponse who = await account;
+            NetworkHero hero = who != null ? LeftBehindBy(who.accountId) : null;
+            if (hero != null)
             {
-                if (!hero.IsSpawned) continue;
-                Team side = hero.GetComponent<Unit>().team;
-                heroes[side]++;
-                if (hero.IsBot) bots[side] = hero;
-                else players[side]++;
+                _rejoining[clientId] = hero;
+                response.Approved = true;
+                response.Reason = null;
             }
-            foreach (Team side in players[Team.Red] < players[Team.Blue] ? new[] { Team.Red, Team.Blue } : new[] { Team.Blue, Team.Red })
-            {
-                if (players[side] >= size) continue;
-                team = side;
-                bot = heroes[side] >= size && bots.TryGetValue(side, out NetworkHero b) ? b : null;
-                if (heroes[side] >= size && bot == null) continue;
-                return true;
-            }
-            team = Team.Blue;
-            bot = null;
-            return false;
+            response.Pending = false;
         }
 
-        // Only before anyone has joined: once a player is in, the map is theirs.
-        bool CanReroll => _randomMap && !_started && !_loadingMap && _layouts.layouts.Count > 1
-                          && _manager.ConnectedClientsIds.Count == 0;
-
-        // Picks another map and loads it on the next frame (not from inside NGO's approval callback).
-        void RerollMap()
+        void OnClientConnected(ulong clientId)
         {
-            var others = _layouts.layouts.FindAll(l => l != _layout);
-            _layout = _mapToLoad = others[Random.Range(0, others.Count)];
-            _loadingMap = true;
+            if (_phase is Phase.Queue or Phase.Lobby) AddPlayer(clientId);
         }
 
-        void Update()
+        void OnClientDisconnected(ulong clientId)
         {
-            if (_mapToLoad == null) return;
-            MapLayoutInfo layout = _mapToLoad;
-            _mapToLoad = null;
-            PrepareBots(_bots); // new bots for the new map
-            _manager.SceneManager.LoadScene(layout.sceneName, LoadSceneMode.Single);
-            Debug.Log($"[GameServer] Re-rolled the map for a new visitor: {layout.displayName}.");
+            Debug.Log($"[GameServer] Client {clientId} left.");
+            _joins.Remove(clientId);
+            _accounts.Remove(clientId);
+            _rejoining.Remove(clientId);
+            if (_phase is Phase.Queue or Phase.Lobby) RemovePlayer(clientId);
+        }
+
+        // A player rejoining the running match has loaded the map: hand their hero back.
+        void OnClientSynchronized(ulong clientId)
+        {
+            if (!_rejoining.Remove(clientId, out NetworkHero hero) || hero == null) return;
+            hero.GetComponent<NetworkObject>().ChangeOwnership(clientId);
+            Debug.Log($"[GameServer] Client {clientId} ({hero.PlayerName}) rejoined and took back {hero.HeroId}.");
+        }
+
+        // The player's name: their account's username once the ticket is checked, otherwise what the game sent.
+        string NameOf(ulong clientId)
+        {
+            if (_accounts.TryGetValue(clientId, out Task<RedeemTicketResponse> t) && t.IsCompletedSuccessfully && t.Result != null)
+                return t.Result.username;
+            return _joins.TryGetValue(clientId, out NetSession.JoinRequest join) && !string.IsNullOrEmpty(join.playerName)
+                ? join.playerName
+                : $"Player {clientId}";
+        }
+
+        async Task<string> AccountOf(ulong clientId) =>
+            _accounts.TryGetValue(clientId, out Task<RedeemTicketResponse> t) ? (await t)?.accountId ?? "" : "";
+
+        // ---------- The match ----------
+
+        // Champion select is over: bots go into the lineup the map spawns, players are spawned once every client has
+        // loaded the map (OnMapLoaded).
+        void StartMatch()
+        {
+            _phase = Phase.Loading;
+            MatchSettings.Mode = MatchMode.PvP;
+            MatchSettings.Lineup.Clear();
+            foreach (LobbySeat seat in _seats)
+                if (seat.Bot) MatchSettings.Lineup.Add(new LobbySlot { team = seat.Team, heroId = seat.Hero, isBot = true });
+            BroadcastLobby();
+            Debug.Log($"[GameServer] Champion select done: {HumanCount} player(s). Loading {_layout.displayName}.");
+            _manager.SceneManager.LoadScene(_layout.sceneName, LoadSceneMode.Single);
+        }
+
+        async void OnMapLoaded()
+        {
+            GameManager game = GameManager.Instance;
+            MatchBootstrap bootstrap = FindFirstObjectByType<MatchBootstrap>();
+            if (game == null || bootstrap == null || _phase != Phase.Loading) return;
+            _phase = Phase.Match;
+            game.MatchEnded += _ => StartCoroutine(QuitSoon());
+
+            foreach (LobbySeat seat in _seats.ToArray())
+            {
+                if (seat.Bot || !_manager.ConnectedClients.ContainsKey(seat.ClientId)) continue;
+                string accountId = await AccountOf(seat.ClientId);
+                if (this == null || !_manager.ConnectedClients.ContainsKey(seat.ClientId)) continue;
+                string name = NameOf(seat.ClientId);
+                bootstrap.SpawnPlayer(seat.ClientId, seat.Hero, name, accountId, seat.Team, null);
+                Debug.Log($"[GameServer] {name}{(accountId.Length > 0 ? " (logged in)" : "")} plays {seat.Hero} on {seat.Team}.");
+            }
+            game.SetPaused(false);
+            Debug.Log("[GameServer] The match starts.");
         }
 
         // A hero this account played and left (now owned by the server).
@@ -261,45 +259,10 @@ namespace Moba.Net
             return null;
         }
 
-        // Bots fill both teams; players take their places as they join.
-        void PrepareBots(int perTeam)
-        {
-            MatchSettings.Mode = MatchMode.PvP;
-            MatchSettings.Lineup.Clear();
-            AddBots(Team.Blue, perTeam);
-            AddBots(Team.Red, perTeam);
-        }
-
-        void AddBots(Team team, int count)
-        {
-            var taken = new List<string>();
-            for (int i = 0; i < count; i++)
-            {
-                var options = _roster.heroes.FindAll(h => h != null && !taken.Contains(h.id));
-                if (options.Count == 0) options = _roster.heroes.FindAll(h => h != null);
-                HeroDefinition hero = options[Random.Range(0, options.Count)];
-                taken.Add(hero.id);
-                MatchSettings.Lineup.Add(new LobbySlot { team = team, heroId = hero.id, isBot = true });
-            }
-        }
-
         MapLayoutInfo PickLayout(string id)
         {
             MapLayoutInfo found = _layouts.layouts.Find(l => l.id == id);
             return found ?? _layouts.layouts[Random.Range(0, _layouts.layouts.Count)];
-        }
-
-        // The match waits (paused: no creeps, bots or timer) until the first player has joined.
-        void OnMapLoaded()
-        {
-            _loadingMap = false;
-            foreach (NetworkManager.ConnectionApprovalResponse held in _heldJoins) held.Pending = false;
-            _heldJoins.Clear();
-            GameManager game = GameManager.Instance;
-            if (game == null) return;
-            game.MatchEnded += _ => StartCoroutine(QuitSoon());
-            if (!_started) game.SetPaused(true);
-            Debug.Log($"[GameServer] Map loaded ({_layout.displayName}). Waiting for the first player.");
         }
 
         IEnumerator QuitSoon()
