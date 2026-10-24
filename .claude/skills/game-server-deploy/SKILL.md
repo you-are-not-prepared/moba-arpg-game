@@ -46,7 +46,7 @@ For a test without bots, don't edit the file: `deploy "$(nobots_override)"`, and
 ## Behaviour worth knowing
 
 - One match per run: queue (15 s after the first player) → champion select (60 s, or 5 s after everyone locked in, or Start now) → the map loads. When a core falls, the server quits after 15 s and Docker restarts it for the next match.
-- With `TestPrices` on (1-gold items, `Editor/GameBuilder.cs`), bots buy everything at once and end matches in about 1–3 minutes.
+- Bots currently buy only a Fireball for Q (`BotBrain.fullShopping` off). With full shopping and `TestPrices` (1-gold items), they'd buy everything at once and end matches in about 1–3 minutes.
 - Unity's headless noise in the log is harmless: "Built-in Resource Error: dereference potentially...", and "Trying to access a shader but no shaders were included".
 - The server reaches the backend on the host via `host.docker.internal` (see `extra_hosts`). The backend must be running (`docker compose up -d` in moba-backend) for matches to be recorded.
 

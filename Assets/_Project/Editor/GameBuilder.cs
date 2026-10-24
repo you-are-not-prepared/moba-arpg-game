@@ -59,7 +59,7 @@ namespace Moba.EditorTools
         class Mats
         {
             public Material Rock, Stone, Blue, Red, BluePad, RedPad, Marker, AttackMarker, RangeIndicator, Fire, Explosion, Arrow,
-                ShieldWall, ShieldFlash, HasteAura;
+                ShieldWall, ShieldFlash, HasteAura, MeleeSlash;
         }
 
         // ---------- Map layouts ----------
@@ -682,7 +682,7 @@ namespace Moba.EditorTools
             unit.goldBounty = 300;
             unit.xpBounty = 200f;
             ConfigureAttacker(go, damage: spec.Damage, range: spec.Range, aps: spec.AttacksPerSecond,
-                projectileSpeed: spec.Melee ? 0f : 28f, size: 0.35f, origin: new Vector3(0f, 1.4f, 0.5f), mat: body);
+                projectileSpeed: spec.Melee ? 0f : 28f, size: 0.35f, origin: new Vector3(0f, 1.4f, 0.5f), mat: body, swing: m.MeleeSlash);
             ConfigureAgent(go, radius: 0.5f, height: 2f, speed: spec.Speed);
             // No turn rate: instant facing plus near-instant velocity changes.
             go.GetComponent<NavMeshAgent>().acceleration = 1000f;
@@ -720,7 +720,7 @@ namespace Moba.EditorTools
                     origin: new Vector3(0f, height, 0.3f), mat: m.Blue);
             else
                 ConfigureAttacker(go, damage: 12f, range: 0.6f, aps: 1f, projectileSpeed: 0f, size: 0f,
-                    origin: Vector3.zero, mat: null);
+                    origin: Vector3.zero, mat: null, swing: m.MeleeSlash);
             ConfigureAgent(go, radius, height, speed: 3.5f);
             var ai = go.AddComponent<CreepAI>();
             ai.aggroRange = 6f;
@@ -1015,10 +1015,12 @@ namespace Moba.EditorTools
             return unit;
         }
 
+        // `swing`: the melee swing arc (melee attackers only).
         static Attacker ConfigureAttacker(GameObject go, float damage, float range, float aps, float projectileSpeed,
-            float size, Vector3 origin, Material mat)
+            float size, Vector3 origin, Material mat, Material swing = null)
         {
             var a = go.AddComponent<Attacker>();
+            a.meleeSwingMaterial = projectileSpeed <= 0f ? swing : null;
             a.damage = damage;
             a.range = range;
             a.attacksPerSecond = aps;
@@ -1075,6 +1077,7 @@ namespace Moba.EditorTools
             ShieldWall = ShaderMat("ShieldWall", "Moba/ShieldWall"),
             ShieldFlash = EmissiveMat("ShieldFlash", new Color(0.6f, 0.85f, 1f), 2f),
             HasteAura = ShaderMat("HasteAura", "Moba/GroundRing", new Color(1f, 0.25f, 0.35f, 1f)),
+            MeleeSlash = ShaderMat("MeleeSlash", "Moba/MeleeSlash", new Color(1f, 0.95f, 0.8f, 0.9f)),
         };
 
         // A material on one of the project's own shaders; `color` (if given) sets its _Color.

@@ -110,6 +110,7 @@ MonoBehaviour:
   projectileSize: 0.35
   projectileMaterial: {fileID: 2100000, guid: 1956d3b3f8a19f04faaf01bec131a221, type: 2}
   projectileOrigin: {x: 0, y: 1.4, z: 0.5}
+  meleeSwingMaterial: {fileID: 2100000, guid: f9cd73925aa6f3346bdaaf1dcfb6eb45, type: 2}
   faceTarget: 1
 --- !u!195 &5417415174788950503
 NavMeshAgent:
