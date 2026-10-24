@@ -15,7 +15,7 @@ source .claude/skills/pvp-e2e-test/scripts/pvp.sh   # loads all three helper set
 |---|---|
 | `tester_create tester_x` → token | Throwaway backend account (names must start with `tester_`) |
 | `tester_delete tester_x`, `tester_list` | Remove it with its matches, sessions and profile; list leftovers |
-| `pvp_join hero name`, `pvp_leave` | Join the server from the Frontend and wait for the hero; leave |
+| `pvp_join hero name`, `pvp_leave` | Find a match from the Frontend: through the queue, lock in the hero, Start now, wait for the match; leave |
 | `pvp_cheat Level 5` | Server cheats: Level, Gold, NoManaCost, NoCooldowns (needs `MOBA_CHEATS: "on"`) |
 | `wait_recorded <iso time>` | Wait for the server's `[Matches]` log line after that time |
 | `last_match <token>` | The account's newest recorded match, per player |
@@ -56,8 +56,9 @@ Orders from the client go through `HeroController` (`OrderMove`, `IssueAttackMov
   ```bash
   powershell -NoProfile -Command "Start-Process -FilePath '$(cygpath -w "$PWD/Builds/WindowsClient/MobaTest.exe")' -ArgumentList '-screen-fullscreen','0','-screen-width','1280','-screen-height','720','-join','kael','-name','P1'"
   ```
-  The Editor then joins red, so a red player's view (shop, fog, HUD sides) can be inspected. The built game logs to `%USERPROFILE%\AppData\LocalLow\DefaultCompany\moba-test\Player.log`. Close it afterwards with `taskkill //IM MobaTest.exe //F`.
-- **The PvP champion select** asks the server for its map with a probe connection, which the server logs as a client that left. That's expected.
+  With `-join` it searches at once and locks in that hero. The Editor then searches within 15 s, lands in the same champion select on red, and its view (shop, fog, HUD sides) can be inspected. The built game logs to `%USERPROFILE%\AppData\LocalLow\DefaultCompany\moba-test\Player.log`. Close it afterwards with `taskkill //IM MobaTest.exe //F`.
+- **Queue and champion select** happen in the Frontend scene: `Moba.Net.GameClient.Lobby` is the server's state (phase, map, seats, time left), and the menu's PvP screen shows it. To test the lobby UI itself, call `StartPvP` on the FrontendController (reflection) and click `hero-tile`, `lockButton` and `startNowButton` with `uiclick Frontend ...`.
+- **A running match** only takes back a logged-in player who left it. Anyone else gets "A match is already running…": restart the server (`docker compose restart game-server`) for a fresh match.
 - **Leaving and rejoining:** after `pvp_leave`, a logged-in account that joins again gets its old hero back ("rejoined and took back ..."). An anonymous player gets a new hero.
 
 ## After (always)

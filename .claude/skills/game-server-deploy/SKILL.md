@@ -10,7 +10,7 @@ The game server is this same Unity project, built as a headless Linux server (`B
 ```bash
 source .claude/skills/game-server-deploy/scripts/server.sh   # also loads the unity-playtest helpers
 build_server      # build from the open Editor, wait for new output, check the Editor's target, revert settings noise
-deploy            # docker compose up -d --build, wait for "Map loaded", show the server log
+deploy            # docker compose up -d --build, wait for "Waiting for players", show the server log
 server_log        # [GameServer]/[Matches] lines and real errors only
 ```
 
@@ -27,8 +27,8 @@ server_log        # [GameServer]/[Matches] lines and real errors only
    - If the target is still `StandaloneLinux64/Server`, switch it back (`EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64)` and `standaloneBuildSubtarget = Player`). Otherwise the Editor itself compiles with `UNITY_SERVER` and starts as a server in play mode.
 3. `deploy`. The log should show:
    ```
-   [GameServer] Listening on UDP 7777. Map: Zones, 3 bots per team, cheats on, recording matches at http://host.docker.internal:8080.
-   [GameServer] Map loaded. Waiting for the first player.
+   [GameServer] Listening on UDP 7777. Map: Zones, up to 3 bots per team, cheats on, recording matches at http://host.docker.internal:8080.
+   [GameServer] Waiting for players.
    ```
 4. Check `git status`. Only intended files should be changed (`ProjectSettings/ProjectSettings.asset` must not be: the build restores `insecureHttpOption` and saves).
 
@@ -37,7 +37,7 @@ server_log        # [GameServer]/[Matches] lines and real errors only
 | Setting | Values |
 |---|---|
 | `MOBA_MAP` | `classic`, `zones`, `delve`, `random` (default) |
-| `MOBA_BOTS` | bots per team before anyone joins; each player takes a bot's place on the team with fewer players |
+| `MOBA_BOTS` | bots per team for the seats players don't fill in champion select (0 = players only) |
 | `MOBA_CHEATS` | `on` lets players use the cheat menu; **must be `off` before anyone else plays** |
 | `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY` | where finished matches are recorded; the key must equal moba-backend's `GAME_SERVER_KEY` |
 
@@ -45,7 +45,7 @@ For a test without bots, don't edit the file: `deploy "$(nobots_override)"`, and
 
 ## Behaviour worth knowing
 
-- The match is paused until the first player joins. When a core falls, the server quits after 15 s and Docker restarts it with a fresh match (and a new random map).
+- One match per run: queue (15 s after the first player) → champion select (60 s, or 5 s after everyone locked in, or Start now) → the map loads. When a core falls, the server quits after 15 s and Docker restarts it for the next match.
 - With `TestPrices` on (1-gold items, `Editor/GameBuilder.cs`), bots buy everything at once and end matches in about 1–3 minutes.
 - Unity's headless noise in the log is harmless: "Built-in Resource Error: dereference potentially...", and "Trying to access a shader but no shaders were included".
 - The server reaches the backend on the host via `host.docker.internal` (see `extra_hosts`). The backend must be running (`docker compose up -d` in moba-backend) for matches to be recorded.

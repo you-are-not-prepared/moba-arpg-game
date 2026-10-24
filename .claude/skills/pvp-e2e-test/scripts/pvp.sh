@@ -42,13 +42,18 @@ m=ms[0]; print(m['mode'], m['mapLayout'], 'won' if m['won'] else 'lost', str(m['
 for p in m['players']: print(' ', p['team'], p['heroId'], p['username'] or ('bot' if p['isBot'] else 'anonymous'), 'L'+str(p['level']), '%d/%d/%d'%(p['kills'],p['deaths'],p['assists']))"
 }
 
-# Joins the game server from the Frontend (play mode) as a hero; waits until the hero is ours.
+# Finds a match from the Frontend (play mode), waits through the queue, locks in a hero in champion select, presses
+# Start now, and waits until the hero is ours in the match:
 #   pvp_join kael "Tester"   (logged in, the account's username is used instead)
+# Other players searching within the queue's 15 s land in the same champion select.
 pvp_join() {
-  ev "Moba.Net.GameClient.Connect(\"${1:-kael}\", \"${2:-Tester}\"); return \"connecting\";" >/dev/null
-  for i in $(seq 1 10); do
+  ev "Moba.Net.GameClient.FindMatch(\"${2:-Tester}\"); return \"searching\";" >/dev/null
+  local r
+  for i in $(seq 1 15); do
     sleep 2
-    r=$(ev 'var gm = Moba.GameManager.Instance; return gm != null && gm.hero != null && gm.hero.Remote != null ? "joined as " + gm.hero.name + " on " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name : "waiting";')
+    r=$(evv 'var l = Moba.Net.GameClient.Lobby; var me = Moba.Net.GameClient.LocalSeat(l); return l == null ? "none" : l.phase + (me != null ? ":" + me.team + ":" + (me.locked ? "locked" : "open") : "");')
+    case "$r" in lobby:*:open) ev "Moba.Net.GameClient.SendPick(\"${1:-kael}\"); Moba.Net.GameClient.SendStartNow(); return \"picked\";" >/dev/null ;; esac
+    r=$(ev 'var gm = Moba.GameManager.Instance; return gm != null && gm.hero != null && gm.hero.Remote != null ? "joined as " + gm.hero.name + " on " + gm.hero.Unit.team + ", " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name : "waiting";')
     echo "$r" | grep -q joined && { echo "$r"; return 0; }
   done
   echo "not joined: $(ev 'return "lastError=" + Moba.Net.GameClient.LastError;')"; return 1

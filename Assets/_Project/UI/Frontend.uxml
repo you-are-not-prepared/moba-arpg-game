@@ -120,6 +120,7 @@
             <ui:VisualElement class="select__footer">
                 <ui:Button name="backButton" class="fe-button" text="Back" />
                 <ui:Label name="selectStatus" class="select__status" />
+                <ui:Button name="startNowButton" class="fe-button select__start-now hidden" text="Start now" />
                 <ui:Button name="lockButton" class="fe-button fe-button--primary" text="Lock in" />
             </ui:VisualElement>
         </ui:VisualElement>
