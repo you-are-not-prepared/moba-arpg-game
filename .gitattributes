@@ -169,3 +169,7 @@ Packages/packages-lock.json linguist-generated
 
 # Exceptions for .asset files such as lightning pre-baking
 LightingData.asset     binary
+
+# Shell scripts and the Dockerfile run in bash / Linux: always LF, even with core.autocrlf on Windows
+*.sh                    text eol=lf
+Dockerfile              text eol=lf
