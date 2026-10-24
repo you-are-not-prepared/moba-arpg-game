@@ -154,7 +154,13 @@ namespace Moba
                 // Dead enemy heroes stay hidden (their controller hides them; fog mustn't show them again).
                 bool visible = u.team == _team || structure || (u.IsAlive && SeenBySources(u));
                 u.IsVisibleToPlayer = visible;
-                if (u.team == _team || structure) continue;
+                if (u.team == _team || structure)
+                {
+                    // An ally the fog hid while the player's team wasn't known yet (on a game server the team comes with
+                    // the player's hero, e.g. a red player whose allies spawned first, or who rejoined): show it again.
+                    if (_unitVisuals.Remove(u, out UnitVisual hidden) && !hidden.Shown && u.IsAlive) Show(u, hidden, true);
+                    continue;
+                }
 
                 if (!_unitVisuals.TryGetValue(u, out UnitVisual visual))
                 {
