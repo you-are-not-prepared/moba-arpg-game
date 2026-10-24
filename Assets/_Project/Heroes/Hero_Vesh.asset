@@ -28,6 +28,8 @@ MonoBehaviour:
   moveSpeedMultiplier: 1
   isolationDamageBonus: 0
   isolationRadius: 7
+  tailwindSpeed: 0
+  tailwindDuration: 2
   ascension:
     paths:
     - root:
@@ -48,6 +50,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: vesh_a1
         name: Accelerated Mind
@@ -66,6 +71,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: vesh_a2
         name: Temporal Flow
         flavor: Every spell lands a moment sooner.
@@ -83,6 +91,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: vesh_a3
         name: Perpetual Motion
@@ -101,6 +112,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: vesh_a4
         name: Echo
         flavor: Each spell leaves an echo behind.
@@ -118,6 +132,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: vesh_b
         name: Chronoshift
@@ -136,6 +153,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: vesh_b1
         name: Borrowed Time
@@ -154,6 +174,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: vesh_b2
         name: Haste of Ages
         flavor: Walk between the ticks of the clock.
@@ -171,6 +194,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: vesh_b3
         name: Rewound Wounds
@@ -189,6 +215,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: vesh_b4
         name: Endless Loop
         flavor: Again. And again. And again.
@@ -206,6 +235,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: vesh_c
         name: Paradox
@@ -224,6 +256,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: vesh_c1
         name: Temporal Spike
@@ -242,6 +277,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: vesh_c2
         name: Mana Loop
         flavor: Spend it twice.
@@ -259,6 +297,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: vesh_c3
         name: Collapse
@@ -277,6 +318,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: vesh_c4
         name: Infinite Loop
         flavor: There is no last cast.
@@ -294,4 +338,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
   ultimate: {fileID: 11400000, guid: 8deedc423caf0c74e950a697aa570909, type: 2}

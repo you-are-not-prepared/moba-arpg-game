@@ -35,6 +35,9 @@ namespace Moba
         [Tooltip("Bonus damage (0.15 = 15%) against targets with no allied hero within isolationRadius.")]
         public float isolationDamageBonus;
         public float isolationRadius = 7f;
+        [Tooltip("Movement speed (0.25 = 25%) for tailwindDuration seconds after every spell cast. 0 = none.")]
+        public float tailwindSpeed;
+        public float tailwindDuration = 2f;
 
         [Header("Ascension")]
         [Tooltip("Talent choices at levels 6, 11 and 18: path A or B, then two options within that path.")]
@@ -59,6 +62,12 @@ namespace Moba
                 var isolation = hero.gameObject.AddComponent<IsolationPassive>();
                 isolation.damageBonus = isolationDamageBonus;
                 isolation.radius = isolationRadius;
+            }
+            if (tailwindSpeed > 0f)
+            {
+                var tailwind = hero.gameObject.AddComponent<TailwindPassive>();
+                tailwind.moveSpeedBonus = tailwindSpeed;
+                tailwind.duration = tailwindDuration;
             }
             if (ascension != null && ascension.IsComplete) hero.gameObject.AddComponent<HeroAscension>().Init(ascension);
             if (ultimate != null)

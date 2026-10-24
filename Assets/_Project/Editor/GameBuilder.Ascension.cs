@@ -169,6 +169,32 @@ namespace Moba.EditorTools
         };
 
         // Nyx: lone targets (Lone Prey), Bloodrush, or a slippery skirmisher.
+        // Thessa: Tailwind (casting gives speed), Eye of the Storm, or a hit-and-run skirmisher.
+        static AscensionTree ThessaAscension() => new()
+        {
+            paths =
+            {
+                AscPath(
+                    T("thessa_a", "Gale", "The wind never quite lets go.", t => t.tailwindDuration = 0.5f),
+                    T("thessa_a1", "Jet Stream", "Ride the gust.", t => t.tailwindSpeed = 0.1f),
+                    T("thessa_a2", "Updraft", "One spell carries her further.", t => t.tailwindDuration = 1f),
+                    T("thessa_a3", "Slipstream", "Strike while the wind is behind you.", t => t.tailwindAttackSpeed = 0.2f),
+                    T("thessa_a4", "Second Gust", "The wind keeps blowing.", t => t.tailwindDuration = 1.5f)),
+                AscPath(
+                    T("thessa_b", "Hurricane", "The storm gathers a little longer.", t => t.ultimateDuration = 1f),
+                    T("thessa_b1", "Eye Widens", "A longer calm at the centre.", t => t.ultimateDuration = 2f),
+                    T("thessa_b2", "Charged Air", "Every spell crackles.", t => t.spellDamage = 0.15f),
+                    T("thessa_b3", "Ceaseless", "Spells come back faster, always.", t => t.cooldownReduction = 0.1f),
+                    T("thessa_b4", "Calm Before", "The next storm is never far.", t => t.ultimateCooldownReduction = 0.25f)),
+                AscPath(
+                    T("thessa_c", "Skirmisher", "Never stand still.", t => t.attackSpeed = 0.1f),
+                    T("thessa_c1", "Quickdraw", "Faster hands.", t => t.attackSpeed = 0.15f),
+                    T("thessa_c2", "Light Feet", "Faster feet.", t => t.moveSpeed = 0.1f),
+                    T("thessa_c3", "Crosswind", "One more on the wind.", t => t.extraProjectiles = 1),
+                    T("thessa_c4", "Windward", "Spells come back faster.", t => t.cooldownReduction = 0.1f)),
+            },
+        };
+
         static AscensionTree NyxAscension() => new()
         {
             paths =

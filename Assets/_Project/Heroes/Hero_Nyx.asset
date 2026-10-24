@@ -30,6 +30,8 @@ MonoBehaviour:
   moveSpeedMultiplier: 1
   isolationDamageBonus: 0.15
   isolationRadius: 7
+  tailwindSpeed: 0
+  tailwindDuration: 2
   ascension:
     paths:
     - root:
@@ -50,6 +52,9 @@ MonoBehaviour:
         isolationDamage: 0.1
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: nyx_a1
         name: Predator
@@ -68,6 +73,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: nyx_a2
         name: Stalker's Pace
         flavor: Close the gap before they notice.
@@ -85,6 +93,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: nyx_a3
         name: Apex
@@ -103,6 +114,9 @@ MonoBehaviour:
         isolationDamage: 0.15
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: nyx_a4
         name: Frenzy
         flavor: Faster and faster.
@@ -120,6 +134,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: nyx_b
         name: Blood Frenzy
@@ -138,6 +155,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 2
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: nyx_b1
         name: Hemorrhage
@@ -156,6 +176,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: nyx_b2
         name: Thirst
         flavor: Feed on the fight.
@@ -173,6 +196,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: nyx_b3
         name: Endless Hunt
@@ -191,6 +217,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 2
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: nyx_b4
         name: Quick Return
         flavor: Rush again, sooner.
@@ -208,6 +237,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: nyx_c
         name: Shadowstep
@@ -226,6 +258,9 @@ MonoBehaviour:
         isolationDamage: 0.05
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: nyx_c1
         name: Ambush
@@ -244,6 +279,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: nyx_c2
         name: Night Run
         flavor: The rush carries you further.
@@ -261,6 +299,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 1.5
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: nyx_c3
         name: Phantom
@@ -279,6 +320,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: nyx_c4
         name: Execution
         flavor: Alone, and out of time.
@@ -296,4 +340,7 @@ MonoBehaviour:
         isolationDamage: 0.1
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
   ultimate: {fileID: 11400000, guid: 6868062af2eb1b3489a088ddbd33aff8, type: 2}

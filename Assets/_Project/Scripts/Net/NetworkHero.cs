@@ -53,6 +53,7 @@ namespace Moba.Net
         readonly NetworkVariable<float> _maxMana = new();
         readonly NetworkVariable<float> _hasteEnd = new();
         readonly NetworkVariable<float> _shieldEnd = new();
+        readonly NetworkVariable<float> _stormEnd = new();
         // Cheat toggles: 1 = no mana cost, 2 = no cooldowns.
         readonly NetworkVariable<byte> _cheatToggles = new();
         NetworkList<short> _kit;
@@ -255,6 +256,8 @@ namespace Moba.Net
             _hasteEnd.Value = EndTime(TryGetComponent(out Haste haste) && haste.enabled ? haste.Remaining : 0f, _hasteEnd.Value, now);
             _shieldEnd.Value = EndTime(TryGetComponent(out ProjectileShield shield) && shield.enabled ? shield.Remaining : 0f,
                 _shieldEnd.Value, now);
+            _stormEnd.Value = EndTime(TryGetComponent(out SpellStorm storm) && storm.enabled ? storm.Remaining : 0f,
+                _stormEnd.Value, now);
         }
 
         void WriteKit(int index, short value)
@@ -298,6 +301,10 @@ namespace Moba.Net
                 while (_ascension.Picked.Count < _talents.Count) _ascension.ChooseFromServer(_talents[_ascension.Picked.Count]);
 
             Haste.SyncFromServer(_hero.Unit, Remaining(_hasteEnd.Value, now), FindSpell<HasteSpell>()?.auraMaterial);
+            SpellStormSpell stormSpell = FindSpell<SpellStormSpell>();
+            if (stormSpell != null)
+                SpellStorm.SyncFromServer(_hero.Unit, Remaining(_stormEnd.Value, now), stormSpell.CooldownMultiplier,
+                    stormSpell.ManaCostMultiplier, stormSpell.auraMaterial);
             ShieldWallSpell wall = FindSpell<ShieldWallSpell>();
             if (wall != null)
                 ProjectileShield.SyncFromServer(_hero.Unit, Remaining(_shieldEnd.Value, now), wall.radius, wall.arcDegrees,

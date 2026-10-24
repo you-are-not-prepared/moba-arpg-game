@@ -28,6 +28,8 @@ MonoBehaviour:
   moveSpeedMultiplier: 0.85
   isolationDamageBonus: 0
   isolationRadius: 7
+  tailwindSpeed: 0
+  tailwindDuration: 2
   ascension:
     paths:
     - root:
@@ -48,6 +50,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: torvald_a1
         name: Iron Skin
@@ -66,6 +71,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: torvald_a2
         name: Unstoppable
         flavor: Heavy, but always moving.
@@ -83,6 +91,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: torvald_a3
         name: Mountain
@@ -101,6 +112,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: torvald_a4
         name: Crushing Blows
         flavor: Every swing lands like a landslide.
@@ -118,6 +132,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: torvald_b
         name: Aegis Warden
@@ -136,6 +153,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 2
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: torvald_b1
         name: Bulwark Drill
@@ -154,6 +174,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: torvald_b2
         name: Shield Bash
         flavor: The best defence hits back.
@@ -171,6 +194,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: torvald_b3
         name: Unbreakable Wall
@@ -189,6 +215,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 2
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: torvald_b4
         name: Rapid Guard
         flavor: Always ready to block.
@@ -206,6 +235,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: torvald_c
         name: Warlord
@@ -224,6 +256,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 1
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: torvald_c1
         name: Battle Cry
@@ -242,6 +277,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: torvald_c2
         name: Forced March
         flavor: Never fall behind the front line.
@@ -259,6 +297,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: torvald_c3
         name: Shield Charge
@@ -277,6 +318,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 1
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: torvald_c4
         name: Warlord's Might
         flavor: One blow ends the fight.
@@ -294,4 +338,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
   ultimate: {fileID: 11400000, guid: cb951955d797dd4439aefaf6063a5678, type: 2}

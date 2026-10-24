@@ -28,6 +28,8 @@ MonoBehaviour:
   moveSpeedMultiplier: 1
   isolationDamageBonus: 0
   isolationRadius: 7
+  tailwindSpeed: 0
+  tailwindDuration: 2
   ascension:
     paths:
     - root:
@@ -48,6 +50,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: kael_a1
         name: Splintering Shots
@@ -66,6 +71,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: kael_a2
         name: Quickdraw
         flavor: Nock, draw, loose. Again.
@@ -83,6 +91,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: kael_a3
         name: Endless Quiver
@@ -101,6 +112,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: kael_a4
         name: Barrage Rhythm
         flavor: Fall into the rhythm of the hunt.
@@ -118,6 +132,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: kael_b
         name: Skybreaker
@@ -136,6 +153,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: kael_b1
         name: Pinning Shot
@@ -154,6 +174,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0.75
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: kael_b2
         name: Hunter's Focus
         flavor: Patience sharpens every arrow.
@@ -171,6 +194,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: kael_b3
         name: Heaven's Fall
@@ -189,6 +215,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0.75
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: kael_b4
         name: Sky Hunter
         flavor: Draw the great bow again and again.
@@ -206,6 +235,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
     - root:
         id: kael_c
         name: Windrunner
@@ -224,6 +256,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       second:
       - id: kael_c1
         name: Hit and Run
@@ -242,6 +277,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: kael_c2
         name: Steady Aim
         flavor: Every arrow counts.
@@ -259,6 +297,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       third:
       - id: kael_c3
         name: Gale Volley
@@ -277,6 +318,9 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
       - id: kael_c4
         name: Sky Piercer
         flavor: Strike from the edge of sight.
@@ -294,4 +338,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0.5
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
   ultimate: {fileID: 11400000, guid: 7bd2db61be6dec244ba12523ec7649a7, type: 2}
