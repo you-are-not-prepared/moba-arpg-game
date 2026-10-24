@@ -76,6 +76,8 @@ namespace Moba
         public bool IsAttackMoving => _attackMoving;
         public Unit AttackTarget => _attackTarget;
         public bool HasPendingCast => _pendingCastSlot != NoSlot;
+        // After the hero is back at its spawn point (the game server teleports it on clients).
+        public event System.Action Respawned;
 
         void Awake()
         {
@@ -634,6 +636,7 @@ namespace Moba
             _abilities.RestoreMana();
             SetPresent(true);
             _agent.Warp(pos);
+            Respawned?.Invoke();
         }
 
         void SetPresent(bool present)

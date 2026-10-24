@@ -18,7 +18,8 @@ namespace Moba.Net
     // the server quits after a short delay, and Docker restarts it for a fresh match.
     //
     // Settings (command line "-map classic" / environment MOBA_MAP=classic):
-    //   map    classic | zones | delve | random (default random)
+    //   map    classic | zones | delve | random (default random). With random, a server nobody has joined yet rolls a
+    //          new map each time a menu asks which map it runs (PvP champion select), as offline play does per visit.
     //   port   UDP port to listen on (default 7777)
     //   bots   number of bots per team besides players; blue gets one fewer (default 3)
     //   cheats on | off: whether players may use the cheat menu (default off; for local testing)
@@ -40,6 +41,12 @@ namespace Moba.Net
         HeroRoster _roster;
         MapLayoutCatalog _layouts;
         MapLayoutInfo _layout;
+        bool _randomMap;
+        int _bots;
+        // A map is loading (at start, or a re-roll): joins wait for it (their approval is held until it's loaded).
+        bool _loadingMap;
+        MapLayoutInfo _mapToLoad;
+        readonly List<NetworkManager.ConnectionApprovalResponse> _heldJoins = new();
         NetworkManager _manager;
         bool _started;
 
@@ -81,12 +88,15 @@ namespace Moba.Net
             _layouts = layouts;
             Application.targetFrameRate = 30;
 
-            MapLayoutInfo layout = _layout = PickLayout(Setting("map", "random"));
+            string mapSetting = Setting("map", "random");
+            _randomMap = _layouts.layouts.Find(l => l.id == mapSetting) == null;
+            MapLayoutInfo layout = _layout = PickLayout(mapSetting);
             ushort port = ushort.TryParse(Setting("port", NetSession.DefaultPort.ToString()), out ushort p) ? p : NetSession.DefaultPort;
             int bots = int.TryParse(Setting("bots", "3"), out int b) ? Mathf.Clamp(b, 0, 5) : 3;
             CheatsAllowed = Setting("cheats", "off").ToLowerInvariant() is "on" or "1" or "true";
             BackendClient.UrlOverride = Setting("backend_url", BackendClient.DefaultUrl);
             BackendKey = Setting("backend_key", "");
+            _bots = bots;
             PrepareBots(bots);
 
             _manager = NetSession.EnsureManager();
@@ -101,6 +111,7 @@ namespace Moba.Net
             }
             _manager.SceneManager.OnSynchronizeComplete += SpawnJoinedPlayer;
             _manager.SceneManager.OnLoadEventCompleted += (_, _, _, _) => OnMapLoaded();
+            _loadingMap = true;
             _manager.SceneManager.LoadScene(layout.sceneName, LoadSceneMode.Single);
             Debug.Log($"[GameServer] Listening on UDP {port}. Map: {layout.displayName}, {bots} bots per team, " +
                       $"cheats {(CheatsAllowed ? "on" : "off")}, " +
@@ -114,6 +125,7 @@ namespace Moba.Net
             // A menu asking which map this server runs: answered in the refusal reason.
             if (join is { probe: true })
             {
+                if (CanReroll) RerollMap();
                 response.Approved = false;
                 response.Reason = JsonUtility.ToJson(new NetSession.ServerInfo
                 {
@@ -130,6 +142,11 @@ namespace Moba.Net
             else if (!running) response.Reason = "The match on this server has just ended. Try again in a few seconds.";
             if (!response.Approved) return;
             s_Joining[request.ClientNetworkId] = join;
+            if (_loadingMap)
+            {
+                response.Pending = true;
+                _heldJoins.Add(response);
+            }
             // Checked while the client loads the map.
             if (!string.IsNullOrEmpty(join.ticket) && BackendKey.Length > 0)
                 s_Redeeming[request.ClientNetworkId] = MatchService.RedeemTicket(join.ticket, BackendKey);
@@ -165,6 +182,28 @@ namespace Moba.Net
                 GameManager.Instance.SetPaused(false);
                 Debug.Log("[GameServer] First player in: the match starts.");
             }
+        }
+
+        // Only before anyone has joined: once a player is in, the map is theirs.
+        bool CanReroll => _randomMap && !_started && !_loadingMap && _layouts.layouts.Count > 1
+                          && _manager.ConnectedClientsIds.Count == 0;
+
+        // Picks another map and loads it on the next frame (not from inside NGO's approval callback).
+        void RerollMap()
+        {
+            var others = _layouts.layouts.FindAll(l => l != _layout);
+            _layout = _mapToLoad = others[Random.Range(0, others.Count)];
+            _loadingMap = true;
+        }
+
+        void Update()
+        {
+            if (_mapToLoad == null) return;
+            MapLayoutInfo layout = _mapToLoad;
+            _mapToLoad = null;
+            PrepareBots(_bots); // new bots for the new map
+            _manager.SceneManager.LoadScene(layout.sceneName, LoadSceneMode.Single);
+            Debug.Log($"[GameServer] Re-rolled the map for a new visitor: {layout.displayName}.");
         }
 
         // A hero this account played and left (now owned by the server).
@@ -207,11 +246,14 @@ namespace Moba.Net
         // The match waits (paused: no creeps, bots or timer) until the first player has joined.
         void OnMapLoaded()
         {
+            _loadingMap = false;
+            foreach (NetworkManager.ConnectionApprovalResponse held in _heldJoins) held.Pending = false;
+            _heldJoins.Clear();
             GameManager game = GameManager.Instance;
             if (game == null) return;
             game.MatchEnded += _ => StartCoroutine(QuitSoon());
             if (!_started) game.SetPaused(true);
-            Debug.Log("[GameServer] Map loaded. Waiting for the first player.");
+            Debug.Log($"[GameServer] Map loaded ({_layout.displayName}). Waiting for the first player.");
         }
 
         IEnumerator QuitSoon()
