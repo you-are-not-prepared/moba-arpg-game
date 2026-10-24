@@ -151,6 +151,13 @@ namespace Moba.Net
             _hero.Remote = this;
             GameManager game = GameManager.Instance;
             if (game == null) return;
+            // The player may be on red: fog, shop, wave timer and the HUD's ally/enemy sides follow their team.
+            Team team = _hero.Unit.team;
+            game.playerTeam = team;
+            Shop shop = Shop.ForTeam(team);
+            if (shop != null) game.playerShop = shop;
+            foreach (CreepSpawner spawner in FindObjectsByType<CreepSpawner>(FindObjectsSortMode.None))
+                if (spawner.team == team) game.playerSpawner = spawner;
             game.hero = _hero;
             if (game.cameraRig != null)
             {

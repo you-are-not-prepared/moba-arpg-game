@@ -117,6 +117,8 @@ namespace Moba
 
         void Update()
         {
+            // The local player's team (on a game server it's known once their hero arrives).
+            if (GameManager.Instance != null) _team = GameManager.Instance.playerTeam;
             GatherSources();
             UpdateUnits();
             UpdateGrid();

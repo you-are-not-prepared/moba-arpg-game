@@ -23,7 +23,7 @@ server_log        # [GameServer]/[Matches] lines and real errors only
 ## Steps
 
 1. Make sure the Editor has compiled the change (`recompile` from unity-playtest) and isn't in play mode.
-2. `build_server`. It prints `Server built to Builds/LinuxServer (88 MB) in 20s.` and `editor target: StandaloneWindows64/Player, http: DevelopmentOnly`.
+2. `build_server`. The first `ev` may report "Network error" or a timeout while the Editor is busy building; that's fine, the script waits for the new build output. It prints `Server built to Builds/LinuxServer (88 MB) in 20s.` and `editor target: StandaloneWindows64/Player, http: DevelopmentOnly`.
    - If the target is still `StandaloneLinux64/Server`, switch it back (`EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64)` and `standaloneBuildSubtarget = Player`). Otherwise the Editor itself compiles with `UNITY_SERVER` and starts as a server in play mode.
 3. `deploy`. The log should show:
    ```
@@ -37,7 +37,7 @@ server_log        # [GameServer]/[Matches] lines and real errors only
 | Setting | Values |
 |---|---|
 | `MOBA_MAP` | `classic`, `zones`, `delve`, `random` (default) |
-| `MOBA_BOTS` | bots per team (blue gets one fewer; players join blue) |
+| `MOBA_BOTS` | bots per team before anyone joins; each player takes a bot's place on the team with fewer players |
 | `MOBA_CHEATS` | `on` lets players use the cheat menu; **must be `off` before anyone else plays** |
 | `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY` | where finished matches are recorded; the key must equal moba-backend's `GAME_SERVER_KEY` |
 

@@ -86,13 +86,13 @@ namespace Moba
             }
         }
 
-        // Game server: a player who joined gets their hero on the blue team (players own their hero object). If they
-        // leave, the hero stays in the match.
-        public void SpawnPlayer(ulong clientId, string heroId, string playerName, string accountId)
+        // Game server: a player who joined gets their hero on `team` (players own their hero object), at `spot` (the
+        // place of the bot they replace) or a new spot. If they leave, the hero stays in the match.
+        public void SpawnPlayer(ulong clientId, string heroId, string playerName, string accountId, Team team, Transform spot)
         {
             HeroDefinition definition = roster.Find(heroId) ?? roster.heroes.FirstOrDefault(h => h != null);
             if (definition == null || definition.prefab == null) return;
-            HeroController hero = Spawn(definition, Team.Blue, _spawnIndex[Team.Blue]++, _perTeam, isBot: false);
+            HeroController hero = Spawn(definition, team, _spawnIndex[team]++, _perTeam, isBot: false, spot);
             hero.isPlayer = false; // input arrives from the client
             var net = hero.GetComponent<Net.NetworkHero>();
             net.Init(definition.id, playerName, isBot: false);
@@ -102,13 +102,16 @@ namespace Moba
             networkObject.SpawnAsPlayerObject(clientId, destroyWithScene: true);
         }
 
-        HeroController Spawn(HeroDefinition definition, Team team, int index, int perTeam, bool isBot)
+        HeroController Spawn(HeroDefinition definition, Team team, int index, int perTeam, bool isBot, Transform spot = null)
         {
             Transform teamSpawn = team == Team.Blue ? heroSpawn : _redSpawn;
             // Line the team up side by side; each hero respawns at its own spot.
-            var spot = new GameObject($"Spawn_{team}_{index}").transform;
-            spot.SetParent(teamSpawn, false);
-            spot.localPosition = Vector3.right * ((index - (perTeam - 1) * 0.5f) * SpawnSpacing);
+            if (spot == null)
+            {
+                spot = new GameObject($"Spawn_{team}_{index}").transform;
+                spot.SetParent(teamSpawn, false);
+                spot.localPosition = Vector3.right * ((index - (perTeam - 1) * 0.5f) * SpawnSpacing);
+            }
 
             HeroController hero = Instantiate(definition.prefab, spot.position, teamSpawn.rotation);
             hero.name = isBot ? $"{definition.displayName} (bot)" : definition.displayName;

@@ -52,7 +52,11 @@ Orders from the client go through `HeroController` (`OrderMove`, `IssueAttackMov
 
 - **Matches end fast:** with test prices the bots finish a match in 1–3 minutes. To test anything slower, use `deploy "$(nobots_override)"` (no bots), and `deploy` afterwards.
 - **Fast effects** (projectiles, cooldowns, turning, pop-ups): count or time them with a probe (unity-playtest), not with separate `ev` calls.
-- **Several clients:** the Editor is one client. A second needs a built Windows player (not set up yet).
+- **Two players:** build the Windows client from the Editor with `ev 'Moba.EditorTools.GameBuilder.BuildWindowsClient(out string m); return m;'`, then poll `Builds/WindowsClient/MobaTest_Data/Managed/Assembly-CSharp.dll`. Start it first, so it takes blue:
+  ```bash
+  powershell -NoProfile -Command "Start-Process -FilePath '$(cygpath -w "$PWD/Builds/WindowsClient/MobaTest.exe")' -ArgumentList '-screen-fullscreen','0','-screen-width','1280','-screen-height','720','-join','kael','-name','P1'"
+  ```
+  The Editor then joins red, so a red player's view (shop, fog, HUD sides) can be inspected. The built game logs to `%USERPROFILE%\AppData\LocalLow\DefaultCompany\moba-test\Player.log`. Close it afterwards with `taskkill //IM MobaTest.exe //F`.
 - **The PvP champion select** asks the server for its map with a probe connection, which the server logs as a client that left. That's expected.
 - **Leaving and rejoining:** after `pvp_leave`, a logged-in account that joins again gets its old hero back ("rejoined and took back ..."). An anonymous player gets a new hero.
 

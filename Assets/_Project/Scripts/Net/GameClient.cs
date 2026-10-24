@@ -36,11 +36,11 @@ namespace Moba.Net
             }
         }
 
-        // Logged in, it first gets a join ticket so the server can record the match on this account.
-        public static async void Connect(string heroId, string playerName)
+        // Logged in (and `useAccount`), it first gets a join ticket so the server can record the match on this account.
+        public static async void Connect(string heroId, string playerName, bool useAccount = true)
         {
             MatchSettings.Mode = MatchMode.PvP;
-            string ticket = await Online.MatchService.JoinTicket();
+            string ticket = useAccount ? await Online.MatchService.JoinTicket() : null;
             NetworkManager manager = NetSession.EnsureManager();
             s_Probing = false;
             if (manager.IsListening) manager.Shutdown();
@@ -129,6 +129,19 @@ namespace Moba.Net
         {
             Debug.LogWarning($"[GameClient] {message}");
             ConnectFailed?.Invoke(message);
+        }
+
+        // Quick tests with a built client: "-join vesh -name Bob" joins the game server as soon as the game starts, as
+        // an anonymous player (no login), e.g. a second player next to the Editor.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void JoinFromCommandLine()
+        {
+            if (GameServer.IsServerProcess) return;
+            string[] args = Environment.GetCommandLineArgs();
+            int join = Array.IndexOf(args, "-join");
+            if (join < 0 || join + 1 >= args.Length) return;
+            int name = Array.IndexOf(args, "-name");
+            Connect(args[join + 1], name >= 0 && name + 1 < args.Length ? args[name + 1] : "Player", useAccount: false);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

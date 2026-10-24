@@ -335,7 +335,7 @@ namespace Moba.UI
             {
                 // The game server picks its own map: ask it which one.
                 _mapName.text = "Asking the server…";
-                _mapDescription.text = "The game server rolls the map for its match. You join the blue team.";
+                _mapDescription.text = "The game server rolls the map for its match. You join the team with fewer players.";
                 _preview.Show(null);
                 Net.GameClient.QueryServer();
             }
@@ -608,12 +608,12 @@ namespace Moba.UI
                 _mapDescription.text = info == null
                     ? $"Couldn't reach the game server at {Net.NetSession.ServerAddress}. Is it running? " +
                       "(docker compose up in the moba-test folder)"
-                    : "The game server rolls the map for its match. You join the blue team.";
+                    : "The game server rolls the map for its match. You join the team with fewer players.";
                 return;
             }
             _layout = layout;
             _mapName.text = layout.displayName;
-            _mapDescription.text = $"{layout.description} Picked by the game server; you join the blue team.";
+            _mapDescription.text = $"{layout.description} Picked by the game server; you join the team with fewer players.";
             _preview.Show(layout);
         }
 
