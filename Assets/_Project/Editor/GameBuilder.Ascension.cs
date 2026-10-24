@@ -195,6 +195,110 @@ namespace Moba.EditorTools
             },
         };
 
+        // Oren: Heat bursts (Kindled Blade), Blazing Leap, or a sturdier Phoenix.
+        static AscensionTree OrenAscension() => new()
+        {
+            paths =
+            {
+                AscPath(
+                    T("oren_a", "Wildfire", "The fire spreads.", t => t.heatBurstDamage = 25f),
+                    T("oren_a1", "Flashpoint", "Bigger flames.", t => t.heatBurstDamage = 25f),
+                    T("oren_a2", "Stoke", "Fan the flames faster.", t => t.attackSpeed = 0.1f),
+                    T("oren_a3", "Inferno", "Everything burns.", t => t.heatBurstDamage = 50f),
+                    T("oren_a4", "Forge Heart", "Hot iron doesn't break.", t => t.maxHealth = 200f)),
+                AscPath(
+                    T("oren_b", "Meteor", "The blades stay hot longer.", t => t.ultimateDuration = 2f),
+                    T("oren_b1", "Quick Ignition", "Ready to leap again.", t => t.ultimateCooldownReduction = 0.2f),
+                    T("oren_b2", "Scorch", "Landings hit harder.", t => t.spellDamage = 0.15f),
+                    T("oren_b3", "Afterburn", "The fire refuses to die.", t => t.ultimateDuration = 3f),
+                    T("oren_b4", "Second Wind", "Always another leap.", t => t.ultimateCooldownReduction = 0.25f)),
+                AscPath(
+                    T("oren_c", "Phoenix", "Rises from the ashes.", t => t.maxHealth = 150f),
+                    T("oren_c1", "Searing Edge", "Every cut burns deeper.", t => t.attackDamage = 15f),
+                    T("oren_c2", "Ember Stride", "Close the gap.", t => t.moveSpeed = 0.08f),
+                    T("oren_c3", "Rebirth", "Stronger with every level.", t => t.healthPerLevel = 30f),
+                    T("oren_c4", "Sunfire", "The last blow lands hardest.", t => t.attackDamage = 25f)),
+            },
+        };
+
+        // Ilsa: stronger slows (Chilling Touch), Glacial Prison, or a kiting Glacier Walker.
+        static AscensionTree IlsaAscension() => new()
+        {
+            paths =
+            {
+                AscPath(
+                    T("ilsa_a", "Deep Freeze", "The cold bites harder.", t => t.spellSlow = 0.05f),
+                    T("ilsa_a1", "Frostbite", "Hardly able to move.", t => t.spellSlow = 0.1f),
+                    T("ilsa_a2", "Lingering Frost", "The chill stays.", t => t.spellSlowSeconds = 1f),
+                    T("ilsa_a3", "Shatter", "Frozen things break.", t => t.spellDamage = 0.2f),
+                    T("ilsa_a4", "Permafrost", "Winter never ends.", t => t.spellSlow = 0.1f)),
+                AscPath(
+                    T("ilsa_b", "Winter's Grasp", "The ice holds longer.", t => t.ultimateDuration = 1f),
+                    T("ilsa_b1", "Deep Ice", "Frozen solid.", t => t.stunDuration = 0.5f),
+                    T("ilsa_b2", "Cold Snap", "Ready sooner.", t => t.ultimateCooldownReduction = 0.15f),
+                    T("ilsa_b3", "Endless Winter", "The field lingers.", t => t.ultimateDuration = 2f),
+                    T("ilsa_b4", "Glacial Age", "Ice, again and again.", t => t.ultimateCooldownReduction = 0.25f)),
+                AscPath(
+                    T("ilsa_c", "Glacier Walker", "Glide over the ice.", t => t.moveSpeed = 0.05f),
+                    T("ilsa_c1", "Frost Armour", "A shell of ice.", t => t.maxHealth = 150f),
+                    T("ilsa_c2", "Hailstorm", "One more shard.", t => t.extraProjectiles = 1),
+                    T("ilsa_c3", "Arctic Mind", "Clear and cold thoughts.", t => t.cooldownReduction = 0.1f),
+                    T("ilsa_c4", "Glacier Heart", "A deep well of power.", t => t.maxMana = 150f)),
+            },
+        };
+
+        // Maela: stronger healing (Verdant Bond), Sanctuary, or a sturdy Warden of the Wild.
+        static AscensionTree MaelaAscension() => new()
+        {
+            paths =
+            {
+                AscPath(
+                    T("maela_a", "Lifebloom", "Life flows further.", t => t.allyHeal = 0.05f),
+                    T("maela_a1", "Deep Roots", "Draw life from deeper.", t => t.allyHeal = 0.1f),
+                    T("maela_a2", "Wildgrowth", "Every spell grows stronger.", t => t.spellDamage = 0.1f),
+                    T("maela_a3", "Full Bloom", "Life overflowing.", t => t.allyHeal = 0.1f),
+                    T("maela_a4", "Barkskin", "Hard to cut down.", t => t.maxHealth = 200f)),
+                AscPath(
+                    T("maela_b", "Sacred Grove", "The grove stands longer.", t => t.ultimateDuration = 1f),
+                    T("maela_b1", "Old Growth", "Ancient and patient.", t => t.ultimateDuration = 2f),
+                    T("maela_b2", "Quick Sprouts", "The seeds are ready.", t => t.ultimateCooldownReduction = 0.15f),
+                    T("maela_b3", "Seasons", "Everything comes back.", t => t.cooldownReduction = 0.1f),
+                    T("maela_b4", "Evergreen", "Never bare.", t => t.ultimateCooldownReduction = 0.25f)),
+                AscPath(
+                    T("maela_c", "Warden of the Wild", "The forest protects its own.", t => t.maxHealth = 150f),
+                    T("maela_c1", "Thorns", "Even she has teeth.", t => t.attackDamage = 10f),
+                    T("maela_c2", "Swiftwood", "Light on her feet.", t => t.moveSpeed = 0.08f),
+                    T("maela_c3", "Sap", "A deep reserve.", t => t.maxMana = 150f),
+                    T("maela_c4", "Ironbark", "Grows tougher every season.", t => t.healthPerLevel = 25f)),
+            },
+        };
+
+        // Corvin: more chains (Static Charge), Thunderhead, or a Conduit for constant casting.
+        static AscensionTree CorvinAscension() => new()
+        {
+            paths =
+            {
+                AscPath(
+                    T("corvin_a", "Overcharge", "The charge builds faster.", t => t.chargeSooner = 1),
+                    T("corvin_a1", "Arc", "The lightning reaches further.", t => t.chainJumps = 1),
+                    T("corvin_a2", "Voltage", "Every spell hits harder.", t => t.spellDamage = 0.1f),
+                    T("corvin_a3", "Chain Reaction", "It never stops at one.", t => t.chainJumps = 1),
+                    T("corvin_a4", "Full Charge", "Always crackling.", t => t.chargeSooner = 1)),
+                AscPath(
+                    T("corvin_b", "Tempest", "The storm lingers.", t => t.ultimateDuration = 1f),
+                    T("corvin_b1", "Brewing Storm", "Thunder that won't pass.", t => t.ultimateDuration = 2f),
+                    T("corvin_b2", "Thunderclap", "Every strike shakes the ground.", t => t.spellDamage = 0.15f),
+                    T("corvin_b3", "Gathering Clouds", "The sky darkens sooner.", t => t.ultimateCooldownReduction = 0.2f),
+                    T("corvin_b4", "Eye of Thunder", "Storms on call.", t => t.ultimateCooldownReduction = 0.25f)),
+                AscPath(
+                    T("corvin_c", "Conduit", "Power flows through him.", t => t.cooldownReduction = 0.05f),
+                    T("corvin_c1", "Flow", "Spells return faster.", t => t.cooldownReduction = 0.1f),
+                    T("corvin_c2", "Battery", "A deeper charge.", t => t.maxMana = 150f),
+                    T("corvin_c3", "Forked Bolt", "One more spark.", t => t.extraProjectiles = 1),
+                    T("corvin_c4", "Storm Mind", "Thought becomes lightning.", t => t.spellDamage = 0.15f)),
+            },
+        };
+
         static AscensionTree NyxAscension() => new()
         {
             paths =

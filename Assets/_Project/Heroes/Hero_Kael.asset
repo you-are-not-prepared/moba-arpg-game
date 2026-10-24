@@ -30,6 +30,16 @@ MonoBehaviour:
   isolationRadius: 7
   tailwindSpeed: 0
   tailwindDuration: 2
+  heatMaxStacks: 0
+  heatAttackSpeed: 0.04
+  heatBurstDamage: 50
+  spellSlow: 0
+  spellSlowSeconds: 1.5
+  slowedDamageBonus: 0
+  allyHealFraction: 0
+  chargeEvery: 0
+  chargeJumps: 1
+  passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
     - root:
@@ -53,6 +63,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: kael_a1
         name: Splintering Shots
@@ -74,6 +90,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: kael_a2
         name: Quickdraw
         flavor: Nock, draw, loose. Again.
@@ -94,6 +116,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: kael_a3
         name: Endless Quiver
@@ -115,6 +143,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: kael_a4
         name: Barrage Rhythm
         flavor: Fall into the rhythm of the hunt.
@@ -135,6 +169,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: kael_b
         name: Skybreaker
@@ -156,6 +196,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: kael_b1
         name: Pinning Shot
@@ -177,6 +223,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: kael_b2
         name: Hunter's Focus
         flavor: Patience sharpens every arrow.
@@ -197,6 +249,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: kael_b3
         name: Heaven's Fall
@@ -218,6 +276,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: kael_b4
         name: Sky Hunter
         flavor: Draw the great bow again and again.
@@ -238,6 +302,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: kael_c
         name: Windrunner
@@ -259,6 +329,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: kael_c1
         name: Hit and Run
@@ -280,6 +356,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: kael_c2
         name: Steady Aim
         flavor: Every arrow counts.
@@ -300,6 +382,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: kael_c3
         name: Gale Volley
@@ -321,6 +409,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: kael_c4
         name: Sky Piercer
         flavor: Strike from the edge of sight.
@@ -341,4 +435,10 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
   ultimate: {fileID: 11400000, guid: 7bd2db61be6dec244ba12523ec7649a7, type: 2}

@@ -123,6 +123,18 @@ namespace Moba
                 inventory.SetStatMultiplier(inventory.StatMultiplier + t.itemStats);
             if (_progression != null) _progression.healthPerLevel += t.healthPerLevel;
             if (t.isolationDamage != 0f && TryGetComponent(out IsolationPassive isolation)) isolation.damageBonus += t.isolationDamage;
+            if (t.heatBurstDamage != 0f && TryGetComponent(out KindledBlade heat)) heat.burstDamage += t.heatBurstDamage;
+            if (TryGetComponent(out StaticCharge charge))
+            {
+                charge.jumps += t.chainJumps;
+                charge.every = Mathf.Max(1, charge.every - t.chargeSooner);
+            }
+            if (TryGetComponent(out SpellHitPassive onHit))
+            {
+                onHit.slow += t.spellSlow;
+                onHit.slowSeconds += t.spellSlowSeconds;
+                onHit.healFraction += t.allyHeal;
+            }
             if (TryGetComponent(out TailwindPassive tailwind))
             {
                 tailwind.moveSpeedBonus += t.tailwindSpeed;

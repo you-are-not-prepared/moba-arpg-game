@@ -115,6 +115,32 @@ namespace Moba.Net
             MeleeSwing.Play(from.GetComponent<Unit>(), targetUnit, attacker.meleeSwingMaterial);
         }
 
+        // Server: show a ground zone (its warning ring, then the zone) on every client.
+        public void BroadcastZone(Vector3 center, float radius, float delay, float duration, Team team, Material warning, Material zone)
+        {
+            if (IsSpawned && IsServer)
+                ZoneClientRpc(center, radius, delay, duration, (byte)team, NetItems.MaterialId(warning), NetItems.MaterialId(zone));
+        }
+
+        [ClientRpc]
+        void ZoneClientRpc(Vector3 center, float radius, float delay, float duration, byte team, short warning, short zone)
+        {
+            if (!IsServer)
+                GroundZone.CreateVisual(center, radius, delay, duration, (Team)team, NetItems.Material(warning), NetItems.Material(zone));
+        }
+
+        // Server: show a lightning bolt on every client.
+        public void BroadcastBolt(Vector3 from, Vector3 to, Material material, Team team)
+        {
+            if (IsSpawned && IsServer) BoltClientRpc(from, to, NetItems.MaterialId(material), (byte)team);
+        }
+
+        [ClientRpc]
+        void BoltClientRpc(Vector3 from, Vector3 to, short material, byte team)
+        {
+            if (!IsServer) LightningBolt.Spawn(from, to, NetItems.Material(material), (Team)team);
+        }
+
         // Server: show a spell projectile on every client. Returns its id for BroadcastSpellProjectileEnd (0 = not sent).
         public int BroadcastSpellProjectile(Vector3 position, Vector3 direction, in SpellProjectile.Payload p)
         {

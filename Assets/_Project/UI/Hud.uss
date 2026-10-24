@@ -967,6 +967,10 @@
     bottom: 0;
 }
 
+.unit-bar--slowed {
+    border-color: rgb(120, 200, 255);
+}
+
 .unit-bar--stunned {
     border-width: 2px;
     border-color: rgb(255, 230, 80);
