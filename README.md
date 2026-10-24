@@ -63,6 +63,8 @@ Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with 
 | **Torvald**, Bulwark (melee) | +50 max HP per level, 15% slower | **Aegis Wall:** a moving shield that blocks enemy projectiles from the front for 5s (tower shots pass through) |
 | **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
 
+Melee heroes and creeps show each attack as a swing: the model lunges at the target while a slash arc sweeps across in front (`MeleeSwing`, shader `Moba/MeleeSlash`). On the game server, every player sees it.
+
 ### Ascension (levels 6, 11, 18)
 At levels 6, 11 and 18 talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
 - **Level 6** picks a path, one card per path: **A** builds on the hero's passive, **B** on the ultimate, and **C** is a hybrid playstyle that draws on both. The system supports 2–4 paths per hero.
@@ -226,7 +228,8 @@ PvE stays fully offline as before.
   - game speed: 1x / 2x / 4x / 8x.
 
   Using any cheat marks the match. On the game server the menu works when `MOBA_CHEATS` is `on`.
-- **Test prices:** while `TestPrices` is `true` in `Assets/_Project/Editor/GameBuilder.cs`, every item, spell and mod costs **1 gold**. Bots then buy everything at once and hit very hard, so PvE matches end quickly. The same goes for the bots on the game server. Set it to `false` and rebuild for real prices.
+- **Test prices:** while `TestPrices` is `true` in `Assets/_Project/Editor/GameBuilder.cs`, every item, spell and mod costs **1 gold**.
+- **Bot shopping:** for now, bots buy only one spell (the shop's first, Fireball) for Q: no items and no mods. Set `fullShopping` on `BotBrain` to bring back spells for every slot, mods and items. With 1-gold prices that means a full inventory at once, and matches end within minutes. The same goes for the bots on the game server. Set it to `false` and rebuild for real prices.
 - **Test colours:** `TestKindColors` colours inventory tiles by kind (items orange, spells blue, mods green).
 
 ---

@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Moba.Net
 {
     // Match-wide state on the game server (on the scene's Game object): the winner, the match clock, the next creep
-    // wave, whether cheats are allowed, and visuals for attack and spell projectiles and explosions (the server
-    // applies the damage; clients only see the shots).
+    // wave, whether cheats are allowed, and visuals for melee swings, attack and spell projectiles and explosions
+    // (the server applies the damage; clients only see them).
     [RequireComponent(typeof(GameManager))]
     public class NetworkMatch : NetworkBehaviour
     {
@@ -95,6 +95,24 @@ namespace Moba.Net
             if (!from.TryGetComponent(out Attacker attacker) || !to.TryGetComponent(out Unit targetUnit)) return;
             Projectile.Launch(from.transform.TransformPoint(attacker.projectileOrigin), from.GetComponent<Unit>(), targetUnit,
                 0f, attacker.projectileSpeed, attacker.projectileSize, attacker.projectileMaterial, visualOnly: true);
+        }
+
+        // Server: show a melee swing on every client.
+        public void BroadcastMelee(Unit source, Unit target)
+        {
+            if (!IsSpawned || !IsServer || source == null || target == null) return;
+            if (!source.TryGetComponent(out NetworkObject from) || !target.TryGetComponent(out NetworkObject to)) return;
+            if (!from.IsSpawned || !to.IsSpawned) return;
+            MeleeClientRpc(from, to);
+        }
+
+        [ClientRpc]
+        void MeleeClientRpc(NetworkObjectReference source, NetworkObjectReference target)
+        {
+            if (IsServer) return;
+            if (!source.TryGet(out NetworkObject from) || !target.TryGet(out NetworkObject to)) return;
+            if (!from.TryGetComponent(out Attacker attacker) || !to.TryGetComponent(out Unit targetUnit)) return;
+            MeleeSwing.Play(from.GetComponent<Unit>(), targetUnit, attacker.meleeSwingMaterial);
         }
 
         // Server: show a spell projectile on every client. Returns its id for BroadcastSpellProjectileEnd (0 = not sent).

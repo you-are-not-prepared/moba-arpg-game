@@ -5,8 +5,9 @@ using UnityEngine;
 namespace Moba.Bots
 {
     // Simple hero AI. Several times a second it:
-    //   - spends skill points (ultimate first) and, while at its shop, buys spells, mods and items (finishing its
-    //     shopping before it leaves base, and walking home to shop once it has saved up recallGold);
+    //   - spends skill points (ultimate first) and, while at its shop, buys a spell for Q (with fullShopping: spells
+    //     for every slot, mods and items, finishing its shopping before it leaves base, and walking home to shop
+    //     once it has saved up recallGold);
     //   - retreats to base below retreatHealth and stays until healed;
     //   - fights an enemy hero in reach when it isn't losing the trade, otherwise last-hits creeps, then hits
     //     structures that its own creeps are tanking;
@@ -26,6 +27,9 @@ namespace Moba.Bots
         public float heroRange = 9f;
         [Tooltip("With this much gold (and something to buy), the bot walks home to shop.")]
         public int recallGold = 1500;
+        [Tooltip("Buy spells for every slot, mods and items. Off for now: bots buy one spell (the shop's first, Fireball) " +
+                 "for Q and nothing else, until items and prices are balanced.")]
+        public bool fullShopping;
 
         HeroController _hero;
         Unit _unit;
@@ -290,6 +294,7 @@ namespace Moba.Bots
         {
             spellSlot = -1;
             if (_shop.catalog == null || _inventory == null || _progression == null || _inventory.IsFull) return null;
+            if (!fullShopping) return FirstSpell(out spellSlot);
 
             for (int slot = 0; slot < AbilityCaster.SlotCount; slot++)
             {
@@ -318,6 +323,22 @@ namespace Moba.Bots
                     && (best == null || equipment.cost > best.cost || (equipment.cost == best.cost && equipment.attackDamage > best.attackDamage)))
                     best = equipment;
             return best;
+        }
+
+        // Without fullShopping: the shop's first spell for the first basic slot, once.
+        InventoryItem FirstSpell(out int spellSlot)
+        {
+            spellSlot = -1;
+            for (int slot = 0; slot < AbilityCaster.SlotCount; slot++)
+            {
+                if (_abilities.IsSlotLocked(slot)) continue;
+                if (_abilities.GetSlot(slot).ability != null) return null;
+                if (spellSlot < 0) spellSlot = slot;
+            }
+            foreach (InventoryItem item in _shop.catalog.items)
+                if (item is AbilityDefinition spell && !spell.IsPassive && spell.cost <= _progression.Gold) return spell;
+            spellSlot = -1;
+            return null;
         }
 
         bool Buy(InventoryItem item, out int inventorySlot)

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Moba
 {
-    // Basic auto-attack: melee (instant hit) or ranged (homing projectile).
+    // Basic auto-attack: melee (instant hit, shown as a swing; see MeleeSwing) or ranged (homing projectile).
     [RequireComponent(typeof(Unit))]
     public class Attacker : MonoBehaviour
     {
@@ -20,6 +20,8 @@ namespace Moba
         public float projectileSize = 0.3f;
         public Material projectileMaterial;
         public Vector3 projectileOrigin = new(0f, 1f, 0f);
+        [Tooltip("Melee only: the swing arc's material (Moba/MeleeSlash). None = no swing shown.")]
+        public Material meleeSwingMaterial;
         public bool faceTarget = true;
 
         Unit _self;
@@ -46,12 +48,19 @@ namespace Moba
             _nextAttackTime = Time.time + 1f / (attacksPerSecond * attackSpeedMultiplier);
 
             if (projectileSpeed <= 0f)
+            {
                 target.TakeDamage(TotalDamage, _self);
+                // A headless game server shows nothing itself; its clients see the swing (below).
+                if (!Net.NetSession.IsNetworked) MeleeSwing.Play(_self, target, meleeSwingMaterial);
+                Net.NetworkMatch.Instance?.BroadcastMelee(_self, target);
+            }
             else
+            {
                 Projectile.Launch(transform.TransformPoint(projectileOrigin), _self, target, TotalDamage,
                     projectileSpeed, projectileSize, projectileMaterial);
-            // On the game server, clients see the shot too.
-            if (projectileSpeed > 0f) Net.NetworkMatch.Instance?.BroadcastProjectile(_self, target);
+                // On the game server, clients see the shot too.
+                Net.NetworkMatch.Instance?.BroadcastProjectile(_self, target);
+            }
             return true;
         }
     }
