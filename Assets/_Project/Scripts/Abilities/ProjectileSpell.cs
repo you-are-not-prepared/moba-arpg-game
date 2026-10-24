@@ -70,6 +70,14 @@ namespace Moba.Abilities
                 ExplosionMaterial = explosionMaterial,
             };
 
+            if (caster.TryGetComponent(out StaticCharge charge) && charge.NextIsCharged)
+            {
+                payload.ChainJumps = charge.jumps;
+                payload.ChainFraction = charge.fraction;
+                payload.ChainRange = charge.range;
+                payload.BoltMaterial = charge.boltMaterial;
+            }
+
             Vector3 origin = caster.transform.position + dir * (caster.radius + 0.3f);
             int count = 1 + Mathf.Max(0, m.extraProjectiles);
             for (int i = 0; i < count; i++)

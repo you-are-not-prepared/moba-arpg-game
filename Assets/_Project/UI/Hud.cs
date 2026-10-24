@@ -647,6 +647,7 @@ namespace Moba.UI
                 _root.EnableInClassList("unit-bar--protected", !unit.IsTargetable);
                 _root.EnableInClassList("unit-bar--burning", Burning.IsBurning(unit));
                 _root.EnableInClassList("unit-bar--stunned", Stun.IsStunned(unit));
+                _root.EnableInClassList("unit-bar--slowed", Slow.IsSlowed(unit));
                 if (level > 0 && level != _shownLevel)
                 {
                     _shownLevel = level;

@@ -70,6 +70,12 @@ namespace Moba
         [Tooltip("Added to a Tailwind passive's speed (0.1 = +10% movement speed).")] public float tailwindSpeed;
         [Tooltip("Seconds added to a Tailwind passive.")] public float tailwindDuration;
         [Tooltip("Attack speed while Tailwind lasts (0.2 = +20%).")] public float tailwindAttackSpeed;
+        [Tooltip("Added to a Heat burst's damage.")] public float heatBurstDamage;
+        [Tooltip("Added to the slow of a hero's spell hits (0.1 = 10% stronger).")] public float spellSlow;
+        [Tooltip("Seconds added to the slow of a hero's spell hits.")] public float spellSlowSeconds;
+        [Tooltip("Added to the healing from spell damage (0.1 = 10% more of the damage).")] public float allyHeal;
+        [Tooltip("More enemies a charged spell's hit jumps to.")] public int chainJumps;
+        [Tooltip("Charged spells come this many casts sooner (every 4th -> every 3rd).")] public int chargeSooner;
 
         public bool IsSet => !string.IsNullOrEmpty(name);
 
@@ -98,6 +104,12 @@ namespace Moba
             Pct(tailwindSpeed, "Tailwind movement speed");
             Secs(tailwindDuration, "Tailwind duration");
             Pct(tailwindAttackSpeed, "attack speed during Tailwind");
+            Flat(heatBurstDamage, "Heat burst damage");
+            Pct(spellSlow, "slow from spell hits");
+            Secs(spellSlowSeconds, "slow duration");
+            Pct(allyHeal, "of spell damage healed to allies");
+            if (chainJumps != 0) lines.Add($"{Signed(chainJumps)} chain jump{(Math.Abs(chainJumps) == 1 ? "" : "s")} on charged spells");
+            if (chargeSooner != 0) lines.Add($"charged spells {chargeSooner} cast{(chargeSooner == 1 ? "" : "s")} sooner");
             return lines;
         }
 

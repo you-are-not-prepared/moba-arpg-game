@@ -32,6 +32,16 @@ MonoBehaviour:
   isolationRadius: 7
   tailwindSpeed: 0
   tailwindDuration: 2
+  heatMaxStacks: 0
+  heatAttackSpeed: 0.04
+  heatBurstDamage: 50
+  spellSlow: 0
+  spellSlowSeconds: 1.5
+  slowedDamageBonus: 0
+  allyHealFraction: 0
+  chargeEvery: 0
+  chargeJumps: 1
+  passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
     - root:
@@ -55,6 +65,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: nyx_a1
         name: Predator
@@ -76,6 +92,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: nyx_a2
         name: Stalker's Pace
         flavor: Close the gap before they notice.
@@ -96,6 +118,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: nyx_a3
         name: Apex
@@ -117,6 +145,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: nyx_a4
         name: Frenzy
         flavor: Faster and faster.
@@ -137,6 +171,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: nyx_b
         name: Blood Frenzy
@@ -158,6 +198,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: nyx_b1
         name: Hemorrhage
@@ -179,6 +225,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: nyx_b2
         name: Thirst
         flavor: Feed on the fight.
@@ -199,6 +251,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: nyx_b3
         name: Endless Hunt
@@ -220,6 +278,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: nyx_b4
         name: Quick Return
         flavor: Rush again, sooner.
@@ -240,6 +304,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: nyx_c
         name: Shadowstep
@@ -261,6 +331,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: nyx_c1
         name: Ambush
@@ -282,6 +358,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: nyx_c2
         name: Night Run
         flavor: The rush carries you further.
@@ -302,6 +384,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: nyx_c3
         name: Phantom
@@ -323,6 +411,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: nyx_c4
         name: Execution
         flavor: Alone, and out of time.
@@ -343,4 +437,10 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
   ultimate: {fileID: 11400000, guid: 6868062af2eb1b3489a088ddbd33aff8, type: 2}

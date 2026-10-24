@@ -129,8 +129,8 @@ namespace Moba
                 return;
             }
 
-            // Stunned: frozen in place, input ignored; orders resume when it wears off.
-            bool stunned = Stun.IsStunned(_unit);
+            // Stunned (or mid-leap): frozen in place, input ignored; orders resume when it wears off.
+            bool stunned = Stun.IsStunned(_unit) || Leap.IsLeaping(_unit);
             if (_agent.isOnNavMesh) _agent.isStopped = stunned;
             if (stunned)
             {

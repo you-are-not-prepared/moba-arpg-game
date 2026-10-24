@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4977d03c3231d438bc7ae87808a993, type: 3}
+  m_Name: Ult_GlacialPrison
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ZoneSpell
+  displayName: Glacial Prison
+  description: 'Mark an area: after a moment, enemies inside are frozen, and the
+    ice slows anyone in it for 3s.'
+  cost: 0
+  icon: {fileID: 0}
+  color: {r: 0.55, g: 0.8, b: 1, a: 1}
+  glyph: GP
+  tags: 0
+  targeting: 1
+  unitFilter: 0
+  range: 9
+  areaRadius: 3.5
+  cooldownByRank:
+  - 90
+  - 80
+  - 70
+  manaCostByRank:
+  - 100
+  radius: 3.5
+  delay: 0.75
+  durationByRank:
+  - 3
+  freezeByRank:
+  - 1.5
+  - 1.75
+  - 2
+  enemySlow: 0.3
+  enemyDamagePerSecond: 0
+  allyHealByRank:
+  - 0
+  allyMoveSpeed: 0
+  zoneMaterial: {fileID: 2100000, guid: 52dd415f77eda524989c0f9a38851f0e, type: 2}
+  warningMaterial: {fileID: 2100000, guid: a4e85bee4fd5b524fa5e1af7a9f47d35, type: 2}

@@ -32,6 +32,16 @@ MonoBehaviour:
   isolationRadius: 7
   tailwindSpeed: 0.25
   tailwindDuration: 2
+  heatMaxStacks: 0
+  heatAttackSpeed: 0.04
+  heatBurstDamage: 50
+  spellSlow: 0
+  spellSlowSeconds: 1.5
+  slowedDamageBonus: 0
+  allyHealFraction: 0
+  chargeEvery: 0
+  chargeJumps: 1
+  passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
     - root:
@@ -55,6 +65,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0.5
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: thessa_a1
         name: Jet Stream
@@ -76,6 +92,12 @@ MonoBehaviour:
         tailwindSpeed: 0.1
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: thessa_a2
         name: Updraft
         flavor: One spell carries her further.
@@ -96,6 +118,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 1
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: thessa_a3
         name: Slipstream
@@ -117,6 +145,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0.2
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: thessa_a4
         name: Second Gust
         flavor: The wind keeps blowing.
@@ -137,6 +171,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 1.5
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: thessa_b
         name: Hurricane
@@ -158,6 +198,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: thessa_b1
         name: Eye Widens
@@ -179,6 +225,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: thessa_b2
         name: Charged Air
         flavor: Every spell crackles.
@@ -199,6 +251,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: thessa_b3
         name: Ceaseless
@@ -220,6 +278,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: thessa_b4
         name: Calm Before
         flavor: The next storm is never far.
@@ -240,6 +304,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: thessa_c
         name: Skirmisher
@@ -261,6 +331,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: thessa_c1
         name: Quickdraw
@@ -282,6 +358,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: thessa_c2
         name: Light Feet
         flavor: Faster feet.
@@ -302,6 +384,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: thessa_c3
         name: Crosswind
@@ -323,6 +411,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: thessa_c4
         name: Windward
         flavor: Spells come back faster.
@@ -343,4 +437,10 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
   ultimate: {fileID: 11400000, guid: 9aaf3937c991b5c4894a1efff74baacc, type: 2}

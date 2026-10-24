@@ -54,6 +54,7 @@ namespace Moba.Net
         readonly NetworkVariable<float> _hasteEnd = new();
         readonly NetworkVariable<float> _shieldEnd = new();
         readonly NetworkVariable<float> _stormEnd = new();
+        readonly NetworkVariable<float> _cloudEnd = new();
         // Cheat toggles: 1 = no mana cost, 2 = no cooldowns.
         readonly NetworkVariable<byte> _cheatToggles = new();
         NetworkList<short> _kit;
@@ -258,6 +259,8 @@ namespace Moba.Net
                 _shieldEnd.Value, now);
             _stormEnd.Value = EndTime(TryGetComponent(out SpellStorm storm) && storm.enabled ? storm.Remaining : 0f,
                 _stormEnd.Value, now);
+            _cloudEnd.Value = EndTime(TryGetComponent(out StormCloud cloud) && cloud.enabled ? cloud.Remaining : 0f,
+                _cloudEnd.Value, now);
         }
 
         void WriteKit(int index, short value)
@@ -301,6 +304,8 @@ namespace Moba.Net
                 while (_ascension.Picked.Count < _talents.Count) _ascension.ChooseFromServer(_talents[_ascension.Picked.Count]);
 
             Haste.SyncFromServer(_hero.Unit, Remaining(_hasteEnd.Value, now), FindSpell<HasteSpell>()?.auraMaterial);
+            StormCloudSpell cloudSpell = FindSpell<StormCloudSpell>();
+            if (cloudSpell != null) StormCloud.SyncFromServer(_hero.Unit, Remaining(_cloudEnd.Value, now), cloudSpell.cloudMaterial);
             SpellStormSpell stormSpell = FindSpell<SpellStormSpell>();
             if (stormSpell != null)
                 SpellStorm.SyncFromServer(_hero.Unit, Remaining(_stormEnd.Value, now), stormSpell.CooldownMultiplier,

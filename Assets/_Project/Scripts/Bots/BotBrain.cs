@@ -223,11 +223,24 @@ namespace Moba.Bots
                         if (target != null && _hero.OrderCast(slot, target.transform.position, null)) return true;
                         break;
                     }
+                    case LeapSpell leap:
+                        if (enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= leap.range
+                            && _hero.OrderCast(slot, enemyHero.transform.position, null)) return true;
+                        break;
+                    case ZoneSpell zone when zone.Offensive:
+                        if (enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= zone.range + zone.radius * 0.5f
+                            && _hero.OrderCast(slot, enemyHero.transform.position, null)) return true;
+                        break;
+                    case ZoneSpell zone:
+                        // Supportive zones (healing, speed): on the bot itself, in a fight.
+                        if (enemyHero != null && _hero.OrderCast(slot, transform.position, null)) return true;
+                        break;
                     case CooldownResetSpell:
                         if (enemyHero != null && AnyBasicOnCooldown(2f) && _hero.OrderCast(slot, default, null)) return true;
                         break;
                     case ShieldWallSpell:
                     case SpellStormSpell:
+                    case StormCloudSpell:
                         if (enemyHero != null && _hero.OrderCast(slot, default, null)) return true;
                         break;
                     case HasteSpell:

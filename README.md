@@ -63,6 +63,12 @@ Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with 
 | **Torvald**, Bulwark (melee) | +50 max HP per level, 15% slower | **Aegis Wall:** a moving shield that blocks enemy projectiles from the front for 5s (tower shots pass through) |
 | **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
 | **Thessa**, Windrunner | Each spell cast gives +25% move speed for 2s | **Eye of the Storm:** for 6s (7/8 at higher ranks) spells cost no mana and have 50% shorter cooldowns |
+| **Oren**, Ember Duelist (melee) | Attacks build Heat (5 max, +4% attack speed each); at 5 the next attack bursts for 50 fire damage around the target and burns | **Blazing Leap:** leaps up to 6m, 150/225/300 damage and a burn where he lands; his attacks burn for 5s |
+| **Ilsa**, Frostwarden | Spell hits slow 20% for 1.5s; slowed enemies take 10% more damage from her | **Glacial Prison:** after 0.75s freezes enemies in a 3.5m area for 1.5–2s, then the ice slows (30%) for 3s |
+| **Maela**, Grovekeeper | Spell hits heal the nearest allied hero (8m) for 15% of the damage | **Sanctuary:** a 5m grove for 6s: allied heroes heal 4–6% max health/s and move 20% faster, enemies are slowed 20% |
+| **Corvin**, Stormcaller | Every 4th spell is charged: its first hit jumps to 1 more enemy for 50% damage | **Thunderhead:** a storm cloud follows him for 6s and strikes an enemy within 6m every 0.5s (heroes first) |
+
+Building blocks the heroes added, ready for new spells and mods: **slows** (a status like stun and burn, shown as an icy border on health bars), **ground zones** (`ZoneSpell`: warning ring, freeze, slow, damage, ally healing and speed), a **leap** (`LeapSpell`), **chain lightning** on spell hits, timed buffs (`SpellStorm`, `StormCloud`, `BurningBlades`), and `SpellEvents.Hit` for passives that react to spell hits.
 
 Melee heroes and creeps show each attack as a swing: the model lunges at the target while a slash arc sweeps across in front (`MeleeSwing`, shader `Moba/MeleeSlash`). On the game server, every player sees it.
 

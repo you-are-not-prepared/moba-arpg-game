@@ -28,6 +28,12 @@ namespace Moba.Abilities
             public float Height;
             public Material ProjectileMaterial;
             public Material ExplosionMaterial;
+            // Chain (a charged spell, see StaticCharge): the first hit jumps to this many more enemies within ChainRange
+            // for ChainFraction of the damage each.
+            public int ChainJumps;
+            public float ChainFraction;
+            public float ChainRange;
+            public Material BoltMaterial;
         }
 
         static readonly List<Unit> s_Targets = new();
@@ -171,12 +177,43 @@ namespace Moba.Abilities
                 }
             }
 
+            if (_p.ChainJumps > 0 && firstHit) Chain(hit);
+
             if (_p.Pierce)
             {
                 (_pierced ??= new HashSet<Unit>()).Add(hit);
                 return;
             }
             Destroy(gameObject);
+        }
+
+        // Lightning jumping from the hit target to the nearest enemies not yet struck, one after another.
+        void Chain(Unit from)
+        {
+            var struck = new HashSet<Unit> { from };
+            Unit previous = from;
+            for (int jump = 0; jump < _p.ChainJumps; jump++)
+            {
+                Unit next = null;
+                float best = _p.ChainRange;
+                foreach (Unit u in Unit.All)
+                {
+                    if (u.team == _p.Team || !u.IsTargetable || struck.Contains(u)) continue;
+                    float d = previous.EdgeDistanceTo(u);
+                    if (d <= best)
+                    {
+                        best = d;
+                        next = u;
+                    }
+                }
+                if (next == null) return;
+                struck.Add(next);
+                float damage = _p.Damage * _p.ChainFraction;
+                LightningBolt.Spawn(previous.AimPoint, next.AimPoint, _p.BoltMaterial, _p.Team);
+                next.TakeDamage(damage, _p.Caster);
+                SpellEvents.RaiseHit(_p.Caster, next, damage);
+                previous = next;
+            }
         }
 
         void Explode(Vector3 center, Unit primary)
@@ -200,6 +237,7 @@ namespace Moba.Abilities
             foreach (Unit u in s_Targets)
             {
                 u.TakeDamage(_p.Damage, _p.Caster);
+                SpellEvents.RaiseHit(_p.Caster, u, _p.Damage);
                 if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster);
                 if (_p.StunDuration > 0f && u.IsAlive) Stun.Apply(u, _p.StunDuration);
             }

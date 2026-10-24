@@ -59,7 +59,8 @@ namespace Moba.EditorTools
         class Mats
         {
             public Material Rock, Stone, Blue, Red, BluePad, RedPad, Marker, AttackMarker, RangeIndicator, Fire, Explosion, Arrow,
-                ShieldWall, ShieldFlash, HasteAura, StormAura, MeleeSlash;
+                ShieldWall, ShieldFlash, HasteAura, StormAura, MeleeSlash, FrostWarning, FrostField, Grove,
+                Lightning, StormCloud;
         }
 
         // ---------- Map layouts ----------
@@ -159,6 +160,11 @@ namespace Moba.EditorTools
             public float CooldownMultiplier = 1f, ItemStatMultiplier = 1f;
             public float HealthPerLevelBonus, MoveSpeedMultiplier = 1f, IsolationDamageBonus, IsolationRadius = 7f;
             public float TailwindSpeed, TailwindDuration = 2f;
+            public int HeatMaxStacks;
+            public float HeatAttackSpeed = 0.04f, HeatBurstDamage = 50f;
+            public System.Func<Mats, Material> PassiveMaterial;
+            public float SpellSlow, SpellSlowSeconds = 1.5f, SlowedDamageBonus, AllyHealFraction;
+            public int ChargeEvery, ChargeJumps = 1;
             public bool Melee;
             public System.Func<Mats, AbilityDefinition> Ultimate;
             public System.Func<AscensionTree> Ascension;
@@ -219,6 +225,42 @@ namespace Moba.EditorTools
                 PassiveName = "Tailwind", PassiveDescription = "Each spell you cast gives 25% movement speed for 2s (casting again refreshes it).",
                 TailwindSpeed = 0.25f, TailwindDuration = 2f,
                 Ultimate = m => EyeOfTheStorm(m),
+            },
+            new HeroSpec
+            {
+                Id = "oren", Name = "Oren", Ascension = OrenAscension, Title = "Ember Duelist", Glyph = "O", Color = new Color(1f, 0.45f, 0.2f),
+                Description = "A melee bruiser who dives onto a target, sticks to it, and burns hotter the longer the fight lasts.",
+                Health = 680f, Damage = 35f, Range = 1f, AttacksPerSecond = 1.15f, Speed = 6.6f, Mana = 300f, Melee = true,
+                PassiveName = "Kindled Blade", PassiveDescription = "Each attack builds Heat (up to 5, +4% attack speed each). At 5, your next attack bursts for 50 fire damage around the target and burns.",
+                HeatMaxStacks = 5, HeatAttackSpeed = 0.04f, HeatBurstDamage = 50f, PassiveMaterial = m => m.Explosion,
+                Ultimate = m => BlazingLeap(m),
+            },
+            new HeroSpec
+            {
+                Id = "ilsa", Name = "Ilsa", Ascension = IlsaAscension, Title = "Frostwarden", Glyph = "I", Color = new Color(0.55f, 0.8f, 1f),
+                Description = "A ranged mage who slows everything she hits and freezes whole groups for her team.",
+                Health = 540f, Damage = 26f, Range = 6f, AttacksPerSecond = 1f, Speed = 6.4f, Mana = 400f,
+                PassiveName = "Chilling Touch", PassiveDescription = "Your spell hits slow enemies by 20% for 1.5s. Slowed enemies take 10% more damage from you.",
+                SpellSlow = 0.2f, SpellSlowSeconds = 1.5f, SlowedDamageBonus = 0.1f,
+                Ultimate = m => GlacialPrison(m),
+            },
+            new HeroSpec
+            {
+                Id = "maela", Name = "Maela", Ascension = MaelaAscension, Title = "Grovekeeper", Glyph = "M", Color = new Color(0.45f, 0.8f, 0.35f),
+                Description = "A support who heals her allies with every spell she lands, and turns fights with a healing grove.",
+                Health = 580f, Damage = 25f, Range = 5.5f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 420f,
+                PassiveName = "Verdant Bond", PassiveDescription = "Your spell hits heal the nearest allied hero (within 8m) for 15% of the damage dealt.",
+                AllyHealFraction = 0.15f,
+                Ultimate = m => Sanctuary(m),
+            },
+            new HeroSpec
+            {
+                Id = "corvin", Name = "Corvin", Ascension = CorvinAscension, Title = "Stormcaller", Glyph = "C", Color = new Color(0.65f, 0.45f, 1f),
+                Description = "A ranged caster whose spells crackle with lightning: the more he casts, the more it strikes.",
+                Health = 550f, Damage = 27f, Range = 6f, AttacksPerSecond = 1.1f, Speed = 6.5f, Mana = 380f,
+                PassiveName = "Static Charge", PassiveDescription = "Every 4th spell you cast is charged: its first hit jumps to 1 more enemy within 5m for 50% damage.",
+                ChargeEvery = 4, ChargeJumps = 1, PassiveMaterial = m => m.Lightning,
+                Ultimate = m => Thunderhead(m),
             },
         };
 
@@ -307,6 +349,106 @@ namespace Moba.EditorTools
             spell.attackSpeedBonus = 0.2f;
             spell.refreshOnHeroKill = true;
             spell.auraMaterial = m.HasteAura;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition BlazingLeap(Mats m)
+        {
+            var spell = LoadOrCreate<LeapSpell>($"{HeroesDir}/Ult_BlazingLeap.asset");
+            spell.displayName = "Blazing Leap";
+            spell.description = "Leap to a point, burning enemies where you land. Your attacks burn for 5s afterwards.";
+            spell.cost = 0;
+            spell.glyph = "BL";
+            spell.color = new Color(1f, 0.45f, 0.2f);
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 6f;
+            spell.areaRadius = 3f;
+            spell.cooldownByRank = new[] { 70f, 60f, 50f };
+            spell.manaCostByRank = new[] { 100f };
+            spell.damageByRank = new[] { 150f, 225f, 300f };
+            spell.landingRadius = 3f;
+            spell.burnFraction = 0.3f;
+            spell.burnSeconds = 3f;
+            spell.bladesSeconds = 5f;
+            spell.bladesBurnPerSecond = 15f;
+            spell.landingMaterial = m.Explosion;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition GlacialPrison(Mats m)
+        {
+            var spell = LoadOrCreate<ZoneSpell>($"{HeroesDir}/Ult_GlacialPrison.asset");
+            spell.displayName = "Glacial Prison";
+            spell.description = "Mark an area: after a moment, enemies inside are frozen, and the ice slows anyone in it for 3s.";
+            spell.cost = 0;
+            spell.glyph = "GP";
+            spell.color = new Color(0.55f, 0.8f, 1f);
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 9f;
+            spell.radius = 3.5f;
+            spell.areaRadius = 3.5f;
+            spell.delay = 0.75f;
+            spell.durationByRank = new[] { 3f };
+            spell.freezeByRank = new[] { 1.5f, 1.75f, 2f };
+            spell.enemySlow = 0.3f;
+            spell.enemyDamagePerSecond = 0f;
+            spell.allyHealByRank = new[] { 0f };
+            spell.allyMoveSpeed = 0f;
+            spell.cooldownByRank = new[] { 90f, 80f, 70f };
+            spell.manaCostByRank = new[] { 100f };
+            spell.warningMaterial = m.FrostWarning;
+            spell.zoneMaterial = m.FrostField;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition Sanctuary(Mats m)
+        {
+            var spell = LoadOrCreate<ZoneSpell>($"{HeroesDir}/Ult_Sanctuary.asset");
+            spell.displayName = "Sanctuary";
+            spell.description = "Grow a grove for 6s: allies inside heal and move faster, enemies inside are slowed.";
+            spell.cost = 0;
+            spell.glyph = "SN";
+            spell.color = new Color(0.45f, 0.8f, 0.35f);
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 8f;
+            spell.radius = 5f;
+            spell.areaRadius = 5f;
+            spell.delay = 0f;
+            spell.durationByRank = new[] { 6f };
+            spell.freezeByRank = new[] { 0f };
+            spell.enemySlow = 0.2f;
+            spell.enemyDamagePerSecond = 0f;
+            spell.allyHealByRank = new[] { 0.04f, 0.05f, 0.06f };
+            spell.allyMoveSpeed = 0.2f;
+            spell.cooldownByRank = new[] { 100f, 90f, 80f };
+            spell.manaCostByRank = new[] { 120f };
+            spell.warningMaterial = null;
+            spell.zoneMaterial = m.Grove;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static AbilityDefinition Thunderhead(Mats m)
+        {
+            var spell = LoadOrCreate<StormCloudSpell>($"{HeroesDir}/Ult_Thunderhead.asset");
+            spell.displayName = "Thunderhead";
+            spell.description = "A storm cloud follows you for 6s, striking a nearby enemy every half second (heroes first).";
+            spell.cost = 0;
+            spell.glyph = "TH";
+            spell.color = new Color(0.65f, 0.45f, 1f);
+            spell.targeting = AbilityTargeting.Instant;
+            spell.range = 0f;
+            spell.cooldownByRank = new[] { 80f, 70f, 60f };
+            spell.manaCostByRank = new[] { 100f };
+            spell.durationByRank = new[] { 6f };
+            spell.interval = 0.5f;
+            spell.radius = 6f;
+            spell.damageByRank = new[] { 60f, 90f, 120f };
+            spell.cloudMaterial = m.StormCloud;
+            spell.boltMaterial = m.Lightning;
             EditorUtility.SetDirty(spell);
             return spell;
         }
@@ -692,6 +834,16 @@ namespace Moba.EditorTools
                 def.isolationRadius = spec.IsolationRadius;
                 def.tailwindSpeed = spec.TailwindSpeed;
                 def.tailwindDuration = spec.TailwindDuration;
+                def.heatMaxStacks = spec.HeatMaxStacks;
+                def.heatAttackSpeed = spec.HeatAttackSpeed;
+                def.heatBurstDamage = spec.HeatBurstDamage;
+                def.passiveEffectMaterial = spec.PassiveMaterial?.Invoke(m);
+                def.spellSlow = spec.SpellSlow;
+                def.spellSlowSeconds = spec.SpellSlowSeconds;
+                def.slowedDamageBonus = spec.SlowedDamageBonus;
+                def.allyHealFraction = spec.AllyHealFraction;
+                def.chargeEvery = spec.ChargeEvery;
+                def.chargeJumps = spec.ChargeJumps;
                 def.ultimate = spec.Ultimate(m);
                 def.ascension = spec.Ascension?.Invoke() ?? new AscensionTree();
                 def.prefab = CreateHeroPrefab(spec, m);
@@ -1110,6 +1262,11 @@ namespace Moba.EditorTools
             ShieldFlash = EmissiveMat("ShieldFlash", new Color(0.6f, 0.85f, 1f), 2f),
             HasteAura = ShaderMat("HasteAura", "Moba/GroundRing", new Color(1f, 0.25f, 0.35f, 1f)),
             StormAura = ShaderMat("StormAura", "Moba/GroundRing", new Color(0.35f, 0.95f, 0.9f, 1f)),
+            FrostWarning = ShaderMat("FrostWarning", "Moba/GroundRing", new Color(0.85f, 0.95f, 1f, 0.6f)),
+            FrostField = ShaderMat("FrostField", "Moba/GroundRing", new Color(0.4f, 0.75f, 1f, 1f)),
+            Grove = ShaderMat("Grove", "Moba/GroundRing", new Color(0.45f, 1f, 0.4f, 1f)),
+            Lightning = UnlitVertexColorMat("Lightning"),
+            StormCloud = Mat("StormCloud", new Color(0.22f, 0.2f, 0.3f)),
             MeleeSlash = ShaderMat("MeleeSlash", "Moba/MeleeSlash", new Color(1f, 0.95f, 0.8f, 0.9f)),
         };
 

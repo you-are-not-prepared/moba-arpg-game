@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 namespace Moba.Net
 {
-    // Replicates a Unit (hero, creep, tower, core) from the server: team, health, max health, stunned and burning,
+    // Replicates a Unit (hero, creep, tower, core) from the server: team, health, max health, stunned, burning, slowed,
     // and for moving units the facing. Position comes from NetworkTransform (smoothed); facing is applied as is, since
     // units have no turn rate (smoothing it would look like one).
     // On a connected client it also switches off everything that would simulate the unit locally (AI, the
@@ -22,6 +22,7 @@ namespace Moba.Net
 
         const byte StatusStunned = 1;
         const byte StatusBurning = 2;
+        const byte StatusSlowed = 4;
 
         Unit _unit;
         bool _moving;
@@ -75,7 +76,8 @@ namespace Moba.Net
             _team.Value = (byte)_unit.team;
             _health.Value = _unit.Health;
             _maxHealth.Value = _unit.maxHealth;
-            _status.Value = (byte)((Stun.IsStunned(_unit) ? StatusStunned : 0) | (Burning.IsBurning(_unit) ? StatusBurning : 0));
+            _status.Value = (byte)((Stun.IsStunned(_unit) ? StatusStunned : 0) | (Burning.IsBurning(_unit) ? StatusBurning : 0)
+                                   | (Slow.IsSlowed(_unit) ? StatusSlowed : 0));
             if (_moving) _yaw.Value = (ushort)(Mathf.RoundToInt(Mathf.Repeat(transform.eulerAngles.y, 360f) * 100f) % 36000);
         }
 
@@ -91,6 +93,7 @@ namespace Moba.Net
         {
             Stun.SetFromServer(_unit, (_status.Value & StatusStunned) != 0);
             Burning.SetFromServer(_unit, (_status.Value & StatusBurning) != 0);
+            Slow.SetFromServer(_unit, (_status.Value & StatusSlowed) != 0);
         }
 
         void DisableSimulation()

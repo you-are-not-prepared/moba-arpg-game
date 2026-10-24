@@ -27,6 +27,9 @@ namespace Moba
         Unit _self;
         float _nextAttackTime;
 
+        // (target) after every attack: a melee hit, or a ranged shot leaving (passives count these, e.g. Oren's Heat).
+        public event System.Action<Unit> Hit;
+
         public float TotalDamage => damage + bonusDamage;
 
         void Awake() => _self = GetComponent<Unit>();
@@ -50,6 +53,7 @@ namespace Moba
             if (projectileSpeed <= 0f)
             {
                 target.TakeDamage(TotalDamage, _self);
+                BurningBlades.BurnOnHit(_self, target);
                 // A headless game server shows nothing itself; its clients see the swing (below).
                 if (!Net.NetSession.IsNetworked) MeleeSwing.Play(_self, target, meleeSwingMaterial);
                 Net.NetworkMatch.Instance?.BroadcastMelee(_self, target);
@@ -61,6 +65,7 @@ namespace Moba
                 // On the game server, clients see the shot too.
                 Net.NetworkMatch.Instance?.BroadcastProjectile(_self, target);
             }
+            Hit?.Invoke(target);
             return true;
         }
     }

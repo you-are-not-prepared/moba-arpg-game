@@ -30,6 +30,16 @@ MonoBehaviour:
   isolationRadius: 7
   tailwindSpeed: 0
   tailwindDuration: 2
+  heatMaxStacks: 0
+  heatAttackSpeed: 0.04
+  heatBurstDamage: 50
+  spellSlow: 0
+  spellSlowSeconds: 1.5
+  slowedDamageBonus: 0
+  allyHealFraction: 0
+  chargeEvery: 0
+  chargeJumps: 1
+  passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
     - root:
@@ -53,6 +63,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: torvald_a1
         name: Iron Skin
@@ -74,6 +90,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: torvald_a2
         name: Unstoppable
         flavor: Heavy, but always moving.
@@ -94,6 +116,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: torvald_a3
         name: Mountain
@@ -115,6 +143,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: torvald_a4
         name: Crushing Blows
         flavor: Every swing lands like a landslide.
@@ -135,6 +169,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: torvald_b
         name: Aegis Warden
@@ -156,6 +196,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: torvald_b1
         name: Bulwark Drill
@@ -177,6 +223,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: torvald_b2
         name: Shield Bash
         flavor: The best defence hits back.
@@ -197,6 +249,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: torvald_b3
         name: Unbreakable Wall
@@ -218,6 +276,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: torvald_b4
         name: Rapid Guard
         flavor: Always ready to block.
@@ -238,6 +302,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
     - root:
         id: torvald_c
         name: Warlord
@@ -259,6 +329,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       second:
       - id: torvald_c1
         name: Battle Cry
@@ -280,6 +356,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: torvald_c2
         name: Forced March
         flavor: Never fall behind the front line.
@@ -300,6 +382,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       third:
       - id: torvald_c3
         name: Shield Charge
@@ -321,6 +409,12 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
       - id: torvald_c4
         name: Warlord's Might
         flavor: One blow ends the fight.
@@ -341,4 +435,10 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
   ultimate: {fileID: 11400000, guid: cb951955d797dd4439aefaf6063a5678, type: 2}
