@@ -3,6 +3,7 @@ using Moba.Items;
 using Moba.UI;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 namespace Moba.Net
@@ -65,6 +66,7 @@ namespace Moba.Net
         AbilityCaster _caster;
         Inventory _inventory;
         HeroAscension _ascension;
+        NetworkTransform _netTransform;
         float _predictUntil;
 
         public string HeroId => _heroId.Value.ToString();
@@ -81,6 +83,7 @@ namespace Moba.Net
             _progression = GetComponent<HeroProgression>();
             _caster = GetComponent<AbilityCaster>();
             _inventory = GetComponent<Inventory>();
+            _netTransform = GetComponent<NetworkTransform>();
             _kit = new NetworkList<short>();
             _cooldowns = new NetworkList<float>();
             _talents = new NetworkList<byte>();
@@ -121,6 +124,7 @@ namespace Moba.Net
                 for (int i = 0; i < KitSize; i++) _kit.Add(NetItems.None);
                 for (int i = 0; i < AbilityCaster.SlotCount * 2; i++) _cooldowns.Add(0f);
                 _progression.BountyEarned += SendBounty;
+                _hero.Respawned += TeleportOnClients;
                 PushState();
                 return;
             }
@@ -168,9 +172,20 @@ namespace Moba.Net
 
         public override void OnNetworkDespawn()
         {
-            if (IsServer) _progression.BountyEarned -= SendBounty;
+            if (IsServer)
+            {
+                _progression.BountyEarned -= SendBounty;
+                _hero.Respawned -= TeleportOnClients;
+            }
             GameManager game = GameManager.Instance;
             if (game != null) game.heroes.Remove(_hero);
+        }
+
+        // Server: a respawn moves the hero to the fountain in one step. Clients must jump too: the position sync
+        // smooths ordinary moves, which would slide the hero across the map.
+        void TeleportOnClients()
+        {
+            if (_netTransform != null) _netTransform.Teleport(transform.position, transform.rotation, transform.localScale);
         }
 
         // Server: the gold and XP pop-ups, for the player who earned them.

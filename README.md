@@ -162,6 +162,7 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 
 **How the server behaves**
 - It picks the map and fills both teams with bots. Players join blue.
+- **Map:** with `MOBA_MAP: random`, a server nobody has joined yet rolls a new map each time someone opens PvP champion select, the way PvE rolls one per visit. The card shows that map, and joining loads it. Once a player is in, the map stays until the match ends.
 - The match stays paused until the first player joins.
 - **Leaving:** a player who leaves keeps their hero in the match, standing still. Logging back in to the same server hands it back.
 - **Recording:** logged-in players are identified with the backend through a join ticket. When a core falls, the server records the match on everyone's account; it then shows in their match history and stats.
