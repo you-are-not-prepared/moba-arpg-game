@@ -13,13 +13,16 @@ using UnityEngine;
 namespace Moba.EditorTools
 {
     // Game-server support: network components on the generated prefabs and scene objects, the prefab list the
-    // NetworkManager loads (Resources/NetworkPrefabs), and the Linux dedicated server build used by Docker.
+    // NetworkManager loads (Resources/NetworkPrefabs), the Linux dedicated server build used by Docker, and the
+    // Windows client build.
     public static partial class GameBuilder
     {
         const string ResourcesDir = Root + "/Resources";
         const string NetworkPrefabsPath = ResourcesDir + "/NetworkPrefabs.asset";
         public const string ServerBuildDir = "Builds/LinuxServer";
         public const string ServerExecutable = "MobaServer.x86_64";
+        public const string ClientBuildDir = "Builds/WindowsClient";
+        public const string ClientExecutable = "MobaTest.exe";
 
         // Replicated by the game server: identity, (for moving units) position, team and health. Facing goes through
         // NetworkUnit instead, unsmoothed (no turn rate).
@@ -99,20 +102,41 @@ namespace Moba.EditorTools
                 message = "Install 'Linux Dedicated Server Build Support' for this Unity version (Unity Hub > Installs > Add modules).";
                 return false;
             }
+            return Build(BuildTarget.StandaloneLinux64, StandaloneBuildSubtarget.Server, ServerBuildDir, ServerExecutable,
+                "Server", out message);
+        }
+
+        // The game as players run it on Windows, to play PvP against the game server with a second copy next to the
+        // Editor (or on another PC). For a quick test it can join straight away:
+        //   MobaTest.exe -screen-fullscreen 0 -screen-width 1280 -screen-height 720 -join vesh -name "Player 2"
+        [MenuItem("MOBA/Build Windows Client")]
+        public static void BuildWindowsClientFromMenu()
+        {
+            if (!BuildWindowsClient(out string message)) EditorUtility.DisplayDialog("Client build failed", message, "OK");
+            else Debug.Log(message);
+        }
+
+        public static bool BuildWindowsClient(out string message) =>
+            Build(BuildTarget.StandaloneWindows64, StandaloneBuildSubtarget.Player, ClientBuildDir, ClientExecutable,
+                "Client", out message);
+
+        static bool Build(BuildTarget target, StandaloneBuildSubtarget subtarget, string dir, string executable, string label,
+            out string message)
+        {
             var options = new BuildPlayerOptions
             {
                 scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
-                locationPathName = Path.Combine(ServerBuildDir, ServerExecutable),
-                target = BuildTarget.StandaloneLinux64,
-                subtarget = (int)StandaloneBuildSubtarget.Server,
+                locationPathName = Path.Combine(dir, executable),
+                target = target,
+                subtarget = (int)subtarget,
                 options = BuildOptions.None,
             };
-            // Building can leave Linux Server as the active target, which would make the Editor compile as a
-            // dedicated server (UNITY_SERVER); put the target back afterwards.
+            // Building can leave another target active (Linux Server would make the Editor compile as a dedicated
+            // server, UNITY_SERVER); put the target back afterwards.
             BuildTarget previousTarget = EditorUserBuildSettings.activeBuildTarget;
             StandaloneBuildSubtarget previousSubtarget = EditorUserBuildSettings.standaloneBuildSubtarget;
-            // The server records matches on the backend running on the same PC, over plain http (HTTPS comes with
-            // online hosting). Allowed for the server build only.
+            // Builds talk to the backend running on this PC over plain http (HTTPS comes with online hosting).
+            // Allowed in the builds only; the project setting stays as it was.
             InsecureHttpOption previousHttp = PlayerSettings.insecureHttpOption;
             PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;
             BuildReport report;
@@ -122,7 +146,7 @@ namespace Moba.EditorTools
             }
             finally
             {
-                // The build saved the project settings with the server's value; save them back.
+                // The build saved the project settings with the build's value; save them back.
                 PlayerSettings.insecureHttpOption = previousHttp;
                 AssetDatabase.SaveAssets();
             }
@@ -134,8 +158,8 @@ namespace Moba.EditorTools
             }
             bool ok = report.summary.result == BuildResult.Succeeded;
             message = ok
-                ? $"[GameBuilder] Server built to {ServerBuildDir} ({report.summary.totalSize / (1024 * 1024)} MB) in {report.summary.totalTime.TotalSeconds:0}s."
-                : $"[GameBuilder] Server build {report.summary.result}: {report.summary.totalErrors} error(s). See the console.";
+                ? $"[GameBuilder] {label} built to {dir} ({report.summary.totalSize / (1024 * 1024)} MB) in {report.summary.totalTime.TotalSeconds:0}s."
+                : $"[GameBuilder] {label} build {report.summary.result}: {report.summary.totalErrors} error(s). See the console.";
             return ok;
         }
     }

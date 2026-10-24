@@ -153,7 +153,7 @@ The game can run as a **server that runs the whole match**: movement, creeps, to
 **Run it**
 1. In Unity: **MOBA → Build Linux Server**. This needs the *Linux Dedicated Server Build Support* module and writes to `Builds/LinuxServer` (ignored by git).
 2. In this folder: `docker compose up -d --build`
-3. In the game: **Find a match → PvP**, pick a hero, **Lock in**. You join the blue team on the server's map.
+3. In the game: **Find a match → PvP**, pick a hero, **Lock in**. You join the server's map on the team with fewer players.
 
 Without the Editor open, you can also build from the command line:
 ```bash
@@ -161,7 +161,7 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 ```
 
 **How the server behaves**
-- It picks the map and fills both teams with bots. Players join blue.
+- It picks the map and fills both teams with bots. Each player who joins takes a bot's place on the team with fewer players (blue on a tie), so two players end up on opposite teams. The server turns players away only when both teams are full of players.
 - **Map:** with `MOBA_MAP: random`, a server nobody has joined yet rolls a new map each time someone opens PvP champion select, the way PvE rolls one per visit. The card shows that map, and joining loads it. Once a player is in, the map stays until the match ends.
 - The match stays paused until the first player joins.
 - **Leaving:** a player who leaves keeps their hero in the match, standing still. Logging back in to the same server hands it back.
@@ -171,13 +171,22 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 
 **Settings** (in `docker-compose.yml`)
 - `MOBA_MAP`: `classic`, `zones`, `delve` or `random`.
-- `MOBA_BOTS`: bots per team.
+- `MOBA_BOTS`: bots per team before anyone joins (players replace them).
 - `MOBA_PORT`: the UDP port.
 - `MOBA_CHEATS`: `on` lets players use the cheat menu (without game speed). On in `docker-compose.yml` for local testing; set it to `off` before others play.
 - `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY`: where to record matches, and the backend's game-server key.
   - The defaults match the local backend on this PC (moba-backend's `docker compose up`).
   - Without a key, nothing is recorded.
   - On a real server, set `GAME_SERVER_KEY` in a `.env` file here and in moba-backend (git ignores `.env`).
+
+**Two players on one PC**
+1. In Unity: **MOBA → Build Windows Client**. This writes `Builds/WindowsClient/MobaTest.exe` (ignored by git).
+2. Start it as a second player. It joins straight away, with no login (an anonymous player):
+   ```bash
+   Builds/WindowsClient/MobaTest.exe -screen-fullscreen 0 -screen-width 1280 -screen-height 720 -join vesh -name "Player 2"
+   ```
+   Without `-join`, it starts at the login screen like the normal game.
+3. Join from the Editor (or another copy) as usual. The two players land on opposite teams.
 
 **Useful commands**
 - `docker compose logs -f game-server` follows the server log.

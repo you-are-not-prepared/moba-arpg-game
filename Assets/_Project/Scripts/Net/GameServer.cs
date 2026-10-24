@@ -12,7 +12,8 @@ using Random = UnityEngine.Random;
 namespace Moba.Net
 {
     // Runs this process as the game server: the Linux server build (in Docker) or any build started with -server.
-    // It loads a map, adds bots, gives every player who connects the hero they picked, and runs the whole match.
+    // It loads a map, fills both teams with bots, and gives every player who connects the hero they picked on the
+    // team with fewer players, in a bot's place (see PickTeam). It runs the whole match.
     // The match stays paused until the first player joins. Logged-in players are identified with the backend
     // (join tickets), and the finished match is recorded there for them (see Online.MatchReporter). When it ends
     // the server quits after a short delay, and Docker restarts it for a fresh match.
@@ -21,7 +22,7 @@ namespace Moba.Net
     //   map    classic | zones | delve | random (default random). With random, a server nobody has joined yet rolls a
     //          new map each time a menu asks which map it runs (PvP champion select), as offline play does per visit.
     //   port   UDP port to listen on (default 7777)
-    //   bots   number of bots per team besides players; blue gets one fewer (default 3)
+    //   bots   bots per team before anyone joins; each player replaces one (default 3, max 5)
     //   cheats on | off: whether players may use the cheat menu (default off; for local testing)
     //   backend_url   the moba-backend API (default http://localhost:8080)
     //   backend_key   the backend's game-server key; without it matches aren't recorded
@@ -136,10 +137,12 @@ namespace Moba.Net
             }
             bool knownHero = join != null && _roster != null && _roster.Find(join.heroId) != null;
             bool running = GameManager.Instance == null || !GameManager.Instance.IsOver;
-            response.Approved = knownHero && running;
+            bool room = _loadingMap || PickTeam(out _, out _);
+            response.Approved = knownHero && running && room;
             response.CreatePlayerObject = false;
             if (!knownHero) response.Reason = "The server doesn't know that hero.";
             else if (!running) response.Reason = "The match on this server has just ended. Try again in a few seconds.";
+            else if (!room) response.Reason = "This match is full.";
             if (!response.Approved) return;
             s_Joining[request.ClientNetworkId] = join;
             if (_loadingMap)
@@ -171,10 +174,24 @@ namespace Moba.Net
                 left.GetComponent<NetworkObject>().ChangeOwnership(clientId);
                 Debug.Log($"[GameServer] Client {clientId} ({name}) rejoined and took back {left.HeroId}.");
             }
+            else if (PickTeam(out Team team, out NetworkHero bot))
+            {
+                Transform spot = null;
+                string replaced = "";
+                if (bot != null)
+                {
+                    spot = bot.GetComponent<HeroController>().spawnPoint;
+                    replaced = $", in place of the bot {bot.HeroId}";
+                    bot.GetComponent<NetworkObject>().Despawn(destroy: true);
+                }
+                bootstrap.SpawnPlayer(clientId, join.heroId, name, accountId, team, spot);
+                Debug.Log($"[GameServer] Client {clientId} ({name}{(accountId.Length > 0 ? ", logged in" : "")}) joined " +
+                          $"{team} as {join.heroId}{replaced}.");
+            }
             else
             {
-                bootstrap.SpawnPlayer(clientId, join.heroId, name, accountId);
-                Debug.Log($"[GameServer] Client {clientId} ({name}{(accountId.Length > 0 ? ", logged in" : "")}) joined as {join.heroId}.");
+                _manager.DisconnectClient(clientId, "This match is full.");
+                return;
             }
             if (!_started && GameManager.Instance != null)
             {
@@ -182,6 +199,35 @@ namespace Moba.Net
                 GameManager.Instance.SetPaused(false);
                 Debug.Log("[GameServer] First player in: the match starts.");
             }
+        }
+
+        // The team for the next player: the one with fewer players (blue on a tie). A full team gives up a bot for them;
+        // false when both teams are full of players.
+        bool PickTeam(out Team team, out NetworkHero bot)
+        {
+            int size = Mathf.Max(MatchSettings.TeamSize, _bots);
+            var players = new Dictionary<Team, int> { [Team.Blue] = 0, [Team.Red] = 0 };
+            var heroes = new Dictionary<Team, int> { [Team.Blue] = 0, [Team.Red] = 0 };
+            var bots = new Dictionary<Team, NetworkHero>();
+            foreach (NetworkHero hero in FindObjectsByType<NetworkHero>(FindObjectsSortMode.None))
+            {
+                if (!hero.IsSpawned) continue;
+                Team side = hero.GetComponent<Unit>().team;
+                heroes[side]++;
+                if (hero.IsBot) bots[side] = hero;
+                else players[side]++;
+            }
+            foreach (Team side in players[Team.Red] < players[Team.Blue] ? new[] { Team.Red, Team.Blue } : new[] { Team.Blue, Team.Red })
+            {
+                if (players[side] >= size) continue;
+                team = side;
+                bot = heroes[side] >= size && bots.TryGetValue(side, out NetworkHero b) ? b : null;
+                if (heroes[side] >= size && bot == null) continue;
+                return true;
+            }
+            team = Team.Blue;
+            bot = null;
+            return false;
         }
 
         // Only before anyone has joined: once a player is in, the map is theirs.
@@ -215,12 +261,12 @@ namespace Moba.Net
             return null;
         }
 
-        // Bots fill both teams; players join the blue team.
+        // Bots fill both teams; players take their places as they join.
         void PrepareBots(int perTeam)
         {
             MatchSettings.Mode = MatchMode.PvP;
             MatchSettings.Lineup.Clear();
-            AddBots(Team.Blue, Mathf.Max(0, perTeam - 1));
+            AddBots(Team.Blue, perTeam);
             AddBots(Team.Red, perTeam);
         }
 
