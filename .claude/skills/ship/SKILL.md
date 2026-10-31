@@ -67,10 +67,13 @@ gh pr create --repo you-are-not-prepared/<repo> --base main --head dev --title "
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
-gh pr merge dev --repo you-are-not-prepared/<repo> --merge     # only when the user said to merge
+gh pr merge dev --repo you-are-not-prepared/<repo> --merge --admin     # only when the user said to merge, and only as tomicnikola (see below)
 gh pr list --repo you-are-not-prepared/<repo> --state merged --limit 1
 ```
 
+- `main` in all three repos has the "Protect main" ruleset: no deletion, no force-push, PRs need 1 approval. Only tomicnikola (org admin) can bypass it. Check who you are with `gh api user --jq .login`:
+  - **tomicnikola:** GitHub doesn't allow approving your own PR, so merge with `--admin`. Pushes straight to moba-arpg-ideas `main` go through as a bypass.
+  - **Anyone else:** never use `--admin`. Open the PR and leave the approval and merge to tomicnikola. Changes to moba-arpg-ideas also go through a PR.
 - When a change spans moba-arpg-game and moba-arpg-backend, say so in both PRs ("Goes with you-are-not-prepared/moba-arpg-backend (…)").
 - Refer to PRs as `you-are-not-prepared/<repo>#N` or full links, never a bare `#N`.
 - After merging, tell the user the PR link(s) and that it's on `main`. Keep `dev` as is: the next commit continues on it, and "fetch main" syncs it when asked.
