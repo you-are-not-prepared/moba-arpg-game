@@ -116,7 +116,7 @@ namespace Moba.Net
             if (!wasConnected)
             {
                 Fail(reason ?? $"Couldn't reach the game server at {NetSession.ServerAddress}. " +
-                     "Is it running? (docker compose up in the moba-test folder)");
+                     "Is it running? (docker compose up in the moba-arpg-game folder)");
                 return;
             }
 

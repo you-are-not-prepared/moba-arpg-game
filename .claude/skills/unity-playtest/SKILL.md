@@ -1,16 +1,16 @@
 ---
 name: unity-playtest
-description: Drive the open Unity Editor from the shell to test moba-test in play mode — run C# in the Editor, wait for compiles, enter/leave play mode, press keys, click UI Toolkit elements, take Game view screenshots, and measure things frame by frame with probes. Use whenever a change to moba-test should be checked in the running game (offline PvE, menus, HUD, abilities), and always before saying a gameplay or UI change works. Includes the rules that keep the user's own login and Editor state untouched.
+description: Drive the open Unity Editor from the shell to test moba-arpg-game in play mode — run C# in the Editor, wait for compiles, enter/leave play mode, press keys, click UI Toolkit elements, take Game view screenshots, and measure things frame by frame with probes. Use whenever a change to moba-arpg-game should be checked in the running game (offline PvE, menus, HUD, abilities), and always before saying a gameplay or UI change works. Includes the rules that keep the user's own login and Editor state untouched.
 ---
 
-# Unity playtest (moba-test)
+# Unity playtest (moba-arpg-game)
 
 Test changes in the real game by driving the Unity Editor the user has open, through the `unity` CLI (`unity command eval`, `editor_play`, ...). Helpers live in `scripts/unity.sh`.
 
 ## Setup
 
 ```bash
-source .claude/skills/unity-playtest/scripts/unity.sh   # from the moba-test folder; it cd's there
+source .claude/skills/unity-playtest/scripts/unity.sh   # from the moba-arpg-game folder; it cd's there
 ```
 
 | Helper | Does |
