@@ -1,9 +1,9 @@
 ---
 name: pvp-e2e-test
-description: End-to-end test of PvP in moba-test: the Unity Editor joins the local Docker game server as a player, optionally logged in as a throwaway tester_* backend account, then checks orders, spells, shop, sync, leaving/rejoining and match recording, and cleans up. Use to verify anything that runs through the game server (Scripts/Net, NetworkHero/NetworkUnit/NetworkMatch, GameServer, GameClient, server-side recording) or when the user reports a PvP bug.
+description: End-to-end test of PvP in moba-arpg-game: the Unity Editor joins the local Docker game server as a player, optionally logged in as a throwaway tester_* backend account, then checks orders, spells, shop, sync, leaving/rejoining and match recording, and cleans up. Use to verify anything that runs through the game server (Scripts/Net, NetworkHero/NetworkUnit/NetworkMatch, GameServer, GameClient, server-side recording) or when the user reports a PvP bug.
 ---
 
-# PvP end-to-end test (moba-test + game server + moba-backend)
+# PvP end-to-end test (moba-arpg-game + game server + moba-arpg-backend)
 
 The Editor plays the client, Docker runs the server, and the backend records matches. Uses the unity-playtest and game-server-deploy helpers.
 
@@ -23,7 +23,7 @@ source .claude/skills/pvp-e2e-test/scripts/pvp.sh   # loads all three helper set
 ## Before
 
 1. **The server runs the current code:** `build_server` and `deploy` if game code or scenes changed since the last build (see game-server-deploy).
-2. **The backend is up** if recording or login is involved: `curl -s localhost:8080/health` → `{"status":"ok"...}`, otherwise `docker compose up -d` in `../moba-backend`.
+2. **The backend is up** if recording or login is involved: `curl -s localhost:8080/health` → `{"status":"ok"...}`, otherwise `docker compose up -d` in `../moba-arpg-backend`.
 3. **Keep the user's login out:** `token_aside`. For a logged-in test: `T=$(tester_create tester_<something>)`, then `token_use "$T"`, both **before** `play`.
 
 ## A test run
@@ -56,7 +56,7 @@ Orders from the client go through `HeroController` (`OrderMove`, `IssueAttackMov
   ```bash
   powershell -NoProfile -Command "Start-Process -FilePath '$(cygpath -w "$PWD/Builds/WindowsClient/MobaTest.exe")' -ArgumentList '-screen-fullscreen','0','-screen-width','1280','-screen-height','720','-join','kael','-name','P1'"
   ```
-  With `-join` it searches at once and locks in that hero. The Editor then searches within 15 s, lands in the same champion select on red, and its view (shop, fog, HUD sides) can be inspected. The built game logs to `%USERPROFILE%\AppData\LocalLow\DefaultCompany\moba-test\Player.log`. Close it afterwards with `taskkill //IM MobaTest.exe //F`.
+  With `-join` it searches at once and locks in that hero. The Editor then searches within 15 s, lands in the same champion select on red, and its view (shop, fog, HUD sides) can be inspected. The built game logs to `%USERPROFILE%\AppData\LocalLow\DefaultCompany\moba-arpg-game\Player.log`. Close it afterwards with `taskkill //IM MobaTest.exe //F`.
 - **Queue and champion select** happen in the Frontend scene: `Moba.Net.GameClient.Lobby` is the server's state (phase, map, seats, time left), and the menu's PvP screen shows it. To test the lobby UI itself, call `StartPvP` on the FrontendController (reflection) and click `hero-tile`, `lockButton` and `startNowButton` with `uiclick Frontend ...`.
 - **A running match** only takes back a logged-in player who left it. Anyone else gets "A match is already running…": restart the server (`docker compose restart game-server`) for a fresh match.
 - **Leaving and rejoining:** after `pvp_leave`, a logged-in account that joins again gets its old hero back ("rejoined and took back ..."). An anonymous player gets a new hero.

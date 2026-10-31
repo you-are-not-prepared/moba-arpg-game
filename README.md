@@ -1,4 +1,4 @@
-# Project MOBA (moba-test)
+# Project MOBA (moba-arpg-game)
 
 A MOBA with ARPG builds, made in Unity. It has classic MOBA structure (lanes, creeps, towers, destroy the enemy core) with Path of Exile–style buildcrafting: heroes buy spells in the shop, put them on Q/W/E, and socket mods that change how they behave.
 
@@ -6,7 +6,7 @@ A MOBA with ARPG builds, made in Unity. It has classic MOBA structure (lanes, cr
 - **Playable:** PvE (3v3 against bots), 5 heroes, 3 map layouts, accounts with match history.
 - **Game server (stage 4b):** PvP finds a match on a local game server in Docker. It has a queue and a shared champion select, runs the whole match, and records it on your account (see below).
 
-The backend (accounts, settings sync, match history) lives in a separate repo: [tomicnikola/moba-backend](https://github.com/tomicnikola/moba-backend).
+The backend (accounts, settings sync, match history) lives in a separate repo: [you-are-not-prepared/moba-arpg-backend](https://github.com/you-are-not-prepared/moba-arpg-backend).
 
 ---
 
@@ -19,7 +19,7 @@ The backend (accounts, settings sync, match history) lives in a separate repo: [
 
 ```bash
 git lfs install
-git clone https://github.com/tomicnikola/moba-test.git
+git clone https://github.com/you-are-not-prepared/moba-arpg-game.git
 ```
 
 1. Open the folder in Unity Hub (Add → the cloned folder).
@@ -139,7 +139,7 @@ While logged in:
 - **History:** **Match history** on the start screen shows your stats and recent matches. Click a match for full details, and hover items, spells and mods for their descriptions.
 - **Cheats:** matches where the cheat menu was used stay in the history but don't count towards your stats.
 
-To run the backend locally, see [moba-backend](https://github.com/tomicnikola/moba-backend): Docker, then `docker compose up -d --build`.
+To run the backend locally, see [moba-arpg-backend](https://github.com/you-are-not-prepared/moba-arpg-backend): Docker, then `docker compose up -d --build`.
 
 **Backend settings**
 - **Server address:** the game connects to `http://localhost:8080`. To use another server, set the PlayerPrefs key `moba.backend.url`.
@@ -190,9 +190,9 @@ unity build --target StandaloneLinux64 --execute-method Moba.EditorTools.GameBui
 - `MOBA_PORT`: the UDP port.
 - `MOBA_CHEATS`: `on` lets players use the cheat menu (without game speed). On in `docker-compose.yml` for local testing; set it to `off` before others play.
 - `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY`: where to record matches, and the backend's game-server key.
-  - The defaults match the local backend on this PC (moba-backend's `docker compose up`).
+  - The defaults match the local backend on this PC (moba-arpg-backend's `docker compose up`).
   - Without a key, nothing is recorded.
-  - On a real server, set `GAME_SERVER_KEY` in a `.env` file here and in moba-backend (git ignores `.env`).
+  - On a real server, set `GAME_SERVER_KEY` in a `.env` file here and in moba-arpg-backend (git ignores `.env`).
 
 **Two players on one PC**
 1. In Unity: **MOBA → Build Windows Client**. This writes `Builds/WindowsClient/MobaTest.exe` (ignored by git).

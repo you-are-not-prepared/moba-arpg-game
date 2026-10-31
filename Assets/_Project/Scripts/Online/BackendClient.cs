@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 namespace Moba.Online
 {
-    // Minimal JSON-over-HTTP client for the moba-backend API. Every call resolves (never throws); check Ok.
+    // Minimal JSON-over-HTTP client for the moba-arpg-backend API. Every call resolves (never throws); check Ok.
     public static class BackendClient
     {
         // Override with PlayerPrefs "moba.backend.url" (e.g. a test server) without rebuilding.

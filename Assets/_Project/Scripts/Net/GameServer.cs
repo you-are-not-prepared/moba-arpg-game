@@ -25,7 +25,7 @@ namespace Moba.Net
     //   port   UDP port to listen on (default 7777)
     //   bots   bots per team for the free seats (default 3; 0 = players only)
     //   cheats on | off: whether players may use the cheat menu (default off; for local testing)
-    //   backend_url   the moba-backend API (default http://localhost:8080)
+    //   backend_url   the moba-arpg-backend API (default http://localhost:8080)
     //   backend_key   the backend's game-server key; without it matches aren't recorded
     public partial class GameServer : MonoBehaviour
     {

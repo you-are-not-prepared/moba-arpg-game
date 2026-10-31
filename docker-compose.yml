@@ -13,7 +13,7 @@ services:
       MOBA_MAP: random   # classic | zones | delve | random
       MOBA_BOTS: "3"     # bots per team for the seats players don't fill (0 = players only)
       MOBA_CHEATS: "on"  # cheat menu for testing; set "off" before letting others play
-      # Records finished matches on the backend (moba-backend, running on this PC). The key must match the
+      # Records finished matches on the backend (moba-arpg-backend, running on this PC). The key must match the
       # backend's GAME_SERVER_KEY; both default to the same local-only value. Set a real one in .env on a server.
       MOBA_BACKEND_URL: http://host.docker.internal:8080
       MOBA_BACKEND_KEY: ${GAME_SERVER_KEY:-local-dev-only-server-key}

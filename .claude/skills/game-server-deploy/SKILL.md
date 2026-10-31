@@ -1,9 +1,9 @@
 ---
 name: game-server-deploy
-description: Build the headless Linux game server from the open Unity Editor and (re)start it in Docker (docker-compose.yml in moba-test). Use after any change to game code the server runs (Scripts/, especially Scripts/Net/), after rebuilding scenes or prefabs (MOBA > Rebuild All Scenes), when changing server settings (map, bots, cheats, backend), or whenever the user says the game server should be rebuilt, restarted or checked.
+description: Build the headless Linux game server from the open Unity Editor and (re)start it in Docker (docker-compose.yml in moba-arpg-game). Use after any change to game code the server runs (Scripts/, especially Scripts/Net/), after rebuilding scenes or prefabs (MOBA > Rebuild All Scenes), when changing server settings (map, bots, cheats, backend), or whenever the user says the game server should be rebuilt, restarted or checked.
 ---
 
-# Game server: build and deploy (moba-test)
+# Game server: build and deploy (moba-arpg-game)
 
 The game server is this same Unity project, built as a headless Linux server (`Builds/LinuxServer`, ignored by git), running in Docker on UDP `127.0.0.1:7777`. Clients only work against a server built from the same code and scenes.
 
@@ -39,7 +39,7 @@ server_log        # [GameServer]/[Matches] lines and real errors only
 | `MOBA_MAP` | `classic`, `zones`, `delve`, `random` (default) |
 | `MOBA_BOTS` | bots per team for the seats players don't fill in champion select (0 = players only) |
 | `MOBA_CHEATS` | `on` lets players use the cheat menu; **must be `off` before anyone else plays** |
-| `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY` | where finished matches are recorded; the key must equal moba-backend's `GAME_SERVER_KEY` |
+| `MOBA_BACKEND_URL` / `MOBA_BACKEND_KEY` | where finished matches are recorded; the key must equal moba-arpg-backend's `GAME_SERVER_KEY` |
 
 For a test without bots, don't edit the file: `deploy "$(nobots_override)"`, and plain `deploy` afterwards to put the normal server back.
 
@@ -48,7 +48,7 @@ For a test without bots, don't edit the file: `deploy "$(nobots_override)"`, and
 - One match per run: queue (15 s after the first player) → champion select (60 s, or 5 s after everyone locked in, or Start now) → the map loads. When a core falls, the server quits after 15 s and Docker restarts it for the next match.
 - Bots currently buy only a Fireball for Q (`BotBrain.fullShopping` off). With full shopping and `TestPrices` (1-gold items), they'd buy everything at once and end matches in about 1–3 minutes.
 - Unity's headless noise in the log is harmless: "Built-in Resource Error: dereference potentially...", and "Trying to access a shader but no shaders were included".
-- The server reaches the backend on the host via `host.docker.internal` (see `extra_hosts`). The backend must be running (`docker compose up -d` in moba-backend) for matches to be recorded.
+- The server reaches the backend on the host via `host.docker.internal` (see `extra_hosts`). The backend must be running (`docker compose up -d` in moba-arpg-backend) for matches to be recorded.
 
 ## Pitfalls
 

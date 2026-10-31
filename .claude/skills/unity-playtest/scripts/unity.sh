@@ -1,7 +1,7 @@
 #!/bin/bash
-# Helpers for driving the open Unity Editor (moba-test) from Git Bash through the `unity` CLI.
+# Helpers for driving the open Unity Editor (moba-arpg-game) from Git Bash through the `unity` CLI.
 #   source .claude/skills/unity-playtest/scripts/unity.sh
-# Every function works from the moba-test folder (this script cd's there).
+# Every function works from the moba-arpg-game folder (this script cd's there).
 
 MOBA_TEST="$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)"
 cd "$MOBA_TEST" || return 1
