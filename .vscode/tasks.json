@@ -1,0 +1,85 @@
+{
+  // Docker tasks for running the game locally. Terminal > Run Task... (or Ctrl+Shift+P > "Tasks: Run Task").
+  // They run scripts/moba.ps1, which also works from any terminal: .\moba start (see the README).
+  // Mac/Linux need PowerShell 7 (pwsh).
+  "version": "2.0.0",
+  "options": {
+    "shell": { "executable": "pwsh", "args": ["-NoProfile", "-Command"] }
+  },
+  "windows": {
+    "options": {
+      "shell": { "executable": "powershell.exe", "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"] }
+    }
+  },
+  "tasks": [
+    {
+      "label": "Start all",
+      "detail": "Backend, then game server (rebuilds after changes)",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["start", "all"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop all",
+      "detail": "Game server and backend (data is kept)",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["stop", "all"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Status",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["status"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: start",
+      "detail": "Database + API on localhost:8080",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["start", "backend"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: stop",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["stop", "backend"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: logs",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["logs", "backend"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Game server: start",
+      "detail": "UDP localhost:7777 from Builds/LinuxServer",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["start", "server"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Game server: stop",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["stop", "server"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Game server: logs",
+      "type": "shell",
+      "command": "./scripts/moba.ps1",
+      "args": ["logs", "server"],
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
