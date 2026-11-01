@@ -173,3 +173,6 @@ LightingData.asset     binary
 # Shell scripts and the Dockerfile run in bash / Linux: always LF, even with core.autocrlf on Windows
 *.sh                    text eol=lf
 Dockerfile              text eol=lf
+
+# Windows scripts run by cmd.exe
+*.cmd text eol=crlf
