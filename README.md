@@ -29,6 +29,46 @@ git clone https://github.com/you-are-not-prepared/moba-arpg-game.git
 
 You can also open a map scene (`Map_Classic`, `Map_Zones`, `Map_Delve`) and press Play to jump straight into a match. It starts with only your hero (the roster's first) and no bots.
 
+### Running the backend and game server (Docker)
+
+PvE and **Play offline** need neither. Logging in needs the backend, and **PvP** needs the game server (plus the backend to record matches).
+
+**Requirements**
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/), running.
+- For the game server: the **Linux Dedicated Server Build Support** module for Unity 6000.3.26f1 (Unity Hub → Installs → Add modules).
+- Free ports: 8080 (API), 5432 (database), 7777/UDP (game server). All three only listen on `127.0.0.1`.
+
+**1. Clone both repos into the same folder.** The VS Code tasks find the backend at `../moba-arpg-backend`.
+```
+Project MOBA/
+  moba-arpg-game/
+  moba-arpg-backend/
+```
+```bash
+git clone https://github.com/you-are-not-prepared/moba-arpg-backend.git
+```
+
+**2. Build the game server in Unity: MOBA → Build Linux Server.** The Docker image is made from `Builds/LinuxServer`, which git ignores, so every clone needs its own build. Redo it after **Rebuild All Scenes** or changes to code the server runs, or the game won't match the server.
+
+**3. Start everything.** In a terminal in this folder (Visual Studio: View → Terminal; Rider and VS Code have one too):
+```bash
+.\moba start
+```
+This starts the backend, then the game server. The first start takes a few minutes while Docker downloads and builds the images. Your database starts empty, so create an account on the game's login screen.
+
+**The `moba` script** (`moba.cmd`, which runs `scripts/moba.ps1`)
+| Command | Does |
+|---|---|
+| `.\moba start` | Backend, then game server. Rebuilds the images, so run it again after pulling changes or making a new server build |
+| `.\moba stop` | Stops both (the data is kept) |
+| `.\moba logs server` / `.\moba logs backend` | Follows a log (Ctrl+C stops following, not the server) |
+| `.\moba status` | Shows what's running |
+
+- Add `backend` or `server` to *start* and *stop* for just one, e.g. `.\moba start server`.
+- Before starting anything, it checks that Docker is running, the backend is cloned next to this repo, and the server build exists.
+- In `cmd` it's `moba start`, without `.\`. On Mac/Linux, install PowerShell 7 and run `pwsh scripts/moba.ps1 start`.
+- **VS Code:** the same commands are tasks (Terminal → Run Task…: *Start all*, *Stop all*, *Status*, and *start/stop/logs* for the backend and the game server).
+
 ---
 
 ## The game
@@ -159,9 +199,9 @@ To run the backend locally, see [moba-arpg-backend](https://github.com/you-are-n
 
 The game can run as a **server that runs the whole match**: movement, creeps, towers, bots, combat and respawns. The game connects to it as a client: it sends your orders (move, attack, attack move, stop, casts, rank-ups) and choices (buying, selling, drag and drop, ascension), and shows what the server says is happening. It uses Unity Netcode for GameObjects; the server is a headless Linux build of this same project.
 
-**Run it**
+**Run it** (first-time setup: [Running the backend and game server](#running-the-backend-and-game-server-docker))
 1. In Unity: **MOBA → Build Linux Server**. This needs the *Linux Dedicated Server Build Support* module and writes to `Builds/LinuxServer` (ignored by git).
-2. In this folder: `docker compose up -d --build`
+2. In this folder: `.\moba start server` (or `docker compose up -d --build`).
 3. In the game: **Find a match → PvP**. You wait briefly while the server gathers players, then pick a hero in champion select and **Lock in**.
 
 Without the Editor open, you can also build from the command line:
