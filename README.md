@@ -316,5 +316,6 @@ Rebuilding overwrites the generated assets, so hand edits to them are lost. Asse
 
 ## Workflow
 
-- Work happens on `dev`. Changes reach `main` through a pull request from `dev`.
+- Each task gets a work branch from `dev` (`feature/…`, `content/…`, `fix/…`, …), which goes into `dev` through a pull request. Changes reach `main` through a pull request from `dev`.
+- The details (branch names, reviews, releases, hotfixes, avoiding scene conflicts) are in [CONTRIBUTING.md](CONTRIBUTING.md).
 - The backend repo works the same way.
