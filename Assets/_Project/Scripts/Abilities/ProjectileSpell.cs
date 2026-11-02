@@ -69,6 +69,7 @@ namespace Moba.Abilities
                 Height = launchHeight,
                 ProjectileMaterial = projectileMaterial,
                 ExplosionMaterial = explosionMaterial,
+                Look = adaptive ? m.damageType : DamageType.None,
             };
 
             if (caster.TryGetComponent(out StaticCharge charge) && charge.NextIsCharged)

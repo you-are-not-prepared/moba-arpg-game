@@ -21,6 +21,21 @@ MonoBehaviour:
   glyph: TH
   tags: 0
   damageType: 4
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 0
   unitFilter: 0
   range: 0

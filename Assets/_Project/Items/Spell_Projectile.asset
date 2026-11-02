@@ -10,16 +10,32 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64567430dfb07c4499a90a3abcb4b3d0, type: 3}
-  m_Name: Spell_Fireball
+  m_Name: Spell_Projectile
   m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ProjectileSpell
-  displayName: Fireball
-  description: Hurls a fireball that explodes on the first enemy it hits.
+  displayName: Projectile
+  description: Fires a projectile that explodes on the first enemy it hits. It takes
+    your hero's damage type and look.
   cost: 1
   icon: {fileID: 0}
   color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
-  glyph: FB
-  tags: 7
-  damageType: 1
+  glyph: PR
+  tags: 3
+  damageType: 0
+  adaptive: 1
+  typeNames:
+  - Fireball
+  - Ice Shard
+  - Thorn
+  - Spark
+  - Arrow
+  - Wind Blade
+  typeGlyphs:
+  - FB
+  - IS
+  - TH
+  - SP
+  - AR
+  - WB
   targeting: 1
   unitFilter: 0
   range: 0

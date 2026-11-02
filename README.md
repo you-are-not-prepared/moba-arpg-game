@@ -118,7 +118,7 @@ Spells and ultimates deal one of six damage types: **Fire, Frost, Nature, Lightn
 - **Base damage type:** the hero's highest affinity. Champion select shows it with the full affinity hexagon; the Tab scoreboard and match details show it next to each hero.
 - **Matchups:** the types form a cycle, in the hexagon's order: **Fire > Frost > Nature > Lightning > Physical > Air > Fire**. A typed hit on a hero deals +10% if its type beats the hero's base type, and -10% if the hero's type beats it. Creeps, towers and cores take every type normally.
 - **Spell tooltips** name the type: "75 Fire damage".
-- **Spell colours:** every hero also has three spell colours (`HeroDefinition.spellColors`), for the hero-specific spell looks still to come.
+- **Spell colours:** every hero also has three spell colours (`HeroDefinition.spellColors`), used by the shop spells' looks (below).
 
 | Hero | Base type | Hero | Base type |
 |---|---|---|---|
@@ -143,6 +143,16 @@ The current talents are placeholders; they're defined in `Assets/_Project/Editor
 - **The shop** works only in your base, plus anywhere while you're dead. Selling refunds 70%. Open it with **B** or the Shop button.
 - **The inventory** has 8 slots, rearranged by dragging. Items, spells and mods all take a slot until equipped.
 - **Spells:** drag one from the inventory onto Q, W or E. Ranks belong to the slot, so swapping spells keeps the rank.
+- **Shop spells are blank slates** (`adaptive`): they deal the hero's base damage type, take its name and shape from that type, and its colours from the hero (`HeroDefinition.spellColors`). The shop shows what each becomes for you, e.g. "Projectile → Fireball".
+
+  | Spell | What it does | Fire / Frost / Nature / Lightning / Physical / Air |
+  |---|---|---|
+  | **Projectile** (ranged) | Explodes on the first enemy hit | Fireball / Ice Shard / Thorn / Spark / Arrow / Wind Blade |
+  | **Burst** (ranged) | Marks a 2.5m circle; after 0.6s everything inside is hit | Meteor / Ice Spikes / Thornburst / Lightning Strike / Arrow Rain / Cyclone |
+  | **Cleave** (melee) | Hits everything in a 120° cone in front of you | Flame Arc / Frost Arc / Bramble Swipe / Storm Arc / Cleave / Gale Arc |
+  | **Lunge** (melee) | Dashes up to 6m and hits everything around where you land | Flame Dash / Frost Dash / Root Leap / Thunder Dash / Lunge / Gust Dash |
+
+  The looks are built at runtime (`Scripts/Abilities/SpellLook.cs`, `SpellBurstEffect.cs`) from the tinted materials in `Resources/SpellLooks.asset`; on the game server they reach every client with the caster, so each player sees the right colours.
 - **Mods:** drag one onto a spell to socket it. Each spell has 3 sockets; a mod only works if it suits the spell (e.g. *Volley* needs a projectile spell).
   - **Volley:** +2 projectiles.
   - **Fork:** splits on hit.
@@ -319,7 +329,7 @@ Players get the game once as a zip from the [releases page](https://github.com/y
 
   Using any cheat marks the match. On the game server the menu works when `MOBA_CHEATS` is `on`.
 - **Test prices:** while `TestPrices` is `true` in `Assets/_Project/Editor/GameBuilder.cs`, every item, spell and mod costs **1 gold**.
-- **Bot shopping:** for now, bots buy only one spell (the shop's first, Fireball) for Q: no items and no mods. Set `fullShopping` on `BotBrain` to bring back spells for every slot, mods and items. With 1-gold prices that means a full inventory at once, and matches end within minutes. The same goes for the bots on the game server. Set it to `false` and rebuild for real prices.
+- **Bot shopping:** for now, bots buy only one spell (the shop's first, Projectile) for Q: no items and no mods. Set `fullShopping` on `BotBrain` to bring back spells for every slot, mods and items. With 1-gold prices that means a full inventory at once, and matches end within minutes. The same goes for the bots on the game server. Set it to `false` and rebuild for real prices.
 - **Test colours:** `TestKindColors` colours inventory tiles by kind (items orange, spells blue, mods green).
 
 ---

@@ -154,7 +154,7 @@ namespace Moba.UI
                 }
 
                 for (int i = 0; i < _spells.Length; i++) _spells[i].Show(_abilities, i);
-                for (int i = 0; i < _items.Length; i++) _items[i].Show(_inventory != null ? _inventory.Get(i) : null);
+                for (int i = 0; i < _items.Length; i++) _items[i].Show(_inventory != null ? _inventory.Get(i) : null, _abilities.Unit);
             }
         }
 
@@ -183,7 +183,7 @@ namespace Moba.UI
             public void Show(AbilityCaster caster, int slot)
             {
                 AbilityDefinition ability = caster.GetSlot(slot).ability;
-                _tile.Show(ability);
+                _tile.Show(ability, caster.Unit);
                 int sockets = ability != null ? caster.SocketCount(slot) : 0;
                 for (int i = 0; i < _dots.Length; i++)
                 {
@@ -209,12 +209,13 @@ namespace Moba.UI
                 Root.Add(_glyph);
             }
 
-            public void Show(InventoryItem item)
+            // `holder`: the row's hero, for adaptive spells' glyphs.
+            public void Show(InventoryItem item, Unit holder)
             {
                 if (_initialized && item == _shown) return;
                 _initialized = true;
                 _shown = item;
-                _glyph.text = item != null ? item.glyph : "";
+                _glyph.text = item != null ? item.GlyphFor(holder) : "";
                 // Per-item colour is data; clearing it falls back to the USS tile colour.
                 Root.style.backgroundColor = item != null ? new StyleColor(item.color) : new StyleColor(StyleKeyword.Null);
             }

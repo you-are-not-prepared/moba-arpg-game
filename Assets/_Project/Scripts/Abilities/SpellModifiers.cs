@@ -9,7 +9,8 @@ namespace Moba.Abilities
         None = 0,
         Projectile = 1 << 0,
         AreaOfEffect = 1 << 1,
-        Fire = 1 << 2,
+        // 1 << 2 was Fire: damage types replaced it (AbilityDefinition.damageType).
+        Melee = 1 << 3,
     }
 
     // The combined effect of the mods socketed with a spell, computed once per cast.

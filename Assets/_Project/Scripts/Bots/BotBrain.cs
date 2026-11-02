@@ -223,6 +223,25 @@ namespace Moba.Bots
                         if (target != null && _hero.OrderCast(slot, target.transform.position, null)) return true;
                         break;
                     }
+                    case BurstSpell burst:
+                    {
+                        Unit target = enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= burst.range ? enemyHero : null;
+                        if (target == null && ManaFraction > 0.5f)
+                            target = _unit.FindClosestEnemy(burst.range * 0.8f,
+                                u => u.kind == UnitKind.Creep && !IsUnsafe(u.transform.position));
+                        if (target != null && _hero.OrderCast(slot, target.transform.position, null)) return true;
+                        break;
+                    }
+                    case MeleeSpell melee:
+                    {
+                        // Lunge toward a hero in dash range; swing at whatever is in reach.
+                        float reach = melee.lunge ? melee.range : melee.reach;
+                        Unit target = enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= reach ? enemyHero : null;
+                        if (target == null && !melee.lunge && ManaFraction > 0.5f)
+                            target = _unit.FindClosestEnemy(reach, u => u.kind == UnitKind.Creep && !IsUnsafe(u.transform.position));
+                        if (target != null && _hero.OrderCast(slot, target.transform.position, null)) return true;
+                        break;
+                    }
                     case LeapSpell leap:
                         if (enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= leap.range
                             && _hero.OrderCast(slot, enemyHero.transform.position, null)) return true;
