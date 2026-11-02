@@ -267,6 +267,31 @@ PvE stays fully offline as before.
 - **Re-run Build Linux Server after rebuilding the scenes:** in-scene objects are matched between server and client by IDs saved in the scenes.
 - **Keep the Editor's build target on Windows:** if the Editor's build target is ever left on Linux Server, the Editor itself compiles as a server. The build helpers switch it back automatically.
 
+## Releases and updates (Windows)
+
+Players get the game once as a zip from the [releases page](https://github.com/you-are-not-prepared/moba-arpg-game/releases), extract it anywhere they can write to (not Program Files), and run `MobaTest.exe`. After that the game updates itself.
+
+**What players see**
+- The menu shows the game's version in the bottom-left corner.
+- When a newer release is out, the login and start screens show a bar with the first lines of its notes, plus **Update now** and **Later**.
+- **Update now** downloads the release and quits the game. A small window swaps the files and starts the new version.
+
+**How it works**
+- On every start (not in the Editor or on the game server), `GameUpdater` asks GitHub for the latest release.
+- It only offers the release when its tag (`v0.2.0`) is newer than this build's **Player Settings → Version**.
+- The update replaces the game's folders whole, so no old files stay behind. If it fails, it says so and links the releases page; the log is `%TEMP%\DefaultCompany\moba-test\update\install-update.log`.
+
+**Publishing a release**
+1. Merge what's going out into `main`.
+2. In Unity, raise **Project Settings → Player → Version** (e.g. `0.1.0` → `0.2.0`), then **MOBA → Build Windows Client**. The build writes its version to `version.txt` next to the exe.
+3. Publish it:
+   ```bash
+   .\moba release
+   ```
+   This zips `Builds/WindowsClient` as `MobaTest-Windows.zip` and creates the GitHub release `v<version>` on `main`. The notes list the PRs merged since the last release; use `-Notes "..."` to write your own. It refuses a version that's already released.
+
+**Testing an update without publishing:** start a build with `-update-feed <url>`, where the URL serves the same JSON as GitHub's latest-release API (with a `MobaTest-Windows.zip` asset).
+
 ## Testing helpers
 
 - **Cheat menu** (in a match, right side under Options):
