@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.85, g: 0.55, b: 0.25, a: 1}
   glyph: B
   prefab: {fileID: 5034245646948570538, guid: db2529743976f1840893bb08cead3b49, type: 3}
+  affinities:
+  - 0.25
+  - -0.2
+  - 0
+  - 0.1
+  - 0.05
+  - -0.1
+  spellColors:
+  - {r: 1, g: 0.55, b: 0.15, a: 1}
+  - {r: 0.85, g: 0.65, b: 0.3, a: 1}
+  - {r: 0.7, g: 0.2, b: 0.1, a: 1}
   passiveName: Masterwork Gear
   passiveDescription: Items give 10% more stats.
   extraProjectiles: 0

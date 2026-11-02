@@ -40,6 +40,9 @@ namespace Moba
         public bool destroyOnDeath = true;
         [Tooltip("Vision radius this unit gives its team (fog of war). 0 = none.")]
         public float sightRadius;
+        [Tooltip("Heroes: their base damage type (set from the HeroDefinition). Typed hits on them get the elemental " +
+                 "matchup (see DamageTypes); None takes every type normally.")]
+        public DamageType baseDamageType;
 
         [Header("Bounty (paid to the hero that lands the last hit)")]
         public int goldBounty;
@@ -72,11 +75,13 @@ namespace Moba
         void OnEnable() => s_All.Add(this);
         void OnDisable() => s_All.Remove(this);
 
-        public void TakeDamage(float amount, Unit source)
+        // `type`: the hit's damage type (None for auto attacks and untyped damage).
+        public void TakeDamage(float amount, Unit source, DamageType type = DamageType.None)
         {
             // On a game-server client the server deals all damage; health arrives through NetworkUnit.
             if (!IsTargetable || Net.NetSession.IsRemoteClient) return;
             if (source != null) amount = source.ModifyOutgoingDamage(this, amount);
+            amount *= DamageTypes.Matchup(type, baseDamageType);
             if (kind == UnitKind.Hero && source != null && source.kind == UnitKind.Hero && source.team != team)
                 _lastHitByHero[source] = Time.time;
             float dealt = Mathf.Min(amount, Health); // overkill doesn't count

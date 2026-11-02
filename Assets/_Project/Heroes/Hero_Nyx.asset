@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 0.85, g: 0.25, b: 0.4, a: 1}
   glyph: N
   prefab: {fileID: 723370757552622355, guid: f4b646396f898584ea93dc24d69b3328, type: 3}
+  affinities:
+  - 0
+  - -0.05
+  - 0.1
+  - -0.1
+  - 0.25
+  - 0.1
+  spellColors:
+  - {r: 0.85, g: 0.2, b: 0.35, a: 1}
+  - {r: 0.32, g: 0.1, b: 0.2, a: 1}
+  - {r: 1, g: 0.55, b: 0.65, a: 1}
   passiveName: Lone Prey
   passiveDescription: Deal 15% more damage to targets with no allied hero within
     7m of them.

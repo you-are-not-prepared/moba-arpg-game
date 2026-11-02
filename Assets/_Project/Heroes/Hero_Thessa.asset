@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 0.4, g: 0.85, b: 0.8, a: 1}
   glyph: Th
   prefab: {fileID: 4925609322593931462, guid: 0f0d4a7b929406f4186d3fd22a1290d2, type: 3}
+  affinities:
+  - -0.1
+  - 0.05
+  - 0.05
+  - 0.15
+  - -0.1
+  - 0.25
+  spellColors:
+  - {r: 0.4, g: 0.85, b: 0.8, a: 1}
+  - {r: 0.8, g: 0.97, b: 0.95, a: 1}
+  - {r: 0.7, g: 0.75, b: 0.78, a: 1}
   passiveName: Tailwind
   passiveDescription: Each spell you cast gives 25% movement speed for 2s (casting
     again refreshes it).

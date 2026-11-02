@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.55, g: 0.68, b: 0.85, a: 1}
   glyph: T
   prefab: {fileID: 1353840264158424968, guid: 9bcbb793f915c874eadae9ecb3420f82, type: 3}
+  affinities:
+  - -0.1
+  - 0.1
+  - 0.05
+  - -0.1
+  - 0.25
+  - -0.05
+  spellColors:
+  - {r: 0.55, g: 0.68, b: 0.85, a: 1}
+  - {r: 0.82, g: 0.85, b: 0.9, a: 1}
+  - {r: 0.95, g: 0.8, b: 0.35, a: 1}
   passiveName: Iron Hide
   passiveDescription: +50 max health per level, but moves 15% slower.
   extraProjectiles: 0

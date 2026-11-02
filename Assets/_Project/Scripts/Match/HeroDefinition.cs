@@ -19,6 +19,13 @@ namespace Moba
         public string glyph = "H";
         public HeroController prefab;
 
+        [Header("Damage types")]
+        [Tooltip("Affinity per type, in DamageTypes.All order (Fire, Frost, Nature, Lightning, Physical, Air): 0.25 = the " +
+                 "hero's spells of that type deal 25% more damage. The highest one is the hero's base damage type.")]
+        public float[] affinities = new float[DamageTypes.Count];
+        [Tooltip("The hero's spell colours (main, secondary, highlight).")]
+        public Color[] spellColors = { Color.white, Color.white, Color.white };
+
         [Header("Passive")]
         public string passiveName;
         [TextArea] public string passiveDescription;
@@ -63,11 +70,37 @@ namespace Moba
         [Tooltip("Locked into the R slot; bought spells go in Q/W/E.")]
         public AbilityDefinition ultimate;
 
-        // Applies the passive and the ultimate to a freshly spawned hero.
+        // The type with the highest affinity (None if the hero has none above 0).
+        public DamageType BaseDamageType
+        {
+            get
+            {
+                DamageType best = DamageType.None;
+                float bestValue = 0f;
+                for (int i = 0; i < DamageTypes.Count && affinities != null && i < affinities.Length; i++)
+                {
+                    if (affinities[i] <= bestValue) continue;
+                    bestValue = affinities[i];
+                    best = DamageTypes.All[i];
+                }
+                return best;
+            }
+        }
+
+        public float Affinity(DamageType type)
+        {
+            int i = DamageTypes.Index(type);
+            return i >= 0 && affinities != null && i < affinities.Length ? affinities[i] : 0f;
+        }
+
+        // Applies the damage types, the passive and the ultimate to a freshly spawned hero.
         public void ApplyTo(HeroController hero)
         {
             hero.definition = this;
             AbilityCaster caster = hero.Abilities;
+            hero.Unit.baseDamageType = BaseDamageType;
+            caster.affinities = new float[DamageTypes.Count];
+            if (affinities != null) System.Array.Copy(affinities, caster.affinities, Mathf.Min(affinities.Length, DamageTypes.Count));
             caster.passiveExtraProjectiles = extraProjectiles;
             caster.cooldownMultiplier = cooldownMultiplier;
             if (hero.TryGetComponent(out Inventory inventory)) inventory.SetStatMultiplier(itemStatMultiplier);

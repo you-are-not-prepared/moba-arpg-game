@@ -18,6 +18,7 @@ namespace Moba
         [Tooltip("Attack speed per stack (0.04 = 4%).")]
         public float attackSpeedPerStack = 0.04f;
         public float burstDamage = 50f;
+        public DamageType burstType = DamageType.Fire;
         public Material burstMaterial;
 
         static readonly List<Unit> s_Targets = new();
@@ -76,8 +77,8 @@ namespace Moba
             }
             foreach (Unit u in s_Targets)
             {
-                u.TakeDamage(burstDamage, _unit);
-                if (u.IsAlive) Burning.Apply(u, burstDamage * 0.5f / BurnSeconds, BurnSeconds, _unit);
+                u.TakeDamage(burstDamage, _unit, burstType);
+                if (u.IsAlive) Burning.Apply(u, burstDamage * 0.5f / BurnSeconds, BurnSeconds, _unit, burstType);
             }
             s_Targets.Clear();
             SpellExplosion.Spawn(center, BurstRadius, burstMaterial);

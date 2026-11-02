@@ -112,6 +112,24 @@ Building blocks the heroes added, ready for new spells and mods: **slows** (a st
 
 Melee heroes and creeps show each attack as a swing: the model lunges at the target while a slash arc sweeps across in front (`MeleeSwing`, shader `Moba/MeleeSlash`). On the game server, every player sees it.
 
+### Damage types
+Spells and ultimates deal one of six damage types: **Fire, Frost, Nature, Lightning, Physical, Air**. Auto attacks, creeps and towers stay untyped.
+- **Affinities:** every hero has an affinity per type (e.g. Oren: Fire +25%, Frost -20%). A spell of that type deals that much more or less damage when the hero casts it.
+- **Base damage type:** the hero's highest affinity. Champion select shows it with the full affinity hexagon; the Tab scoreboard and match details show it next to each hero.
+- **Matchups:** the types form a cycle, in the hexagon's order: **Fire > Frost > Nature > Lightning > Physical > Air > Fire**. A typed hit on a hero deals +10% if its type beats the hero's base type, and -10% if the hero's type beats it. Creeps, towers and cores take every type normally.
+- **Spell tooltips** name the type: "75 Fire damage".
+- **Spell colours:** every hero also has three spell colours (`HeroDefinition.spellColors`), for the hero-specific spell looks still to come.
+
+| Hero | Base type | Hero | Base type |
+|---|---|---|---|
+| Kael | Physical | Thessa | Air |
+| Vesh | Lightning | Oren | Fire |
+| Brann | Fire | Ilsa | Frost |
+| Torvald | Physical | Maela | Nature |
+| Nyx | Physical | Corvin | Lightning |
+
+The numbers are in `GameBuilder.Heroes()` (`Aff(...)`, `Colors(...)`); the cycle and type colours in `Scripts/DamageTypes.cs`.
+
 ### Ascension (levels 6, 11, 18)
 At levels 6, 11 and 18 talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
 - **Level 6** picks a path, one card per path: **A** builds on the hero's passive, **B** on the ultimate, and **C** is a hybrid playstyle that draws on both. The system supports 2–4 paths per hero.

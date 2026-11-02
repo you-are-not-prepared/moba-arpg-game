@@ -65,7 +65,11 @@ namespace Moba.UI
             player.AddToClassList("details-player");
             player.Add(Glyph(p.heroId, "history-mini"));
             VisualElement names = Block(null);
-            names.Add(Text($"{HeroName(p.heroId)}  ·  Lv {p.level}", "details-player__hero"));
+            var heroLine = Block("details-player__hero-line");
+            heroLine.Add(Text($"{HeroName(p.heroId)}  ·  Lv {p.level}", "details-player__hero"));
+            HeroDefinition hero = roster.Find(p.heroId);
+            if (hero != null) heroLine.Add(DamageTypeBadge.Create(hero.BaseDamageType, "damage-type--small"));
+            names.Add(heroLine);
             names.Add(Text(isMe ? "You" : p.isBot ? "Bot" : p.username ?? "Player", "details-player__name"));
             player.Add(names);
             row.Add(player);

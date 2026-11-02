@@ -55,6 +55,7 @@ namespace Moba.Abilities
                 Caster = caster,
                 Team = caster.team,
                 Damage = damage,
+                DamageType = m.damageType,
                 ExplosionRadius = explosionRadius,
                 BurnDps = m.burnFraction > 0f && m.burnDuration > 0f ? damage * m.burnFraction / m.burnDuration : 0f,
                 BurnDuration = m.burnDuration,
@@ -95,8 +96,8 @@ namespace Moba.Abilities
             var parts = new List<string>
             {
                 explosionRadius > 0f
-                    ? $"{damage:0} damage in a {explosionRadius:0.#}m explosion"
-                    : $"{damage:0} damage",
+                    ? $"{damage:0} {DamageWord(m)} in a {explosionRadius:0.#}m explosion"
+                    : $"{damage:0} {DamageWord(m)}",
             };
             int count = 1 + Mathf.Max(0, m.extraProjectiles);
             if (count > 1) parts.Add($"{count} projectiles");

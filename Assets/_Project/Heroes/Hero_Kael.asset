@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
   glyph: K
   prefab: {fileID: 2743056027716994260, guid: f72166844e96afa46b5e89a06b1b8bd2, type: 3}
+  affinities:
+  - -0.05
+  - -0.05
+  - 0.15
+  - -0.1
+  - 0.25
+  - 0.05
+  spellColors:
+  - {r: 0.33, g: 0.6, b: 0.22, a: 1}
+  - {r: 0.62, g: 0.85, b: 0.4, a: 1}
+  - {r: 0.66, g: 0.68, b: 0.72, a: 1}
   passiveName: Split Shot
   passiveDescription: Your projectile spells fire 1 extra projectile.
   extraProjectiles: 1

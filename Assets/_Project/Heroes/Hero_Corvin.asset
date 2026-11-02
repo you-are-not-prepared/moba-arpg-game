@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 0.65, g: 0.45, b: 1, a: 1}
   glyph: C
   prefab: {fileID: 3355695303883840071, guid: fe484096f79b13148ae15ec3d4062084, type: 3}
+  affinities:
+  - 0
+  - -0.05
+  - -0.15
+  - 0.25
+  - -0.1
+  - 0.15
+  spellColors:
+  - {r: 0.6, g: 0.35, b: 1, a: 1}
+  - {r: 0.65, g: 0.85, b: 1, a: 1}
+  - {r: 0.95, g: 0.95, b: 1, a: 1}
   passiveName: Static Charge
   passiveDescription: 'Every 4th spell you cast is charged: its first hit jumps to
     1 more enemy within 5m for 50% damage.'

@@ -1178,3 +1178,73 @@
     margin-left: 10px;
     font-size: 15px;
 }
+
+/* ---------- Damage type badge (also in Hud.uss) ---------- */
+
+.damage-type {
+    flex-direction: row;
+    align-items: center;
+}
+
+.damage-type__dot {
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    border-radius: 6px;
+}
+
+.damage-type__name {
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.damage-type--small .damage-type__dot {
+    width: 9px;
+    height: 9px;
+    margin-right: 4px;
+    border-radius: 5px;
+}
+
+.damage-type--small .damage-type__name {
+    font-size: 12px;
+}
+
+.hero-detail__type-block {
+    margin-left: auto;
+    align-self: flex-start;
+    align-items: flex-end;
+}
+
+.hero-detail__type .damage-type__dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+}
+
+.hero-detail__type .damage-type__name {
+    font-size: 22px;
+}
+
+.hero-detail__affinities {
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.affinity-hex__label {
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.details-player__hero-line {
+    flex-direction: row;
+    align-items: center;
+}
+
+.details-player__hero-line .damage-type {
+    margin-left: 8px;
+}

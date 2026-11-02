@@ -19,6 +19,7 @@ MonoBehaviour:
   color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
   glyph: FB
   tags: 7
+  damageType: 1
   targeting: 1
   unitFilter: 0
   range: 0

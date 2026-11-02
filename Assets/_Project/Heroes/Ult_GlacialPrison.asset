@@ -20,6 +20,7 @@ MonoBehaviour:
   color: {r: 0.55, g: 0.8, b: 1, a: 1}
   glyph: GP
   tags: 0
+  damageType: 2
   targeting: 1
   unitFilter: 0
   range: 9

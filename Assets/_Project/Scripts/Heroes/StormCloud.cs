@@ -14,6 +14,7 @@ namespace Moba
 
         Unit _unit;
         float _remaining, _interval, _radius, _damage, _nextStrike;
+        DamageType _damageType;
         Material _bolt;
         bool _visualOnly;
         Transform _cloud;
@@ -23,7 +24,7 @@ namespace Moba
         public float Remaining => _remaining;
 
         public static void Apply(Unit unit, float duration, float interval, float radius, float damage, Material cloudMaterial,
-            Material boltMaterial)
+            Material boltMaterial, DamageType damageType = DamageType.None)
         {
             if (unit == null || !unit.IsAlive || duration <= 0f) return;
             StormCloud storm = Get(unit);
@@ -32,6 +33,7 @@ namespace Moba
             storm._interval = Mathf.Max(0.1f, interval);
             storm._radius = radius;
             storm._damage = damage;
+            storm._damageType = damageType;
             storm._bolt = boltMaterial;
             storm._nextStrike = 0f;
         }
@@ -133,7 +135,7 @@ namespace Moba
             Unit target = s_Candidates[Random.Range(0, s_Candidates.Count)];
             s_Candidates.Clear();
             LightningBolt.Spawn(_cloud.position, target.AimPoint, _bolt, _unit.team);
-            target.TakeDamage(_damage, _unit);
+            target.TakeDamage(_damage, _unit, _damageType);
             SpellEvents.RaiseHit(_unit, target, _damage);
         }
     }

@@ -21,6 +21,9 @@ namespace Moba.Abilities
     public abstract class AbilityDefinition : InventoryItem
     {
         public SpellTags tags;
+        [Tooltip("The damage this spell deals. The caster's affinity for it scales the damage, and hits on heroes get the " +
+                 "elemental matchup. None for spells that deal no damage.")]
+        public DamageType damageType;
 
         [Header("Targeting")]
         public AbilityTargeting targeting = AbilityTargeting.Instant;
@@ -52,6 +55,13 @@ namespace Moba.Abilities
 
         // Rank- and mod-aware summary for tooltips, e.g. "85 fire damage in a 2.5m radius".
         public virtual string Describe(int rank, in SpellModifiers modifiers) => "";
+
+        // "Fire damage" (the type it deals for this caster, else its own), or just "damage" when untyped.
+        protected string DamageWord(in SpellModifiers modifiers)
+        {
+            DamageType type = modifiers.damageType != DamageType.None ? modifiers.damageType : damageType;
+            return type == DamageType.None ? "damage" : $"{DamageTypes.Name(type)} damage";
+        }
 
         public virtual bool IsValidTarget(Unit caster, Unit target)
         {

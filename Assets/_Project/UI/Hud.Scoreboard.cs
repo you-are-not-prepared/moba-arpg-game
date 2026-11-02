@@ -102,7 +102,10 @@ namespace Moba.UI
                 portrait.Add(_respawn);
                 heroCell.Add(portrait);
                 VisualElement names = Element(null);
-                names.Add(Text(def != null ? def.displayName : hero.name, "score-hero__name"));
+                VisualElement nameLine = Element("score-hero__name-line");
+                nameLine.Add(Text(def != null ? def.displayName : hero.name, "score-hero__name"));
+                if (def != null) nameLine.Add(DamageTypeBadge.Create(def.BaseDamageType, "damage-type--small"));
+                names.Add(nameLine);
                 names.Add(Text(player, "score-hero__player"));
                 heroCell.Add(names);
                 Root.Add(heroCell);

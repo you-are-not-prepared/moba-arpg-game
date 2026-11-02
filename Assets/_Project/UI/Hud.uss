@@ -1417,3 +1417,44 @@
     border-color: var(--path-d);
     color: var(--path-d);
 }
+
+/* ---------- Damage type badge (also in Frontend.uss) ---------- */
+
+.damage-type {
+    flex-direction: row;
+    align-items: center;
+}
+
+.damage-type__dot {
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    border-radius: 6px;
+}
+
+.damage-type__name {
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.damage-type--small .damage-type__dot {
+    width: 9px;
+    height: 9px;
+    margin-right: 4px;
+    border-radius: 5px;
+}
+
+.damage-type--small .damage-type__name {
+    font-size: 12px;
+}
+
+.score-hero__name-line {
+    flex-direction: row;
+    align-items: center;
+}
+
+.score-hero__name-line .damage-type {
+    margin-left: 6px;
+}
