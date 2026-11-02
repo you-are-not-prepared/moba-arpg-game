@@ -21,5 +21,9 @@ namespace Moba.Items
 
         // One-line summary of what the item gives (e.g. "+10 attack damage").
         public virtual string StatsText => "";
+
+        // The name and glyph as `holder` sees them (adaptive spells take the hero's version; null = generic).
+        public virtual string NameFor(Unit holder) => displayName;
+        public virtual string GlyphFor(Unit holder) => glyph;
     }
 }

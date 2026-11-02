@@ -538,6 +538,7 @@ namespace Moba.EditorTools
             // Shared assets, saved to disk first. A throwaway scene hosts the temporary objects prefab building creates.
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Mats m = CreateMaterials();
+            CreateSpellLooks(m);
             CreateItems(m);
             CreateCreepPrefab("Creep_Melee", m, ranged: false);
             CreateCreepPrefab("Creep_Ranged", m, ranged: true);
@@ -1086,7 +1087,10 @@ namespace Moba.EditorTools
                     "Two hands, no regrets."),
                 Item("Executioner", "Executioner", 3000, 70f, "EX", new Color(0.75f, 0.25f, 0.25f),
                     "The finishing blow, sharpened."),
-                Fireball(m),
+                Projectile(m),
+                Burst(),
+                Cleave(),
+                Lunge(),
                 Mod("Mod_Volley", "Volley", 500, "VO", new Color(0.3f, 0.55f, 0.85f),
                     "The spell fires 2 extra projectiles in a fan.",
                     SpellTags.Projectile, mod => mod.extraProjectiles = 2),
@@ -1127,16 +1131,51 @@ namespace Moba.EditorTools
             return item;
         }
 
-        static ProjectileSpell Fireball(Mats m)
+        // The tinted materials adaptive spells are drawn with (SpellLook loads them from Resources).
+        static void CreateSpellLooks(Mats m)
         {
-            var spell = LoadOrCreate<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset");
-            spell.displayName = "Fireball";
-            spell.damageType = DamageType.Fire;
-            spell.description = "Hurls a fireball that explodes on the first enemy it hits.";
-            spell.cost = Price(450);
-            spell.glyph = "FB";
-            spell.color = TestKindColors ? TestSpellColor : new Color(0.9f, 0.42f, 0.1f);
-            spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect | SpellTags.Fire;
+            EnsureFolder(ResourcesDir);
+            var library = LoadOrCreate<SpellLookLibrary>($"{ResourcesDir}/{SpellLookLibrary.ResourcePath}.asset");
+            library.glow = m.Fire;
+            library.lines = m.Lightning;
+            library.ring = m.FrostWarning;
+            library.slash = m.MeleeSlash;
+            EditorUtility.SetDirty(library);
+        }
+
+        // Adaptive shop spells: a blank slate that takes the caster's base damage type, name and look.
+        static T Adaptive<T>(string id, string name, string description, int cost, string glyph, string[] names,
+            string[] glyphs) where T : AbilityDefinition
+        {
+            var spell = LoadOrCreate<T>($"{ItemsDir}/{id}.asset");
+            spell.displayName = name;
+            spell.description = description;
+            spell.cost = Price(cost);
+            spell.glyph = glyph;
+            spell.color = TestKindColors ? TestSpellColor : new Color(0.55f, 0.6f, 0.7f);
+            spell.adaptive = true;
+            spell.damageType = DamageType.None;
+            spell.typeNames = names;
+            spell.typeGlyphs = glyphs;
+            return spell;
+        }
+
+        // Fire, Frost, Nature, Lightning, Physical, Air.
+        static string[] PerType(string fire, string frost, string nature, string lightning, string physical, string air) =>
+            new[] { fire, frost, nature, lightning, physical, air };
+
+        static ProjectileSpell Projectile(Mats m)
+        {
+            // Was Spell_Fireball: moving the asset keeps its GUID, so scenes and prefabs still point at it.
+            const string path = ItemsDir + "/Spell_Projectile.asset";
+            if (AssetDatabase.LoadAssetAtPath<ProjectileSpell>(path) == null
+                && AssetDatabase.LoadAssetAtPath<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset") != null)
+                AssetDatabase.MoveAsset($"{ItemsDir}/Spell_Fireball.asset", path);
+            var spell = Adaptive<ProjectileSpell>("Spell_Projectile", "Projectile",
+                "Fires a projectile that explodes on the first enemy it hits. It takes your hero's damage type and look.",
+                450, "PR", PerType("Fireball", "Ice Shard", "Thorn", "Spark", "Arrow", "Wind Blade"),
+                PerType("FB", "IS", "TH", "SP", "AR", "WB"));
+            spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect;
             spell.targeting = AbilityTargeting.Point;
             spell.range = 0f; // skillshot: fires immediately toward the clicked point
             spell.cooldownByRank = new[] { 1.5f, 1.4f, 1.3f, 1.2f, 1f };
@@ -1152,6 +1191,65 @@ namespace Moba.EditorTools
             spell.spreadAngle = 15f;
             spell.projectileMaterial = m.Fire;
             spell.explosionMaterial = m.Explosion;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static BurstSpell Burst()
+        {
+            var spell = Adaptive<BurstSpell>("Spell_Burst", "Burst",
+                "Marks a circle; after a moment everything inside is hit. It takes your hero's damage type and look.",
+                500, "BU", PerType("Meteor", "Ice Spikes", "Thornburst", "Lightning Strike", "Arrow Rain", "Cyclone"),
+                PerType("ME", "IC", "TB", "LS", "RA", "CY"));
+            spell.tags = SpellTags.AreaOfEffect;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 9f;
+            spell.radius = 2.5f;
+            spell.areaRadius = spell.radius;
+            spell.delay = 0.6f;
+            spell.damageByRank = new[] { 80f, 110f, 140f, 170f, 200f };
+            spell.cooldownByRank = new[] { 6f, 5.5f, 5f, 4.5f, 4f };
+            spell.manaCostByRank = new[] { 50f, 55f, 60f, 65f, 70f };
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static MeleeSpell Cleave()
+        {
+            var spell = Adaptive<MeleeSpell>("Spell_Cleave", "Cleave",
+                "A wide swing that hits every enemy in front of you. It takes your hero's damage type and look.",
+                400, "CL", PerType("Flame Arc", "Frost Arc", "Bramble Swipe", "Storm Arc", "Cleave", "Gale Arc"),
+                PerType("FA", "FR", "BS", "SA", "CL", "GA"));
+            spell.tags = SpellTags.Melee | SpellTags.AreaOfEffect;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 0f;
+            spell.lunge = false;
+            spell.reach = 3f;
+            spell.coneAngle = 120f;
+            spell.damageByRank = new[] { 70f, 100f, 130f, 160f, 190f };
+            spell.cooldownByRank = new[] { 4f, 3.75f, 3.5f, 3.25f, 3f };
+            spell.manaCostByRank = new[] { 30f, 33f, 36f, 39f, 42f };
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static MeleeSpell Lunge()
+        {
+            var spell = Adaptive<MeleeSpell>("Spell_Lunge", "Lunge",
+                "Dashes to a point and hits every enemy around where you land. It takes your hero's damage type and look.",
+                450, "LU", PerType("Flame Dash", "Frost Dash", "Root Leap", "Thunder Dash", "Lunge", "Gust Dash"),
+                PerType("FD", "FD", "RL", "TD", "LU", "GD"));
+            spell.tags = SpellTags.Melee | SpellTags.AreaOfEffect;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 6f;
+            spell.areaRadius = 2.2f;
+            spell.lunge = true;
+            spell.lungeSeconds = 0.25f;
+            spell.lungeHeight = 0.8f;
+            spell.landingRadius = 2.2f;
+            spell.damageByRank = new[] { 60f, 85f, 110f, 135f, 160f };
+            spell.cooldownByRank = new[] { 8f, 7.5f, 7f, 6.5f, 6f };
+            spell.manaCostByRank = new[] { 40f, 44f, 48f, 52f, 56f };
             EditorUtility.SetDirty(spell);
             return spell;
         }

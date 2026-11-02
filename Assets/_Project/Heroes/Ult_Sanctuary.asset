@@ -21,6 +21,21 @@ MonoBehaviour:
   glyph: SN
   tags: 0
   damageType: 3
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 1
   unitFilter: 0
   range: 8

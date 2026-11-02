@@ -21,6 +21,21 @@ MonoBehaviour:
   glyph: GP
   tags: 0
   damageType: 2
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 1
   unitFilter: 0
   range: 9

@@ -9,7 +9,8 @@ namespace Moba.Abilities
         float _age;
         float _radius;
 
-        public static void Spawn(Vector3 center, float radius, Material material)
+        // `broadcast: false` when the clients are told some other way (SpellLook.Play).
+        public static void Spawn(Vector3 center, float radius, Material material, bool broadcast = true)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             go.name = "SpellExplosion";
@@ -19,7 +20,7 @@ namespace Moba.Abilities
             var e = go.AddComponent<SpellExplosion>();
             e._radius = radius;
             e.UpdateScale();
-            if (Net.NetworkMatch.Instance != null) Net.NetworkMatch.Instance.BroadcastExplosion(center, radius, material);
+            if (broadcast && Net.NetworkMatch.Instance != null) Net.NetworkMatch.Instance.BroadcastExplosion(center, radius, material);
         }
 
         void Update()

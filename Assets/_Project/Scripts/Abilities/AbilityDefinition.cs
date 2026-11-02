@@ -24,6 +24,13 @@ namespace Moba.Abilities
         [Tooltip("The damage this spell deals. The caster's affinity for it scales the damage, and hits on heroes get the " +
                  "elemental matchup. None for spells that deal no damage.")]
         public DamageType damageType;
+        [Tooltip("A blank-slate shop spell: it deals the caster's base damage type and takes the hero's look and colours " +
+                 "(damageType is ignored).")]
+        public bool adaptive;
+        [Tooltip("Adaptive spells: the name per type, in DamageTypes.All order (Fireball, Ice Shard...).")]
+        public string[] typeNames = new string[DamageTypes.Count];
+        [Tooltip("Adaptive spells: the slot glyph per type, in DamageTypes.All order.")]
+        public string[] typeGlyphs = new string[DamageTypes.Count];
 
         [Header("Targeting")]
         public AbilityTargeting targeting = AbilityTargeting.Instant;
@@ -40,6 +47,23 @@ namespace Moba.Abilities
         public float[] manaCostByRank = { 50f };
 
         public override string KindLabel => "Spell";
+
+        // The hero's version of an adaptive spell: "Fireball" for a Fire hero, "Projectile" without one.
+        public override string NameFor(Unit holder) =>
+            Adapted(holder, typeNames, out string name) ? name : displayName;
+
+        public override string GlyphFor(Unit holder) =>
+            Adapted(holder, typeGlyphs, out string glyph) ? glyph : this.glyph;
+
+        bool Adapted(Unit holder, string[] values, out string value)
+        {
+            value = null;
+            if (!adaptive || holder == null || values == null) return false;
+            int i = DamageTypes.Index(holder.baseDamageType);
+            if (i < 0 || i >= values.Length || string.IsNullOrEmpty(values[i])) return false;
+            value = values[i];
+            return true;
+        }
 
         public float Cooldown(int rank) => ByRank(cooldownByRank, rank);
         public float ManaCost(int rank) => ByRank(manaCostByRank, rank);

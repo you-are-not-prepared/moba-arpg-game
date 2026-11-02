@@ -195,8 +195,12 @@ namespace Moba.Abilities
 
         // ---------- Damage types ----------
 
-        // The type `spell` deals when this unit casts it.
-        public DamageType DamageTypeOf(AbilityDefinition spell) => spell != null ? spell.damageType : DamageType.None;
+        // The type `spell` deals when this unit casts it: its own, or the hero's base type for an adaptive spell.
+        public DamageType DamageTypeOf(AbilityDefinition spell)
+        {
+            if (spell == null) return DamageType.None;
+            return spell.adaptive ? _unit != null ? _unit.baseDamageType : GetComponent<Unit>().baseDamageType : spell.damageType;
+        }
 
         // 1.25 for a +25% affinity; 1 for untyped damage.
         public float AffinityMultiplier(DamageType type)

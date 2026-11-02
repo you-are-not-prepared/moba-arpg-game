@@ -147,9 +147,33 @@ namespace Moba.Net
             if (!IsSpawned || !IsServer) return 0;
             int id = ++_nextProjectileId;
             SpellProjectileClientRpc(id, position, direction, p.Speed, p.MaxDistance, p.Size, (byte)p.Team,
-                NetItems.MaterialId(p.ProjectileMaterial));
+                NetItems.MaterialId(p.ProjectileMaterial), (byte)p.Look, Reference(p.Caster));
             return id;
         }
+
+        // Server: show an adaptive spell's effect (SpellLook) on every client.
+        public void BroadcastLook(SpellLookKind kind, DamageType type, Unit caster, Vector3 position, Vector3 direction,
+            float radius, float delay)
+        {
+            if (IsSpawned && IsServer)
+                LookClientRpc((byte)kind, (byte)type, Reference(caster), position, direction, radius, delay);
+        }
+
+        [ClientRpc]
+        void LookClientRpc(byte kind, byte type, NetworkObjectReference caster, Vector3 position, Vector3 direction,
+            float radius, float delay)
+        {
+            if (IsServer) return;
+            SpellLook.Play((SpellLookKind)kind, (DamageType)type, Resolve(caster), position, direction, radius, delay,
+                broadcast: false);
+        }
+
+        // A unit as an RPC argument (an empty reference if it isn't a spawned network object).
+        static NetworkObjectReference Reference(Unit unit) =>
+            unit != null && unit.TryGetComponent(out NetworkObject n) && n.IsSpawned ? new NetworkObjectReference(n) : default;
+
+        static Unit Resolve(NetworkObjectReference reference) =>
+            reference.TryGet(out NetworkObject n) ? n.GetComponent<Unit>() : null;
 
         public void BroadcastSpellProjectileEnd(int id, Vector3 position)
         {
@@ -164,11 +188,14 @@ namespace Moba.Net
 
         [ClientRpc]
         void SpellProjectileClientRpc(int id, Vector3 position, Vector3 direction, float speed, float maxDistance, float size,
-            byte team, short material)
+            byte team, short material, byte look, NetworkObjectReference caster)
         {
             if (IsServer) return;
             var payload = new SpellProjectile.Payload
             {
+                // Only for the look's colours: visual projectiles never deal damage.
+                Caster = Resolve(caster),
+                Look = (DamageType)look,
                 Team = (Team)team,
                 Speed = speed,
                 MaxDistance = maxDistance,

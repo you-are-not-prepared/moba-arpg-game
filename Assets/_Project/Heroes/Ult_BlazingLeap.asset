@@ -21,6 +21,21 @@ MonoBehaviour:
   glyph: BL
   tags: 0
   damageType: 1
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 1
   unitFilter: 0
   range: 6

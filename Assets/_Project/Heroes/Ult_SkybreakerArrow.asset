@@ -21,6 +21,21 @@ MonoBehaviour:
   glyph: SA
   tags: 1
   damageType: 5
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 1
   unitFilter: 0
   range: 0
