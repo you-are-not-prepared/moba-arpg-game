@@ -1116,3 +1116,65 @@
     background-color: rgb(40, 20, 20);
     color: rgb(240, 150, 140);
 }
+
+/* ---------- Version and updates ---------- */
+
+.version-label {
+    position: absolute;
+    left: 24px;
+    bottom: 16px;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.update-bar {
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+    width: 420px;
+    padding: 16px 18px;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: var(--accent-border);
+    background-color: var(--panel);
+}
+
+.update-bar__title {
+    padding: 0;
+    margin: 0 0 6px 0;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: var(--gold);
+    white-space: normal;
+}
+
+.update-bar__notes {
+    padding: 0;
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    white-space: normal;
+}
+
+.update-bar__status {
+    padding: 0;
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    color: var(--text);
+    white-space: normal;
+}
+
+.update-bar__buttons {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.update-bar__button {
+    height: 38px;
+    padding: 0 18px;
+    margin-left: 10px;
+    font-size: 15px;
+}

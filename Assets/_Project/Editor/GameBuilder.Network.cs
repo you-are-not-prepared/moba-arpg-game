@@ -116,9 +116,16 @@ namespace Moba.EditorTools
             else Debug.Log(message);
         }
 
-        public static bool BuildWindowsClient(out string message) =>
-            Build(BuildTarget.StandaloneWindows64, StandaloneBuildSubtarget.Player, ClientBuildDir, ClientExecutable,
-                "Client", out message);
+        // version.txt next to the exe tells "moba release" which version this build is (Player Settings > Version).
+        public static bool BuildWindowsClient(out string message)
+        {
+            if (!Build(BuildTarget.StandaloneWindows64, StandaloneBuildSubtarget.Player, ClientBuildDir, ClientExecutable,
+                    "Client", out message))
+                return false;
+            File.WriteAllText(Path.Combine(ClientBuildDir, "version.txt"), PlayerSettings.bundleVersion);
+            message += $" Version {PlayerSettings.bundleVersion}.";
+            return true;
+        }
 
         static bool Build(BuildTarget target, StandaloneBuildSubtarget subtarget, string dir, string executable, string label,
             out string message)
