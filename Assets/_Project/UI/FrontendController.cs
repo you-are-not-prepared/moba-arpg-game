@@ -96,6 +96,7 @@ namespace Moba.UI
             SetUpItemTooltip(root);
             SetUpPostMatch(root);
             SetUpLobby(root);
+            SetUpUpdater(root);
             Net.GameClient.ConnectFailed += OnConnectFailed;
             // Dropped from a game server mid-match: say why on the start screen.
             var startMessage = root.Q<Label>("startMessage");
@@ -293,6 +294,7 @@ namespace Moba.UI
             _historyScreen.EnableInClassList("hidden", screen != _historyScreen);
             _postMatchScreen.EnableInClassList("hidden", screen != _postMatchScreen);
             HideItemTooltip(_itemTooltipAnchor);
+            RefreshUpdateBar(screen);
         }
 
         void Update()

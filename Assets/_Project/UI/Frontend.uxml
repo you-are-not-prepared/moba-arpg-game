@@ -125,6 +125,17 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <ui:Label name="versionLabel" class="version-label" picking-mode="Ignore" />
+        <ui:VisualElement name="updateBar" class="update-bar hidden">
+            <ui:Label name="updateTitle" class="update-bar__title" />
+            <ui:Label name="updateNotes" class="update-bar__notes" />
+            <ui:Label name="updateStatus" class="update-bar__status hidden" />
+            <ui:VisualElement class="update-bar__buttons">
+                <ui:Button name="updateLaterButton" class="fe-button update-bar__button" text="Later" />
+                <ui:Button name="updateNowButton" class="fe-button fe-button--primary update-bar__button" text="Update now" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
         <ui:VisualElement name="itemTooltip" class="item-tooltip hidden" picking-mode="Ignore">
             <ui:Label name="itemTooltipTitle" class="item-tooltip__title" picking-mode="Ignore" />
             <ui:Label name="itemTooltipStats" class="item-tooltip__stats" picking-mode="Ignore" />
