@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 1, g: 0.45, b: 0.2, a: 1}
   glyph: O
   prefab: {fileID: 8974533869058034922, guid: bff3ad6219f9ce448989217ae9ae9070, type: 3}
+  affinities:
+  - 0.25
+  - -0.2
+  - -0.05
+  - 0.05
+  - 0.1
+  - -0.1
+  spellColors:
+  - {r: 0.9, g: 0.25, b: 0.15, a: 1}
+  - {r: 1, g: 0.55, b: 0.15, a: 1}
+  - {r: 1, g: 0.82, b: 0.3, a: 1}
   passiveName: Kindled Blade
   passiveDescription: Each attack builds Heat (up to 5, +4% attack speed each). At
     5, your next attack bursts for 50 fire damage around the target and burns.

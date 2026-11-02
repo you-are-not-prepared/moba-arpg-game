@@ -20,6 +20,7 @@ MonoBehaviour:
   color: {r: 1, g: 0.45, b: 0.2, a: 1}
   glyph: BL
   tags: 0
+  damageType: 1
   targeting: 1
   unitFilter: 0
   range: 6

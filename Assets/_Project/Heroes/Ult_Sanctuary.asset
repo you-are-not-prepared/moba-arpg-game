@@ -20,6 +20,7 @@ MonoBehaviour:
   color: {r: 0.45, g: 0.8, b: 0.35, a: 1}
   glyph: SN
   tags: 0
+  damageType: 3
   targeting: 1
   unitFilter: 0
   range: 8

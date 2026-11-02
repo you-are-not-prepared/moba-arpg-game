@@ -28,7 +28,7 @@ namespace Moba
         public static void BurnOnHit(Unit attacker, Unit target)
         {
             if (attacker.TryGetComponent(out BurningBlades blades) && blades.enabled && target.IsAlive)
-                Burning.Apply(target, blades._burnPerSecond, BurnSeconds, attacker);
+                Burning.Apply(target, blades._burnPerSecond, BurnSeconds, attacker, DamageType.Fire);
         }
 
         void Awake() => _unit = GetComponent<Unit>();

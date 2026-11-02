@@ -19,6 +19,7 @@ MonoBehaviour:
   color: {r: 0.85, g: 0.55, b: 0.25, a: 1}
   glyph: OS
   tags: 0
+  damageType: 0
   targeting: 0
   unitFilter: 0
   range: 6

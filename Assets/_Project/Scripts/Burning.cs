@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Moba
 {
     // Damage over time. Re-applying refreshes the duration and keeps the stronger burn (they don't stack).
-    // Damage is credited to the source, so a burn can land the last hit.
+    // Damage is credited to the source, so a burn can land the last hit, and has the damage type of what set it.
     [DisallowMultipleComponent]
     public class Burning : MonoBehaviour
     {
@@ -11,16 +11,18 @@ namespace Moba
 
         Unit _unit;
         Unit _source;
+        DamageType _type;
         float _dps;
         float _remaining;
         float _tick;
         float _pending;
 
-        public static void Apply(Unit target, float damagePerSecond, float duration, Unit source)
+        public static void Apply(Unit target, float damagePerSecond, float duration, Unit source,
+            DamageType type = DamageType.None)
         {
             if (target == null || !target.IsAlive || damagePerSecond <= 0f || duration <= 0f) return;
             if (!target.TryGetComponent(out Burning burn)) burn = target.gameObject.AddComponent<Burning>();
-            burn.Refresh(damagePerSecond, duration, source);
+            burn.Refresh(damagePerSecond, duration, source, type);
         }
 
         // Game-server clients: shown burning for as long as the server says (the server deals the damage).
@@ -41,12 +43,13 @@ namespace Moba
 
         void Awake() => _unit = GetComponent<Unit>();
 
-        void Refresh(float dps, float duration, Unit source)
+        void Refresh(float dps, float duration, Unit source, DamageType type)
         {
             if (_remaining <= 0f || dps >= _dps)
             {
                 _dps = dps;
                 _source = source;
+                _type = type;
             }
             _remaining = Mathf.Max(_remaining, duration);
             enabled = true;
@@ -72,7 +75,7 @@ namespace Moba
             _tick = 0f;
             float damage = _pending;
             _pending = 0f;
-            _unit.TakeDamage(damage, _source);
+            _unit.TakeDamage(damage, _source, _type);
         }
     }
 }

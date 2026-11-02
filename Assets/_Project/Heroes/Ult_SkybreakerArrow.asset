@@ -20,6 +20,7 @@ MonoBehaviour:
   color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
   glyph: SA
   tags: 1
+  damageType: 5
   targeting: 1
   unitFilter: 0
   range: 0

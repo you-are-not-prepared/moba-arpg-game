@@ -44,6 +44,10 @@ namespace Moba.Abilities
         [Tooltip("The ultimate slot holds the hero's own ultimate: it can't be swapped or unequipped.")]
         public bool ultimateLocked;
 
+        [Header("Damage types (set from the HeroDefinition)")]
+        [Tooltip("Per type, in DamageTypes.All order: 0.25 = spells of that type deal 25% more damage.")]
+        public float[] affinities = new float[DamageTypes.Count];
+
         Unit _unit;
         HeroProgression _progression;
         bool _noCooldowns;
@@ -189,11 +193,25 @@ namespace Moba.Abilities
             return mod != null && socket < SocketCount(index) && mod.Supports(slots[index].ability);
         }
 
+        // ---------- Damage types ----------
+
+        // The type `spell` deals when this unit casts it.
+        public DamageType DamageTypeOf(AbilityDefinition spell) => spell != null ? spell.damageType : DamageType.None;
+
+        // 1.25 for a +25% affinity; 1 for untyped damage.
+        public float AffinityMultiplier(DamageType type)
+        {
+            int i = DamageTypes.Index(type);
+            return i >= 0 && affinities != null && i < affinities.Length ? 1f + affinities[i] : 1f;
+        }
+
         public SpellModifiers BuildModifiers(int index)
         {
             SpellModifiers m = SpellModifiers.None;
             m.extraProjectiles += passiveExtraProjectiles;
             m.damageMultiplier *= spellDamageMultiplier;
+            m.damageType = DamageTypeOf(slots[index].ability);
+            m.damageMultiplier *= AffinityMultiplier(m.damageType);
             for (int i = 0; i < MaxModSockets; i++)
                 if (IsModActive(index, i)) slots[index].mods[i].Apply(ref m);
             return m;

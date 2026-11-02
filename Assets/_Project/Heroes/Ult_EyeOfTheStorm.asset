@@ -20,6 +20,7 @@ MonoBehaviour:
   color: {r: 0.4, g: 0.85, b: 0.8, a: 1}
   glyph: ES
   tags: 0
+  damageType: 0
   targeting: 0
   unitFilter: 0
   range: 0

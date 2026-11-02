@@ -15,6 +15,7 @@ namespace Moba.Abilities
             public Unit Caster;
             public Team Team;
             public float Damage;
+            public DamageType DamageType;
             public float ExplosionRadius;
             public float BurnDps;
             public float BurnDuration;
@@ -210,7 +211,7 @@ namespace Moba.Abilities
                 struck.Add(next);
                 float damage = _p.Damage * _p.ChainFraction;
                 LightningBolt.Spawn(previous.AimPoint, next.AimPoint, _p.BoltMaterial, _p.Team);
-                next.TakeDamage(damage, _p.Caster);
+                next.TakeDamage(damage, _p.Caster, _p.DamageType);
                 SpellEvents.RaiseHit(_p.Caster, next, damage);
                 previous = next;
             }
@@ -236,9 +237,9 @@ namespace Moba.Abilities
 
             foreach (Unit u in s_Targets)
             {
-                u.TakeDamage(_p.Damage, _p.Caster);
+                u.TakeDamage(_p.Damage, _p.Caster, _p.DamageType);
                 SpellEvents.RaiseHit(_p.Caster, u, _p.Damage);
-                if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster);
+                if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster, _p.DamageType);
                 if (_p.StunDuration > 0f && u.IsAlive) Stun.Apply(u, _p.StunDuration);
             }
             s_Targets.Clear();

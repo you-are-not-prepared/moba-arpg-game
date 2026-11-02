@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 0.55, g: 0.8, b: 1, a: 1}
   glyph: I
   prefab: {fileID: 3416483568043818427, guid: 13818915ca7790a428ea3636d234dfe7, type: 3}
+  affinities:
+  - -0.2
+  - 0.25
+  - 0.05
+  - 0
+  - -0.1
+  - 0.1
+  spellColors:
+  - {r: 0.15, g: 0.45, b: 0.95, a: 1}
+  - {r: 0.45, g: 0.8, b: 1, a: 1}
+  - {r: 0.95, g: 0.98, b: 1, a: 1}
   passiveName: Chilling Touch
   passiveDescription: Your spell hits slow enemies by 20% for 1.5s. Slowed enemies
     take 10% more damage from you.

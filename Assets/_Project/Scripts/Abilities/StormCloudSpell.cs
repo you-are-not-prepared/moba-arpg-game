@@ -26,12 +26,13 @@ namespace Moba.Abilities
 
         public override void Execute(in AbilityCastContext context) =>
             StormCloud.Apply(context.Caster, Duration(context.Rank) + HeroAscension.DurationBonusOf(context.Caster), interval,
-                radius, DamageAt(context.Rank) * context.Modifiers.damageMultiplier, cloudMaterial, boltMaterial);
+                radius, DamageAt(context.Rank) * context.Modifiers.damageMultiplier, cloudMaterial, boltMaterial,
+                context.Modifiers.damageType);
 
         public override string StatsText => Describe(1, SpellModifiers.None);
 
         public override string Describe(int rank, in SpellModifiers modifiers) =>
             $"For {Duration(rank):0.#}s, strikes an enemy within {radius:0.#}m every {interval:0.##}s for " +
-            $"{DamageAt(rank) * modifiers.damageMultiplier:0} damage (heroes first)";
+            $"{DamageAt(rank) * modifiers.damageMultiplier:0} {DamageWord(modifiers)} (heroes first)";
     }
 }

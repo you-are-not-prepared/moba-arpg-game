@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 0.45, g: 0.8, b: 0.35, a: 1}
   glyph: M
   prefab: {fileID: 9092578508943111669, guid: 5c92f164dd9c22040b8a524242c51232, type: 3}
+  affinities:
+  - -0.15
+  - -0.05
+  - 0.25
+  - -0.1
+  - 0
+  - 0.1
+  spellColors:
+  - {r: 0.35, g: 0.75, b: 0.25, a: 1}
+  - {r: 0.65, g: 0.9, b: 0.4, a: 1}
+  - {r: 1, g: 0.8, b: 0.9, a: 1}
   passiveName: Verdant Bond
   passiveDescription: Your spell hits heal the nearest allied hero (within 8m) for
     15% of the damage dealt.

@@ -21,6 +21,7 @@ MonoBehaviour:
   color: {r: 0.55, g: 0.68, b: 0.85, a: 1}
   glyph: AW
   tags: 0
+  damageType: 0
   targeting: 0
   unitFilter: 0
   range: 0

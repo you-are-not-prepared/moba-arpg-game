@@ -23,6 +23,8 @@ namespace Moba.Abilities
         // Burn: total burn damage as a fraction of the hit damage, dealt over burnDuration seconds.
         public float burnFraction;
         public float burnDuration;
+        // The spell's damage type for this caster (AbilityCaster.DamageTypeOf); its affinity is in damageMultiplier.
+        public DamageType damageType;
 
         public static SpellModifiers None => new() { damageMultiplier = 1f };
     }

@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.65, g: 0.45, b: 0.95, a: 1}
   glyph: V
   prefab: {fileID: 3486567018637327865, guid: 76166ca2d0148e544b0a231e173a9325, type: 3}
+  affinities:
+  - 0.05
+  - 0.05
+  - -0.1
+  - 0.25
+  - -0.05
+  - 0.1
+  spellColors:
+  - {r: 0.55, g: 0.35, b: 0.95, a: 1}
+  - {r: 0.8, g: 0.65, b: 1, a: 1}
+  - {r: 0.88, g: 0.92, b: 1, a: 1}
   passiveName: Quickened Mind
   passiveDescription: All your cooldowns are 20% shorter.
   extraProjectiles: 0
