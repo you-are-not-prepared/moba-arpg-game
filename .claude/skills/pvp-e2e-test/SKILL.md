@@ -50,7 +50,7 @@ Orders from the client go through `HeroController` (`OrderMove`, `IssueAttackMov
 
 ## Tips
 
-- **Long tests:** bots only have a Fireball for now, so matches last a while. For tests without bots, use `deploy "$(nobots_override)"`, and plain `deploy` afterwards.
+- **Long tests:** bots only have their signature and one Projectile for now, so matches last a while. For tests without bots, use `deploy "$(nobots_override)"`, and plain `deploy` afterwards.
 - **Fast effects** (projectiles, cooldowns, turning, pop-ups): count or time them with a probe (unity-playtest), not with separate `ev` calls.
 - **Two players:** build the Windows client from the Editor with `ev 'Moba.EditorTools.GameBuilder.BuildWindowsClient(out string m); return m;'`, then poll `Builds/WindowsClient/MobaTest_Data/Managed/Assembly-CSharp.dll`. Start it first, so it takes blue:
   ```bash
