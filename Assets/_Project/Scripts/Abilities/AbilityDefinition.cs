@@ -21,8 +21,8 @@ namespace Moba.Abilities
     public abstract class AbilityDefinition : InventoryItem
     {
         public SpellTags tags;
-        [Tooltip("The damage this spell deals. The caster's affinity for it scales the damage, and hits on heroes get the " +
-                 "elemental matchup. None for spells that deal no damage.")]
+        [Tooltip("The damage this spell deals. Hits on heroes get the elemental matchup and the target's resistance " +
+                 "to it. None for spells that deal no damage.")]
         public DamageType damageType;
         [Tooltip("A blank-slate shop spell: it deals the caster's base damage type and takes the hero's look and colours " +
                  "(damageType is ignored).")]

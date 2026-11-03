@@ -5,7 +5,7 @@ namespace Moba
     // The six damage types of spells and ultimates. Auto attacks, creeps and towers deal None (untyped).
     public enum DamageType : byte { None, Fire, Frost, Nature, Lightning, Physical, Air }
 
-    // The elemental cycle, in the order of the affinity hexagon (clockwise from the top): each type is strong against
+    // The elemental cycle, in the order of the resistance hexagon (clockwise from the top): each type is strong against
     // the next one and weak against the one before, Fire > Frost > Nature > Lightning > Physical > Air > Fire.
     // A hit on a hero compares the hit's type with the hero's base type (HeroDefinition.BaseDamageType).
     public static class DamageTypes
@@ -19,7 +19,7 @@ namespace Moba
             DamageType.Fire, DamageType.Frost, DamageType.Nature, DamageType.Lightning, DamageType.Physical, DamageType.Air,
         };
 
-        // Index into All and into per-hero affinity arrays (-1 for None).
+        // Index into All and into per-hero resistance arrays (-1 for None).
         public static int Index(DamageType type) => (int)type - 1;
 
         // The type `type` is strong against.

@@ -83,7 +83,7 @@ namespace Moba.UI
             {
                 SpellModifiers m = SpellModifiers.None;
                 m.damageType = _abilities.DamageTypeOf(ultimate);
-                m.damageMultiplier = _abilities.AffinityMultiplier(m.damageType) * _abilities.spellDamageMultiplier;
+                m.damageMultiplier = _abilities.spellDamageMultiplier;
                 string numbers = ultimate.Describe(1, m);
                 if (!string.IsNullOrEmpty(numbers)) lines.Insert(0, numbers);
             }

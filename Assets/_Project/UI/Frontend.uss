@@ -506,9 +506,9 @@
 
 .hero-detail {
     width: 100%;
-    max-width: 820px;
+    max-width: 1036px; /* as wide as a row of 7 hero tiles (136px + 12px margins) */
     margin-top: 6px;
-    padding: 20px 24px;
+    padding: 16px 24px;
     border-width: 2px;
     border-radius: 10px;
     border-color: var(--border);
@@ -575,12 +575,14 @@
 .hero-detail__ability {
     flex-grow: 1;
     flex-basis: 0;
+    min-width: 0;
     margin-right: 18px;
 }
 
 .hero-detail__section {
     padding: 0;
     margin: 0 0 2px 0;
+    white-space: normal;
     font-size: 12px;
     -unity-font-style: bold;
     letter-spacing: 1px;
@@ -590,6 +592,7 @@
 .hero-detail__ability-name {
     padding: 0;
     margin: 0 0 2px 0;
+    white-space: normal;
     font-size: 17px;
     -unity-font-style: bold;
     color: var(--text);
@@ -1227,12 +1230,12 @@
     font-size: 22px;
 }
 
-.hero-detail__affinities {
+.hero-detail__resistances {
     flex-shrink: 0;
     align-items: center;
 }
 
-.affinity-hex__label {
+.resistance-hex__label {
     padding: 0;
     margin: 0;
     font-size: 14px;

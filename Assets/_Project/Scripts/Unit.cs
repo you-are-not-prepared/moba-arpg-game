@@ -26,6 +26,9 @@ namespace Moba
         public event Action<Unit, Unit> Died;
         // (victim, source, health actually removed). The source may be null.
         public static event Action<Unit, Unit, float> AnyDamaged;
+        // (victim, source, damage, its type, where to show it): every hit, for damage numbers. Raised where the damage
+        // is dealt and, on game-server clients, from the server's message (NetworkMatch).
+        public static event Action<Unit, Unit, float, DamageType, Vector3> AnyDamageNumber;
 
         public Team team;
         public UnitKind kind;
@@ -43,6 +46,9 @@ namespace Moba
         [Tooltip("Heroes: their base damage type (set from the HeroDefinition). Typed hits on them get the elemental " +
                  "matchup (see DamageTypes); None takes every type normally.")]
         public DamageType baseDamageType;
+        // Heroes: resistances per type (DamageTypes.All order, set from the HeroDefinition). They only change the damage
+        // this unit takes: +0.25 = 25% less from that type, -0.1 = 10% more.
+        [NonSerialized] public float[] resistances;
 
         [Header("Bounty (paid to the hero that lands the last hit)")]
         public int goldBounty;
@@ -84,14 +90,29 @@ namespace Moba
             // On a game-server client the server deals all damage; health arrives through NetworkUnit.
             if (!IsTargetable || Net.NetSession.IsRemoteClient) return;
             if (source != null) amount = source.ModifyOutgoingDamage(this, amount);
-            amount *= DamageTypes.Matchup(type, baseDamageType) * incomingDamageMultiplier;
+            amount *= DamageTypes.Matchup(type, baseDamageType) * Mathf.Max(0f, 1f - Resistance(type)) * incomingDamageMultiplier;
             if (kind == UnitKind.Hero && source != null && source.kind == UnitKind.Hero && source.team != team)
                 _lastHitByHero[source] = Time.time;
             float dealt = Mathf.Min(amount, Health); // overkill doesn't count
             Health = Mathf.Max(0f, Health - amount);
-            if (dealt > 0f) AnyDamaged?.Invoke(this, source, dealt);
+            if (dealt > 0f)
+            {
+                AnyDamaged?.Invoke(this, source, dealt);
+                AnyDamageNumber?.Invoke(this, source, dealt, type, AimPoint);
+            }
             if (Health <= 0f) Die(source);
         }
+
+        // 0.25 for a +25% resistance; 0 for untyped damage and units without resistances.
+        public float Resistance(DamageType type)
+        {
+            int i = DamageTypes.Index(type);
+            return i >= 0 && resistances != null && i < resistances.Length ? resistances[i] : 0f;
+        }
+
+        // Game-server clients: a hit the server dealt, for damage numbers.
+        public static void ShowDamageFromServer(Unit victim, Unit source, float amount, DamageType type, Vector3 at) =>
+            AnyDamageNumber?.Invoke(victim, source, amount, type, at);
 
         // Game-server clients: the server's current numbers (see NetworkUnit).
         public void SetHealthFromServer(float health, float max)
