@@ -8,6 +8,8 @@ namespace Moba.Items
         public string displayName = "Item";
         [TextArea] public string description;
         public int cost = 300;
+        [Tooltip("Sells back for its full cost (a hero's signature spell).")]
+        public bool sellsAtFullPrice;
 
         [Header("Display")]
         [Tooltip("Optional. Without an icon the slot shows the colour and glyph below.")]

@@ -16,6 +16,7 @@ MonoBehaviour:
   description: Fires a projectile that explodes on the first enemy it hits. It takes
     your hero's damage type and look.
   cost: 1
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
   glyph: PR
@@ -57,6 +58,12 @@ MonoBehaviour:
   explosionRadius: 2.5
   pierce: 0
   stunDuration: 0
+  slow: 0
+  slowSeconds: 2
+  chainJumps: 0
+  chainFraction: 0.6
+  boltMaterial: {fileID: 0}
+  cooldownRefund: 0
   projectileSpeed: 18
   maxDistance: 14
   projectileSize: 0.6

@@ -93,22 +93,32 @@ This starts the backend, then the game server. The first start takes a few minut
 | **Delve** | 1 | A single lane down a mine shaft and back up |
 
 ### Heroes
-Every hero has a passive and an ultimate locked to **R**. Q/W/E are filled with spells you buy.
+Every hero has a **passive**, a **signature spell** in **Q** from the start, and **three ultimates to choose from** at the first ascension (level 6): two unique to the hero and one shared by every hero with the same base damage type and range. W and E are for spells you buy.
+- **Signature spells** take the hero's damage type and look, sell back for their full price (300), and only that hero's shop (Signature section) sells them again.
+- **R is reserved for the ultimate.** It has no rank before level 6; each ascension (6/11/16) raises it by one rank instead of a skill point.
 
-| Hero | Passive | Ultimate |
-|---|---|---|
-| **Kael**, Ranger | Projectile spells fire +1 projectile | **Skybreaker Arrow:** a huge arrow that pierces and stuns |
-| **Vesh**, Chronomancer | 20% shorter cooldowns | **Rewind:** resets Q/W/E cooldowns |
-| **Brann**, Artificer | Items give 10% more stats | **Overcharged Sockets:** a 4th mod socket on Q/W/E (passive once learned) |
-| **Torvald**, Bulwark (melee) | +50 max HP per level, 15% slower | **Aegis Wall:** a moving shield that blocks enemy projectiles from the front for 5s (tower shots pass through) |
-| **Nyx**, Stalker (melee) | +15% damage to targets with no allied hero within 7m | **Bloodrush:** +60% move speed and +20% attack speed for 7s, refreshed on hero kills |
-| **Thessa**, Windrunner | Each spell cast gives +25% move speed for 2s | **Eye of the Storm:** for 6s (7/8 at higher ranks) spells cost no mana and have 50% shorter cooldowns |
-| **Oren**, Ember Duelist (melee) | Attacks build Heat (5 max, +4% attack speed each); at 5 the next attack bursts for 50 fire damage around the target and burns | **Blazing Leap:** leaps up to 6m, 150/225/300 damage and a burn where he lands; his attacks burn for 5s |
-| **Ilsa**, Frostwarden | Spell hits slow 20% for 1.5s; slowed enemies take 10% more damage from her | **Glacial Prison:** after 0.75s freezes enemies in a 3.5m area for 1.5–2s, then the ice slows (30%) for 3s |
-| **Maela**, Grovekeeper | Spell hits heal the nearest allied hero (8m) for 15% of the damage | **Sanctuary:** a 5m grove for 6s: allied heroes heal 4–6% max health/s and move 20% faster, enemies are slowed 20% |
-| **Corvin**, Stormcaller | Every 4th spell is charged: its first hit jumps to 1 more enemy for 50% damage | **Thunderhead:** a storm cloud follows him for 6s and strikes an enemy within 6m every 0.5s (heroes first) |
+| Hero | Passive | Signature (Q) | Ultimates (level 6) |
+|---|---|---|---|
+| **Kael**, Ranger | Projectile spells fire +1 projectile | **Piercing Shot:** an arrow through every enemy in its path | **Skybreaker Arrow** (huge piercing, stunning arrow) · **Hawk Eye** (+range, +attack speed) · **Arrow Storm** |
+| **Vesh**, Chronomancer | 20% shorter cooldowns | **Chrono Bolt:** a hit shortens his other cooldowns by 1.5s | **Rewind** (resets Q/W/E) · **Time Stop** (freezes an area) · **Thunderstrike** |
+| **Brann**, Artificer | Items give 10% more stats | **Blast Charge:** a burning blast after 0.5s | **Overcharged Sockets** (4th mod socket, passive) · **Bombardment** (3 blasts in a line) · **Meteor** |
+| **Torvald**, Bulwark (melee) | +50 max HP per level, 15% slower | **Shield Bash:** a cone that stuns for 0.75s | **Aegis Wall** (blocks projectiles) · **Unbreakable** (40–60% less damage taken) · **Whirlwind** |
+| **Nyx**, Stalker (melee) | +15% damage to isolated targets | **Pounce:** a short leap that hits where she lands | **Bloodrush** (speed, refreshed on kills) · **Shadow Execute** (dash; +15% of missing health) · **Whirlwind** |
+| **Thessa**, Windrunner | Each spell cast: +25% move speed for 2s | **Gale Shot:** a piercing wind blade that slows | **Eye of the Storm** (free, faster spells) · **Gale Force** (wide slowing wave) · **Cyclone** |
+| **Oren**, Ember Duelist (melee) | Attacks build Heat; at 5 the next attack bursts | **Searing Strike:** a burning cone that adds 2 Heat | **Blazing Leap** · **Phoenix Form** (attack speed, 2 Heat per attack) · **Inferno** |
+| **Ilsa**, Frostwarden | Spell hits slow 20%; slowed enemies take 10% more from her | **Ice Lance:** a heavy 35% slow | **Glacial Prison** (freeze area) · **Avalanche** (wide piercing stun) · **Blizzard** |
+| **Maela**, Grovekeeper | Spell hits heal the nearest ally for 15% of the damage | **Mending Seed:** heals an allied hero | **Sanctuary** (healing grove) · **Wild Growth** (heals every ally around her) · **Overgrowth** |
+| **Corvin**, Stormcaller | Every 4th spell is charged and chains | **Arc Bolt:** bursts and arcs to one more enemy | **Thunderhead** (storm cloud) · **Chain Storm** (chains 5 times) · **Thunderstrike** |
 
-Building blocks the heroes added, ready for new spells and mods: **slows** (a status like stun and burn, shown as an icy border on health bars), **ground zones** (`ZoneSpell`: warning ring, freeze, slow, damage, ally healing and speed), a **leap** (`LeapSpell`), **chain lightning** on spell hits, timed buffs (`SpellStorm`, `StormCloud`, `BurningBlades`), and `SpellEvents.Hit` for passives that react to spell hits.
+**Shared ultimates** (by base damage type and range; they take the hero's look):
+
+| Physical, ranged | Physical, melee | Lightning, ranged | Fire, ranged | Fire, melee | Air, ranged | Frost, ranged | Nature, ranged |
+|---|---|---|---|---|---|---|---|
+| Arrow Storm: a wide area, slows | Whirlwind: hits all around twice a second, +15% speed | Thunderstrike: an area stun | Meteor: a big area, burns | Inferno: a burning aura | Cyclone: a wide area, 50% slow | Blizzard: a damaging, slowing area | Overgrowth: roots an area |
+
+The kits are built in `Assets/_Project/Editor/GameBuilder.Kits.cs` (signatures, new and shared ultimates) and `GameBuilder.cs` (the original ultimates).
+
+Building blocks the heroes added, ready for new spells and mods: **slows** (a status like stun and burn, shown as an icy border on health bars), **ground zones** (`ZoneSpell`: warning ring, freeze, slow, damage, ally healing and speed), a **leap** (`LeapSpell`), **chain lightning** on spell hits, timed buffs (`SpellStorm`, `StormCloud`, `BurningBlades`, and the generic `BuffSpell`/`Buff`: attack speed, range, movement speed, damage reduction, Heat), self-centred auras (`AuraSpell`), heals (`HealSpell`: one ally or everyone around), incoming damage reduction (`Unit.incomingDamageMultiplier`), and `SpellEvents.Hit` for passives that react to spell hits. Projectile spells can also slow, chain and refund cooldowns; Burst can stun, slow, burn and fire several blasts in a line; melee spells can stun, execute and add Heat.
 
 Melee heroes and creeps show each attack as a swing: the model lunges at the target while a slash arc sweeps across in front (`MeleeSwing`, shader `Moba/MeleeSlash`). On the game server, every player sees it.
 
@@ -130,17 +140,16 @@ Spells and ultimates deal one of six damage types: **Fire, Frost, Nature, Lightn
 
 The numbers are in `GameBuilder.Heroes()` (`Aff(...)`, `Colors(...)`); the cycle and type colours in `Scripts/DamageTypes.cs`.
 
-### Ascension (levels 6, 11, 18)
-At levels 6, 11 and 18 talent cards appear in the middle of the screen. The game keeps running, and you click one to choose.
-- **Level 6** picks a path, one card per path: **A** builds on the hero's passive, **B** on the ultimate, and **C** is a hybrid playstyle that draws on both. The system supports 2–4 paths per hero.
-- **Level 11** offers two talents from that path (e.g. A1/A2 or C1/C2), and **level 18** two more (A3/A4 or C3/C4).
+### Ascension (levels 6, 11, 16)
+At levels 6, 11 and 16 cards appear in the middle of the screen. The game keeps running, and you click one to choose.
+- **Level 6: choose your ultimate.** One card per path, each the ultimate it gives (its type and numbers on the card). It goes into R, locked, at rank 1.
+- **Levels 11 and 16:** two talents from that path. Each one makes the chosen ultimate stronger (damage, cooldown, duration, area or stun) **and** builds on the hero's passive (e.g. more Heat burst damage, a stronger Tailwind, another chain jump). Each also raises the ultimate's rank.
+- **Ascension levels give no skill point:** Q/W/E get the 15 points from the other levels.
 
-Talents give stats (health, damage, attack and move speed, cooldowns, spell damage, projectiles, item stats). Some boost the hero's own kit, such as a longer Aegis Wall or Bloodrush, a longer Skybreaker stun, or more damage to isolated targets.
-
-The current talents are placeholders; they're defined in `Assets/_Project/Editor/GameBuilder.Ascension.cs`. Bots pick at random. Your picks are listed in the portrait tooltip.
+The trees are in `Assets/_Project/Editor/GameBuilder.Ascension.cs` (first versions, to tune). Bots pick at random. Your picks are listed in the portrait tooltip.
 
 ### Items, spells and mods
-- **The shop** works only in your base, plus anywhere while you're dead. Selling refunds 70%. Open it with **B** or the Shop button.
+- **The shop** works only in your base, plus anywhere while you're dead. Selling refunds 70% (signature spells: 100%). Open it with **B** or the Shop button.
 - **The inventory** has 8 slots, rearranged by dragging. Items, spells and mods all take a slot until equipped.
 - **Spells:** drag one from the inventory onto Q, W or E. Ranks belong to the slot, so swapping spells keeps the rank.
 - **Shop spells are blank slates** (`adaptive`): they deal the hero's base damage type, take its name and shape from that type, and its colours from the hero (`HeroDefinition.spellColors`). The shop shows what each becomes for you, e.g. "Projectile → Fireball".
@@ -161,7 +170,7 @@ The current talents are placeholders; they're defined in `Assets/_Project/Editor
 ### Economy and progression
 - **Gold:** from last hits, tower kills and hero kills, plus 1 gold per second.
 - **XP and levels:** XP comes from the kills you land (last hits on creeps, towers and heroes), up to level 18.
-- **Ability ranks:** basic spells unlock ranks at levels 1/3/5/7/9; the ultimate at 6/11/16.
+- **Ability ranks:** basic spells unlock ranks at levels 1/3/5/7/9 (a skill point every level except 6, 11 and 16); the ultimate ranks up with each ascension at 6/11/16.
 - **Fountain:** standing in your own base restores 10% of health and mana per second.
 - **Respawn:** after 5 seconds.
 - **Fog of war:** you see what your team sees. Enemy units in the fog are hidden.
@@ -339,7 +348,7 @@ Players get the game once as a zip from the [releases page](https://github.com/y
 ```
 Assets/_Project/
   Editor/      GameBuilder: generates scenes, prefabs, heroes, items and materials (+ ascension talents)
-  Heroes/      Hero definitions, the roster and ultimates (generated)
+  Heroes/      Hero definitions, the roster, signature spells and ultimates (generated)
   Items/       Items, spells, mods and the shop catalog (generated)
   Materials/   (generated)
   Prefabs/     Hero and creep prefabs (generated)

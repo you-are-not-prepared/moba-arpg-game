@@ -53,17 +53,20 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 8deedc423caf0c74e950a697aa570909, type: 2}
+      root:
         id: vesh_a
-        name: Time Weaver
-        flavor: Seconds bend around your spells.
+        name: Rewind
+        flavor: Instantly resets the cooldowns of your Q, W and E spells.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0.1
+        cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -82,15 +85,17 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: vesh_a1
-        name: Accelerated Mind
-        flavor: Think faster, cast more.
+        name: Swift Rewind
+        flavor: 'Quickened Mind: cooldowns another 5% shorter.'
         maxHealth: 0
-        maxMana: 80
+        maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        cooldownReduction: 0.05
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -108,16 +113,18 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: vesh_a2
-        name: Temporal Flow
-        flavor: Every spell lands a moment sooner.
+        name: Swift Rewind
+        flavor: 'Deep reserves: +150 max mana.'
         maxHealth: 0
-        maxMana: 0
+        maxMana: 150
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0.15
+        ultimateCooldownReduction: 0.1
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -135,15 +142,17 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: vesh_a3
-        name: Perpetual Motion
-        flavor: Never stop casting.
+        name: Ever-Ready Rewind
+        flavor: 'Quickened Mind: cooldowns another 10% shorter.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0.1
-        ultimateCooldownReduction: 0
+        ultimateCooldownReduction: 0.2
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -161,17 +170,19 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: vesh_a4
-        name: Echo
-        flavor: Each spell leaves an echo behind.
+        name: Ever-Ready Rewind
+        flavor: 'Folded time: spells deal 15% more damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 1
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.15
+        extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
@@ -186,17 +197,20 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: d1582d70cc3c2104cb59e85b93decdb1, type: 2}
+      root:
         id: vesh_b
-        name: Chronoshift
-        flavor: Rewind comes around sooner.
+        name: Time Stop
+        flavor: 'Mark an area: after a moment, time stops for every enemy inside.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.3
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -215,22 +229,24 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: vesh_b1
-        name: Borrowed Time
-        flavor: Take a few years from tomorrow.
-        maxHealth: 120
+        name: Crushing Time Stop
+        flavor: 'Quickened Mind: cooldowns another 5% shorter.'
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0
+        cooldownReduction: 0.05
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0
+        stunDuration: 0.25
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -241,15 +257,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: vesh_b2
-        name: Haste of Ages
-        flavor: Walk between the ticks of the clock.
+        name: Wide Time Stop
+        flavor: 'Deep reserves: +150 max mana.'
         maxHealth: 0
-        maxMana: 0
+        maxMana: 150
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -268,22 +286,24 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: vesh_b3
-        name: Rewound Wounds
-        flavor: Some injuries never happened.
-        maxHealth: 200
+        name: Paralyzing Time Stop
+        flavor: 'Quickened Mind: cooldowns another 10% shorter.'
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0
+        cooldownReduction: 0.1
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0
+        stunDuration: 0.5
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -294,16 +314,18 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: vesh_b4
-        name: Endless Loop
-        flavor: Again. And again. And again.
+        name: Ever-Ready Time Stop
+        flavor: 'Folded time: spells deal 15% more damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.3
-        spellDamage: 0
+        ultimateCooldownReduction: 0.2
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -319,18 +341,22 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: e85940b504925b443b6226405b9d4f72, type: 2}
+      root:
         id: vesh_c
-        name: Paradox
-        flavor: Cast it all, rewind, cast it all again.
+        name: Thunderstrike
+        flavor: Lightning, ranged. Lightning hammers an area after a moment, stunning
+          everything in it.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.15
-        spellDamage: 0.1
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -348,22 +374,24 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: vesh_c1
-        name: Temporal Spike
-        flavor: A moment, sharpened to a point.
+        name: Crushing Thunderstrike
+        flavor: 'Quickened Mind: cooldowns another 5% shorter.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0
+        cooldownReduction: 0.05
         ultimateCooldownReduction: 0
-        spellDamage: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0
+        stunDuration: 0.25
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -374,15 +402,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: vesh_c2
-        name: Mana Loop
-        flavor: Spend it twice.
+        name: Empowered Thunderstrike
+        flavor: 'Deep reserves: +150 max mana.'
         maxHealth: 0
-        maxMana: 100
+        maxMana: 150
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -401,41 +431,17 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: vesh_c3
-        name: Collapse
-        flavor: Every second lands at once.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0.2
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: vesh_c4
-        name: Infinite Loop
-        flavor: There is no last cast.
+        name: Sweeping Thunderstrike
+        flavor: 'Quickened Mind: cooldowns another 10% shorter.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0.1
-        ultimateCooldownReduction: 0.2
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -452,4 +458,32 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 8deedc423caf0c74e950a697aa570909, type: 2}
+      - id: vesh_c4
+        name: Mighty Thunderstrike
+        flavor: 'Folded time: spells deal 15% more damage.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0.15
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+  signature: {fileID: 11400000, guid: af2138e9449ae2d40a01a686cfc36a5e, type: 2}

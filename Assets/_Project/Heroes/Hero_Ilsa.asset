@@ -55,10 +55,12 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 2fb1c5d4e6ef53b4186073acf6ef1280, type: 2}
+      root:
         id: ilsa_a
-        name: Deep Freeze
-        flavor: The cold bites harder.
+        name: Glacial Prison
+        flavor: 'Mark an area: after a moment, enemies inside are frozen, and the
+          ice slows anyone in it for 3s.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -66,6 +68,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -73,6 +77,35 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      second:
+      - id: ilsa_a1
+        name: Crushing Glacial Prison
+        flavor: 'Chilling Touch: spell hits slow 5% more.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0.25
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -82,36 +115,9 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      second:
-      - id: ilsa_a1
-        name: Frostbite
-        flavor: Hardly able to move.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0.1
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
       - id: ilsa_a2
-        name: Lingering Frost
-        flavor: The chill stays.
+        name: Wide Glacial Prison
+        flavor: 'Chilling Touch: slows last 0.5s longer.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -119,6 +125,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -131,14 +139,14 @@ MonoBehaviour:
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
         spellSlow: 0
-        spellSlowSeconds: 1
+        spellSlowSeconds: 0.5
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       third:
       - id: ilsa_a3
-        name: Shatter
-        flavor: Frozen things break.
+        name: Paralyzing Glacial Prison
+        flavor: 'Chilling Touch: spell hits slow 10% more.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -146,7 +154,37 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.2
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0.5
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0.1
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: ilsa_a4
+        name: Ever-Ready Glacial Prison
+        flavor: 'Shatter: spells deal 15% more damage.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.2
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -162,9 +200,12 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      - id: ilsa_a4
-        name: Permafrost
-        flavor: Winter never ends.
+    - ultimate: {fileID: 11400000, guid: e969f4accc16a0e4db57c9fa40b5ba1a, type: 2}
+      root:
+        id: ilsa_b
+        name: Avalanche
+        flavor: A wall of ice that rolls through everything in its path, stunning
+          it and leaving it slowed.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -172,39 +213,14 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0.1
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-    - root:
-        id: ilsa_b
-        name: Winter's Grasp
-        flavor: The ice holds longer.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 1
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -217,8 +233,8 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: ilsa_b1
-        name: Deep Ice
-        flavor: Frozen solid.
+        name: Crushing Avalanche
+        flavor: 'Chilling Touch: spell hits slow 5% more.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -226,6 +242,65 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0.25
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0.05
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: ilsa_b2
+        name: Empowered Avalanche
+        flavor: 'Chilling Touch: slows last 0.5s longer.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0.5
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      third:
+      - id: ilsa_b3
+        name: Paralyzing Avalanche
+        flavor: 'Chilling Touch: spell hits slow 10% more.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -237,75 +312,24 @@ MonoBehaviour:
         tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: ilsa_b2
-        name: Cold Snap
-        flavor: Ready sooner.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0.15
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      third:
-      - id: ilsa_b3
-        name: Endless Winter
-        flavor: The field lingers.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 2
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
+        spellSlow: 0.1
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       - id: ilsa_b4
-        name: Glacial Age
-        flavor: Ice, again and again.
+        name: Mighty Avalanche
+        flavor: 'Shatter: spells deal 15% more damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.25
-        spellDamage: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -321,17 +345,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: fe84ec24876caa94f8fb4882529200e1, type: 2}
+      root:
         id: ilsa_c
-        name: Glacier Walker
-        flavor: Glide over the ice.
+        name: Blizzard
+        flavor: Frost, ranged. A blizzard rages over a wide area for a few seconds,
+          hurting and slowing everything in it.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.05
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -350,34 +378,36 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: ilsa_c1
-        name: Frost Armour
-        flavor: A shell of ice.
-        maxHealth: 150
+        name: Lasting Blizzard
+        flavor: 'Chilling Touch: spell hits slow 5% more.'
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 0
+        ultimateDuration: 1
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
-        spellSlow: 0
+        spellSlow: 0.05
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       - id: ilsa_c2
-        name: Hailstorm
-        flavor: One more shard.
+        name: Wide Blizzard
+        flavor: 'Chilling Touch: slows last 0.5s longer.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -385,8 +415,10 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
         spellDamage: 0
-        extraProjectiles: 1
+        extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
@@ -397,21 +429,23 @@ MonoBehaviour:
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
         spellSlow: 0
-        spellSlowSeconds: 0
+        spellSlowSeconds: 0.5
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       third:
       - id: ilsa_c3
-        name: Arctic Mind
-        flavor: Clear and cold thoughts.
+        name: Mighty Blizzard
+        flavor: 'Chilling Touch: spell hits slow 10% more.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0.1
+        cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -423,22 +457,24 @@ MonoBehaviour:
         tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
-        spellSlow: 0
+        spellSlow: 0.1
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       - id: ilsa_c4
-        name: Glacier Heart
-        flavor: A deep well of power.
+        name: Sweeping Blizzard
+        flavor: 'Shatter: spells deal 15% more damage.'
         maxHealth: 0
-        maxMana: 150
+        maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
+        spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -454,4 +490,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 2fb1c5d4e6ef53b4186073acf6ef1280, type: 2}
+  signature: {fileID: 11400000, guid: ecfa83d9c85f82b46b5937582f3e0b51, type: 2}

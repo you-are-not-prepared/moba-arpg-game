@@ -48,7 +48,7 @@ namespace Moba.Abilities
             float freeze = Freeze(context.Rank);
             if (freeze > 0f) freeze += HeroAscension.StunBonusOf(caster);
             float damage = enemyDamagePerSecond * context.Modifiers.damageMultiplier;
-            GroundZone.Create(caster, context.Point, radius, delay, Duration(context.Rank) + HeroAscension.DurationBonusOf(caster),
+            GroundZone.Create(caster, context.Point, context.Modifiers.Radius(radius), delay, Duration(context.Rank) + HeroAscension.DurationBonusOf(caster),
                 freeze, enemySlow, damage, AllyHeal(context.Rank), allyMoveSpeed, warningMaterial, zoneMaterial,
                 context.Modifiers.damageType);
         }

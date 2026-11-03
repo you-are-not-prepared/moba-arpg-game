@@ -5,7 +5,8 @@ using UnityEngine.AI;
 
 namespace Moba
 {
-    // A playable hero: its prefab (stats, model), a passive, and an ultimate that is locked into the R slot.
+    // A playable hero: its prefab (stats, model), a passive, a signature spell that starts in Q, and an ascension
+    // tree whose first choice (level 6) is the hero's ultimate, locked into R from then on (see HeroAscension).
     // Passives are plain numbers applied on spawn, so new simple passives are just new fields here.
     [CreateAssetMenu(menuName = "MOBA/Hero", fileName = "Hero")]
     public class HeroDefinition : ScriptableObject
@@ -63,12 +64,25 @@ namespace Moba
         public Material passiveEffectMaterial;
 
         [Header("Ascension")]
-        [Tooltip("Talent choices at levels 6, 11 and 18: path A or B, then two options within that path.")]
+        [Tooltip("Choices at levels 6, 11 and 18: the first picks a path, whose ultimate goes into R; then two talents " +
+                 "within that path.")]
         public AscensionTree ascension = new();
 
-        [Header("Ultimate")]
-        [Tooltip("Locked into the R slot; bought spells go in Q/W/E.")]
-        public AbilityDefinition ultimate;
+        [Header("Signature spell")]
+        [Tooltip("The hero's own basic spell: in Q at the start, sells back at full price, and only this hero's shop " +
+                 "sells it again.")]
+        public AbilityDefinition signature;
+
+        // The ultimates offered at the first ascension, one per path.
+        public System.Collections.Generic.IEnumerable<AbilityDefinition> UltimateOptions
+        {
+            get
+            {
+                if (ascension?.paths == null) yield break;
+                foreach (AscensionPath path in ascension.paths)
+                    if (path?.ultimate != null) yield return path.ultimate;
+            }
+        }
 
         // The type with the highest affinity (None if the hero has none above 0).
         public DamageType BaseDamageType
@@ -93,7 +107,7 @@ namespace Moba
             return i >= 0 && affinities != null && i < affinities.Length ? affinities[i] : 0f;
         }
 
-        // Applies the damage types, the passive and the ultimate to a freshly spawned hero.
+        // Applies the damage types, the passive and the signature spell to a freshly spawned hero.
         public void ApplyTo(HeroController hero)
         {
             hero.definition = this;
@@ -142,11 +156,7 @@ namespace Moba
                 onHit.healFraction = allyHealFraction;
             }
             if (ascension != null && ascension.IsComplete) hero.gameObject.AddComponent<HeroAscension>().Init(ascension);
-            if (ultimate != null)
-            {
-                caster.SetAbility(AbilityCaster.UltimateSlot, ultimate);
-                caster.ultimateLocked = true;
-            }
+            if (signature != null) caster.SetAbility(0, signature);
         }
 
         // "600 HP · 30 damage · 5.5 range · 6.5 speed" from the prefab (passives included), for champion select.

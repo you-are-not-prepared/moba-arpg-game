@@ -16,6 +16,7 @@ MonoBehaviour:
   description: 'Mark an area: after a moment, enemies inside are frozen, and the
     ice slows anyone in it for 3s.'
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.55, g: 0.8, b: 1, a: 1}
   glyph: GP

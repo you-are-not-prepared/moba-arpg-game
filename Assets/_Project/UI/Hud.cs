@@ -296,6 +296,8 @@ namespace Moba.UI
 
             string rankLine = $"Rank {slot.rank}/{maxRank}";
             if (_abilities.CanLevelUp(index)) rankLine += $"   ·   {GameInput.Display(input.LevelUpModifier)}+{key} or + to level up";
+            else if (index == AbilityCaster.UltimateSlot && slot.rank < maxRank)
+                rankLine += $"   ·   next rank at your next ascension (level {HeroAscension.Levels[Mathf.Min(slot.rank, HeroAscension.Levels.Length - 1)]})";
             else if (slot.rank < maxRank) rankLine += $"   ·   next rank at level {AbilityCaster.RequiredLevel(index, slot.rank + 1)}";
 
             if (a == null)
@@ -324,8 +326,8 @@ namespace Moba.UI
             _tooltip.RemoveFromClassList("hidden");
             SetText(_tooltipTitle, string.IsNullOrEmpty(def.title) ? def.displayName : $"{def.displayName}, {def.title}");
             SetText(_tooltipStats, $"Passive: {def.passiveName}");
-            string ult = def.ultimate != null ? $"\nUltimate: {def.ultimate.displayName}. {def.ultimate.description}" : "";
-            SetText(_tooltipBody, def.passiveDescription + ult + AscensionSummary());
+            string signature = def.signature != null ? $"\nSignature: {def.signature.displayName}. {def.signature.description}" : "";
+            SetText(_tooltipBody, def.passiveDescription + signature + AscensionSummary());
             return true;
         }
 

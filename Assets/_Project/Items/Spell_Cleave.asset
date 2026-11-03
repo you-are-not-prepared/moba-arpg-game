@@ -16,6 +16,7 @@ MonoBehaviour:
   description: A wide swing that hits every enemy in front of you. It takes your
     hero's damage type and look.
   cost: 1
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
   glyph: CL
@@ -64,3 +65,6 @@ MonoBehaviour:
   lungeSeconds: 0.25
   lungeHeight: 0.8
   landingRadius: 2.2
+  stunSeconds: 0
+  executeFraction: 0
+  heatStacks: 0

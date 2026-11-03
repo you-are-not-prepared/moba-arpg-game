@@ -56,7 +56,12 @@ namespace Moba.Net
             HeroRoster roster = Object.FindFirstObjectByType<MatchBootstrap>()?.roster;
             if (roster != null)
                 foreach (HeroDefinition hero in roster.heroes)
-                    if (hero != null && hero.ultimate != null && !s_Items.Contains(hero.ultimate)) s_Items.Add(hero.ultimate);
+                {
+                    if (hero == null) continue;
+                    if (hero.signature != null && !s_Items.Contains(hero.signature)) s_Items.Add(hero.signature);
+                    foreach (Abilities.AbilityDefinition ultimate in hero.UltimateOptions)
+                        if (!s_Items.Contains(ultimate)) s_Items.Add(ultimate);
+                }
 
             s_Ids = new Dictionary<InventoryItem, short>();
             for (int i = 0; i < s_Items.Count; i++) s_Ids[s_Items[i]] = (short)i;

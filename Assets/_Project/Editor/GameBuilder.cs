@@ -170,8 +170,10 @@ namespace Moba.EditorTools
             public float[] Affinities = new float[DamageTypes.Count];
             // Main, secondary, highlight.
             public Color[] SpellColors;
-            public System.Func<Mats, AbilityDefinition> Ultimate;
-            public System.Func<AscensionTree> Ascension;
+            // Starts in Q (GameBuilder.Kits).
+            public System.Func<Mats, AbilityDefinition> Signature;
+            // Three paths, one per ultimate (GameBuilder.Ascension).
+            public System.Func<Mats, AscensionTree> Ascension;
         }
 
         // Affinities in DamageTypes.All order, as percentages: Aff(25, -20, 0, 10, -10, 5) = Fire +25%, Frost -20%...
@@ -192,7 +194,7 @@ namespace Moba.EditorTools
                 PassiveName = "Split Shot", PassiveDescription = "Your projectile spells fire 1 extra projectile.",
                 ExtraProjectiles = 1,
                 Affinities = Aff(-5, -5, 15, -10, 25, 5), SpellColors = Colors(Rgb(0.33f, 0.6f, 0.22f), Rgb(0.62f, 0.85f, 0.4f), Rgb(0.66f, 0.68f, 0.72f)),
-                Ultimate = m => SkybreakerArrow(m),
+                Signature = m => PiercingShot(m),
             },
             new HeroSpec
             {
@@ -202,7 +204,7 @@ namespace Moba.EditorTools
                 PassiveName = "Quickened Mind", PassiveDescription = "All your cooldowns are 20% shorter.",
                 CooldownMultiplier = 0.8f,
                 Affinities = Aff(5, 5, -10, 25, -5, 10), SpellColors = Colors(Rgb(0.55f, 0.35f, 0.95f), Rgb(0.8f, 0.65f, 1f), Rgb(0.88f, 0.92f, 1f)),
-                Ultimate = _ => Rewind(),
+                Signature = m => ChronoBolt(m),
             },
             new HeroSpec
             {
@@ -212,7 +214,7 @@ namespace Moba.EditorTools
                 PassiveName = "Masterwork Gear", PassiveDescription = "Items give 10% more stats.",
                 ItemStatMultiplier = 1.1f,
                 Affinities = Aff(25, -20, 0, 10, 5, -10), SpellColors = Colors(Rgb(1f, 0.55f, 0.15f), Rgb(0.85f, 0.65f, 0.3f), Rgb(0.7f, 0.2f, 0.1f)),
-                Ultimate = _ => OverchargedSockets(),
+                Signature = m => BlastCharge(m),
             },
             new HeroSpec
             {
@@ -222,7 +224,7 @@ namespace Moba.EditorTools
                 PassiveName = "Iron Hide", PassiveDescription = "+50 max health per level, but moves 15% slower.",
                 HealthPerLevelBonus = 50f, MoveSpeedMultiplier = 0.85f,
                 Affinities = Aff(-10, 10, 5, -10, 25, -5), SpellColors = Colors(Rgb(0.55f, 0.68f, 0.85f), Rgb(0.82f, 0.85f, 0.9f), Rgb(0.95f, 0.8f, 0.35f)),
-                Ultimate = m => AegisWall(m),
+                Signature = m => ShieldBash(m),
             },
             new HeroSpec
             {
@@ -232,7 +234,7 @@ namespace Moba.EditorTools
                 PassiveName = "Lone Prey", PassiveDescription = "Deal 15% more damage to targets with no allied hero within 7m of them.",
                 IsolationDamageBonus = 0.15f, IsolationRadius = 7f,
                 Affinities = Aff(0, -5, 10, -10, 25, 10), SpellColors = Colors(Rgb(0.85f, 0.2f, 0.35f), Rgb(0.32f, 0.1f, 0.2f), Rgb(1f, 0.55f, 0.65f)),
-                Ultimate = m => Bloodrush(m),
+                Signature = m => Pounce(m),
             },
             new HeroSpec
             {
@@ -242,7 +244,7 @@ namespace Moba.EditorTools
                 PassiveName = "Tailwind", PassiveDescription = "Each spell you cast gives 25% movement speed for 2s (casting again refreshes it).",
                 TailwindSpeed = 0.25f, TailwindDuration = 2f,
                 Affinities = Aff(-10, 5, 5, 15, -10, 25), SpellColors = Colors(Rgb(0.4f, 0.85f, 0.8f), Rgb(0.8f, 0.97f, 0.95f), Rgb(0.7f, 0.75f, 0.78f)),
-                Ultimate = m => EyeOfTheStorm(m),
+                Signature = m => GaleShot(m),
             },
             new HeroSpec
             {
@@ -252,7 +254,7 @@ namespace Moba.EditorTools
                 PassiveName = "Kindled Blade", PassiveDescription = "Each attack builds Heat (up to 5, +4% attack speed each). At 5, your next attack bursts for 50 fire damage around the target and burns.",
                 HeatMaxStacks = 5, HeatAttackSpeed = 0.04f, HeatBurstDamage = 50f, PassiveMaterial = m => m.Explosion,
                 Affinities = Aff(25, -20, -5, 5, 10, -10), SpellColors = Colors(Rgb(0.9f, 0.25f, 0.15f), Rgb(1f, 0.55f, 0.15f), Rgb(1f, 0.82f, 0.3f)),
-                Ultimate = m => BlazingLeap(m),
+                Signature = m => SearingStrike(m),
             },
             new HeroSpec
             {
@@ -262,7 +264,7 @@ namespace Moba.EditorTools
                 PassiveName = "Chilling Touch", PassiveDescription = "Your spell hits slow enemies by 20% for 1.5s. Slowed enemies take 10% more damage from you.",
                 SpellSlow = 0.2f, SpellSlowSeconds = 1.5f, SlowedDamageBonus = 0.1f,
                 Affinities = Aff(-20, 25, 5, 0, -10, 10), SpellColors = Colors(Rgb(0.15f, 0.45f, 0.95f), Rgb(0.45f, 0.8f, 1f), Rgb(0.95f, 0.98f, 1f)),
-                Ultimate = m => GlacialPrison(m),
+                Signature = m => IceLance(m),
             },
             new HeroSpec
             {
@@ -272,7 +274,7 @@ namespace Moba.EditorTools
                 PassiveName = "Verdant Bond", PassiveDescription = "Your spell hits heal the nearest allied hero (within 8m) for 15% of the damage dealt.",
                 AllyHealFraction = 0.15f,
                 Affinities = Aff(-15, -5, 25, -10, 0, 10), SpellColors = Colors(Rgb(0.35f, 0.75f, 0.25f), Rgb(0.65f, 0.9f, 0.4f), Rgb(1f, 0.8f, 0.9f)),
-                Ultimate = m => Sanctuary(m),
+                Signature = m => MendingSeed(m),
             },
             new HeroSpec
             {
@@ -282,7 +284,7 @@ namespace Moba.EditorTools
                 PassiveName = "Static Charge", PassiveDescription = "Every 4th spell you cast is charged: its first hit jumps to 1 more enemy within 5m for 50% damage.",
                 ChargeEvery = 4, ChargeJumps = 1, PassiveMaterial = m => m.Lightning,
                 Affinities = Aff(0, -5, -15, 25, -10, 15), SpellColors = Colors(Rgb(0.6f, 0.35f, 1f), Rgb(0.65f, 0.85f, 1f), Rgb(0.95f, 0.95f, 1f)),
-                Ultimate = m => Thunderhead(m),
+                Signature = m => ArcBolt(m),
             },
         };
 
@@ -879,8 +881,8 @@ namespace Moba.EditorTools
                 def.chargeJumps = spec.ChargeJumps;
                 def.affinities = spec.Affinities;
                 def.spellColors = spec.SpellColors ?? Colors(spec.Color, spec.Color, Color.white);
-                def.ultimate = spec.Ultimate(m);
-                def.ascension = spec.Ascension?.Invoke() ?? new AscensionTree();
+                def.signature = spec.Signature?.Invoke(m);
+                def.ascension = spec.Ascension?.Invoke(m) ?? new AscensionTree();
                 def.prefab = CreateHeroPrefab(spec, m);
                 EditorUtility.SetDirty(def);
                 roster.heroes.Add(def);

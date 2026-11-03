@@ -26,7 +26,7 @@ namespace Moba.Abilities
 
         public override void Execute(in AbilityCastContext context) =>
             StormCloud.Apply(context.Caster, Duration(context.Rank) + HeroAscension.DurationBonusOf(context.Caster), interval,
-                radius, DamageAt(context.Rank) * context.Modifiers.damageMultiplier, cloudMaterial, boltMaterial,
+                context.Modifiers.Radius(radius), DamageAt(context.Rank) * context.Modifiers.damageMultiplier, cloudMaterial, boltMaterial,
                 context.Modifiers.damageType);
 
         public override string StatsText => Describe(1, SpellModifiers.None);

@@ -55,10 +55,12 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 9aaf3937c991b5c4894a1efff74baacc, type: 2}
+      root:
         id: thessa_a
-        name: Gale
-        flavor: The wind never quite lets go.
+        name: Eye of the Storm
+        flavor: For a few seconds your spells cost no mana and their cooldowns are
+          50% shorter.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -66,6 +68,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -74,7 +78,7 @@ MonoBehaviour:
         ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
-        tailwindDuration: 0.5
+        tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
         spellSlow: 0
@@ -84,8 +88,8 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: thessa_a1
-        name: Jet Stream
-        flavor: Ride the gust.
+        name: Lasting Eye of the Storm
+        flavor: 'Tailwind: another +10% movement speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -93,12 +97,14 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 0
+        ultimateDuration: 1
         stunDuration: 0
         tailwindSpeed: 0.1
         tailwindDuration: 0
@@ -110,15 +116,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: thessa_a2
-        name: Updraft
-        flavor: One spell carries her further.
+        name: Swift Eye of the Storm
+        flavor: 'Tailwind: lasts 1s longer.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -137,8 +145,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: thessa_a3
-        name: Slipstream
-        flavor: Strike while the wind is behind you.
+        name: Endless Eye of the Storm
+        flavor: 'Tailwind: +20% attack speed while it lasts.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -146,6 +154,153 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 2
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0.2
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: thessa_a4
+        name: Ever-Ready Eye of the Storm
+        flavor: 'Tailwind: another +15% movement speed.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0.15
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+    - ultimate: {fileID: 11400000, guid: 565f836717fba3a4390aecec03cefc02, type: 2}
+      root:
+        id: thessa_b
+        name: Gale Force
+        flavor: A huge wave of wind that cuts through everything in its path and
+          slows it.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      second:
+      - id: thessa_b1
+        name: Empowered Gale Force
+        flavor: 'Tailwind: another +10% movement speed.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0.1
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: thessa_b2
+        name: Swift Gale Force
+        flavor: 'Tailwind: lasts 1s longer.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 1
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      third:
+      - id: thessa_b3
+        name: Mighty Gale Force
+        flavor: 'Tailwind: +20% attack speed while it lasts.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -162,142 +317,9 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      - id: thessa_a4
-        name: Second Gust
-        flavor: The wind keeps blowing.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 1.5
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-    - root:
-        id: thessa_b
-        name: Hurricane
-        flavor: The storm gathers a little longer.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 1
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      second:
-      - id: thessa_b1
-        name: Eye Widens
-        flavor: A longer calm at the centre.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 2
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: thessa_b2
-        name: Charged Air
-        flavor: Every spell crackles.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0.15
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      third:
-      - id: thessa_b3
-        name: Ceaseless
-        flavor: Spells come back faster, always.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0.1
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
       - id: thessa_b4
-        name: Calm Before
-        flavor: The next storm is never far.
+        name: Ever-Ready Gale Force
+        flavor: 'Tailwind: another +15% movement speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -305,6 +327,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -312,7 +336,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-        tailwindSpeed: 0
+        tailwindSpeed: 0.15
         tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
@@ -321,17 +345,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: 8d6eace2ab3a1c64e9518f914412e16f, type: 2}
+      root:
         id: thessa_c
-        name: Skirmisher
-        flavor: Never stand still.
+        name: Cyclone
+        flavor: Air, ranged. A cyclone tears through a wide area after a moment and
+          leaves everything in it badly slowed.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.1
+        attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -350,15 +378,17 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: thessa_c1
-        name: Quickdraw
-        flavor: Faster hands.
+        name: Wide Cyclone
+        flavor: 'Tailwind: another +10% movement speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.15
+        attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -366,7 +396,7 @@ MonoBehaviour:
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
-        tailwindSpeed: 0
+        tailwindSpeed: 0.1
         tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
@@ -376,15 +406,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: thessa_c2
-        name: Light Feet
-        flavor: Faster feet.
+        name: Empowered Cyclone
+        flavor: 'Tailwind: lasts 1s longer.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -393,7 +425,7 @@ MonoBehaviour:
         ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
-        tailwindDuration: 0
+        tailwindDuration: 1
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
         spellSlow: 0
@@ -403,8 +435,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: thessa_c3
-        name: Crosswind
-        flavor: One more on the wind.
+        name: Sweeping Cyclone
+        flavor: 'Tailwind: +20% attack speed while it lasts.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -412,32 +444,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 1
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: thessa_c4
-        name: Windward
-        flavor: Spells come back faster.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0.1
-        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -447,6 +455,34 @@ MonoBehaviour:
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
+        tailwindAttackSpeed: 0.2
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: thessa_c4
+        name: Mighty Cyclone
+        flavor: 'Tailwind: another +15% movement speed.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0.15
+        tailwindDuration: 0
         tailwindAttackSpeed: 0
         heatBurstDamage: 0
         spellSlow: 0
@@ -454,4 +490,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 9aaf3937c991b5c4894a1efff74baacc, type: 2}
+  signature: {fileID: 11400000, guid: 2decad67332b9b942b54717893576ac1, type: 2}

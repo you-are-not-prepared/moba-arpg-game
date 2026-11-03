@@ -200,15 +200,18 @@ namespace Moba.UI
             _shopItems.Clear();
             if (_shop == null || _shop.catalog == null) return;
 
-            AddShopSection<ItemDefinition>("ITEMS");
-            AddShopSection<AbilityDefinition>("SPELLS");
-            AddShopSection<ModDefinition>("MODS");
+            // Your own signature spell, to buy back after selling it.
+            InventoryItem signature = _hero != null && _hero.definition != null ? _hero.definition.signature : null;
+            if (signature != null) AddShopSection<AbilityDefinition>("SIGNATURE", new[] { signature });
+            AddShopSection<ItemDefinition>("ITEMS", _shop.catalog.items);
+            AddShopSection<AbilityDefinition>("SPELLS", _shop.catalog.items);
+            AddShopSection<ModDefinition>("MODS", _shop.catalog.items);
         }
 
-        void AddShopSection<T>(string title) where T : InventoryItem
+        void AddShopSection<T>(string title, IEnumerable<InventoryItem> items) where T : InventoryItem
         {
             bool any = false;
-            foreach (InventoryItem item in _shop.catalog.items)
+            foreach (InventoryItem item in items)
             {
                 if (item is not T) continue;
                 if (!any)

@@ -16,6 +16,7 @@ MonoBehaviour:
   description: Marks a circle; after a moment everything inside is hit. It takes
     your hero's damage type and look.
   cost: 1
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
   glyph: BU
@@ -60,3 +61,9 @@ MonoBehaviour:
   - 140
   - 170
   - 200
+  count: 1
+  spacing: 3
+  stunSeconds: 0
+  slow: 0
+  slowSeconds: 2
+  burnFraction: 0

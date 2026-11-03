@@ -16,6 +16,7 @@ MonoBehaviour:
   description: A storm cloud follows you for 6s, striking a nearby enemy every half
     second (heroes first).
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.65, g: 0.45, b: 1, a: 1}
   glyph: TH

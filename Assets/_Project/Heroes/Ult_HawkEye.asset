@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c1ec7659f45c0c42a3f747e4190cfba, type: 3}
+  m_Name: Ult_HawkEye
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.BuffSpell
+  displayName: Hawk Eye
+  description: 'For a few seconds you see further and shoot faster: more attack range
+    and attack speed.'
+  cost: 0
+  sellsAtFullPrice: 0
+  icon: {fileID: 0}
+  color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
+  glyph: HE
+  tags: 0
+  damageType: 0
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  targeting: 0
+  unitFilter: 0
+  range: 0
+  areaRadius: 0
+  cooldownByRank:
+  - 70
+  - 60
+  - 50
+  manaCostByRank:
+  - 80
+  durationByRank:
+  - 6
+  - 7
+  - 8
+  attackSpeed: 0.4
+  attackRange: 2
+  moveSpeed: 0
+  damageReductionByRank:
+  - 0
+  heatPerAttack: 0

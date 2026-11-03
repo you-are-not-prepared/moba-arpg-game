@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c68f4fb7f954943a62ae8692b2d819, type: 3}
+  m_Name: Ult_Shared_Cyclone
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.BurstSpell
+  displayName: Cyclone
+  description: Air, ranged. A cyclone tears through a wide area after a moment and
+    leaves everything in it badly slowed.
+  cost: 0
+  sellsAtFullPrice: 0
+  icon: {fileID: 0}
+  color: {r: 0.85, g: 0.75, b: 0.45, a: 1}
+  glyph: CY
+  tags: 2
+  damageType: 0
+  adaptive: 1
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  targeting: 1
+  unitFilter: 0
+  range: 10
+  areaRadius: 4
+  cooldownByRank:
+  - 80
+  - 70
+  - 60
+  manaCostByRank:
+  - 100
+  radius: 4
+  delay: 0.6
+  damageByRank:
+  - 150
+  - 220
+  - 290
+  count: 1
+  spacing: 3
+  stunSeconds: 0
+  slow: 0.5
+  slowSeconds: 2.5
+  burnFraction: 0

@@ -26,7 +26,12 @@ namespace Moba.Abilities
         public float burnDuration;
         // The spell's damage type for this caster (AbilityCaster.DamageTypeOf); its affinity is in damageMultiplier.
         public DamageType damageType;
+        // Multiplies area spells' radius (1 = unchanged; ultimate talents).
+        public float radiusMultiplier;
 
-        public static SpellModifiers None => new() { damageMultiplier = 1f };
+        public static SpellModifiers None => new() { damageMultiplier = 1f, radiusMultiplier = 1f };
+
+        // `radius` with the area bonus applied.
+        public readonly float Radius(float radius) => radius * (radiusMultiplier > 0f ? radiusMultiplier : 1f);
     }
 }

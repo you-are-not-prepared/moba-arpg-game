@@ -41,6 +41,10 @@ namespace Moba.Abilities
         public float ultimateCooldownMultiplier = 1f;
         [Tooltip("Multiplies all spell damage (ascension talents).")]
         public float spellDamageMultiplier = 1f;
+        [Tooltip("Multiplies the ultimate's damage and healing (ascension talents).")]
+        public float ultimateDamageMultiplier = 1f;
+        [Tooltip("Multiplies the ultimate's area (ascension talents).")]
+        public float ultimateRadiusMultiplier = 1f;
         [Tooltip("The ultimate slot holds the hero's own ultimate: it can't be swapped or unequipped.")]
         public bool ultimateLocked;
 
@@ -119,13 +123,24 @@ namespace Moba.Abilities
 
         public static int MaxRank(int slot) => slot == UltimateSlot ? 3 : 5;
 
-        // Basic slots: levels 1/3/5/7/9. Ultimate slot: 6/11/16.
+        // Basic slots: levels 1/3/5/7/9. The ultimate isn't learned with skill points: each ascension (6/11/16)
+        // raises it (SetUltimateRank).
         public static int RequiredLevel(int slot, int rank) => slot == UltimateSlot ? 6 + (rank - 1) * 5 : rank * 2 - 1;
 
         public bool CanLevelUp(int index)
         {
             Slot s = slots[index];
-            return SkillPoints > 0 && s.rank < MaxRank(index) && HeroLevel >= RequiredLevel(index, s.rank + 1);
+            return index != UltimateSlot && SkillPoints > 0 && s.rank < MaxRank(index)
+                   && HeroLevel >= RequiredLevel(index, s.rank + 1);
+        }
+
+        // Ascension: the ultimate's rank follows the number of ascensions.
+        public void SetUltimateRank(int rank)
+        {
+            rank = Mathf.Clamp(rank, 0, MaxRank(UltimateSlot));
+            if (slots[UltimateSlot].rank == rank) return;
+            slots[UltimateSlot].rank = rank;
+            RankLearned?.Invoke(UltimateSlot);
         }
 
         public bool TryLevelUp(int index)
@@ -169,6 +184,13 @@ namespace Moba.Abilities
         }
 
         public bool IsSlotLocked(int index) => ultimateLocked && index == UltimateSlot;
+
+        // Shortens the running cooldowns of the basic (non-ultimate) slots by `seconds` (Chrono Bolt).
+        public void ReduceBasicCooldowns(float seconds)
+        {
+            for (int i = 0; i < SlotCount; i++)
+                if (i != UltimateSlot) slots[i].cooldownRemaining = Mathf.Max(0f, slots[i].cooldownRemaining - seconds);
+        }
 
         // Ends the cooldowns of the basic (non-ultimate) slots.
         public void ResetBasicCooldowns()
@@ -216,6 +238,11 @@ namespace Moba.Abilities
             m.damageMultiplier *= spellDamageMultiplier;
             m.damageType = DamageTypeOf(slots[index].ability);
             m.damageMultiplier *= AffinityMultiplier(m.damageType);
+            if (index == UltimateSlot)
+            {
+                m.damageMultiplier *= ultimateDamageMultiplier;
+                m.radiusMultiplier *= ultimateRadiusMultiplier;
+            }
             for (int i = 0; i < MaxModSockets; i++)
                 if (IsModActive(index, i)) slots[index].mods[i].Apply(ref m);
             return m;

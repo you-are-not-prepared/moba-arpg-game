@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using Moba.Abilities;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Moba.UI
 {
-    // Ascension choice: at levels 6, 11 and 18 talent cards appear in the middle of the screen (one per path at
-    // level 6, then two) and stay until one is clicked (the game keeps running). The path decides the later cards.
+    // Ascension choice: at levels 6, 11 and 16 cards appear in the middle of the screen and stay until one is clicked
+    // (the game keeps running). Level 6 offers one card per path, each the ultimate it gives; the chosen path decides
+    // the talents at 11 and 16, which shape that ultimate and the passive.
     public partial class Hud
     {
         VisualElement _ascensionPanel, _ascensionCards;
@@ -42,7 +44,7 @@ namespace Moba.UI
             _ascensionCards.Clear();
             SetText(_ascensionTitle, $"ASCENSION {TierNumerals[tier]}");
             SetText(_ascensionSubtitle, tier == 0
-                ? $"Level {HeroAscension.Levels[tier]} · choose your path"
+                ? $"Level {HeroAscension.Levels[tier]} · choose your ultimate"
                 : $"Level {HeroAscension.Levels[tier]} · {_ascension.PathName} path");
 
             IReadOnlyList<Talent> options = _ascension.Options(tier);
@@ -63,12 +65,28 @@ namespace Moba.UI
             card.Add(CardText($"PATH {letter}", "ascension-card__badge"));
             card.Add(CardText(code, "ascension-card__glyph"));
             card.Add(CardText(talent.name, "ascension-card__name"));
+            AbilityDefinition ultimate = tier == 0 ? _ascension.UltimateOf(option) : null;
             if (tier > 0) card.Add(CardText($"{_ascension.PathName} path", "ascension-card__path"));
+            else if (ultimate != null)
+            {
+                DamageType type = _abilities.DamageTypeOf(ultimate);
+                card.Add(CardText(type == DamageType.None ? "ULTIMATE" : $"ULTIMATE · {DamageTypes.Name(type).ToUpperInvariant()}",
+                    "ascension-card__path"));
+            }
             else card.Add(CardText("Your next two choices follow this path", "ascension-card__path"));
 
             var effects = new VisualElement { pickingMode = PickingMode.Ignore };
             effects.AddToClassList("ascension-card__effects");
             List<string> lines = talent.EffectLines();
+            // The ultimate's numbers at rank 1, as this hero casts it.
+            if (ultimate != null)
+            {
+                SpellModifiers m = SpellModifiers.None;
+                m.damageType = _abilities.DamageTypeOf(ultimate);
+                m.damageMultiplier = _abilities.AffinityMultiplier(m.damageType) * _abilities.spellDamageMultiplier;
+                string numbers = ultimate.Describe(1, m);
+                if (!string.IsNullOrEmpty(numbers)) lines.Insert(0, numbers);
+            }
             foreach (string line in lines) effects.Add(CardText(line, "ascension-card__effect"));
             card.Add(effects);
             if (!string.IsNullOrEmpty(talent.flavor)) card.Add(CardText(talent.flavor, "ascension-card__flavor"));
