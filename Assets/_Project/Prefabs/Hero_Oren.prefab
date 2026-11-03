@@ -179,6 +179,7 @@ MonoBehaviour:
   protectedBy: []
   destroyOnDeath: 0
   sightRadius: 14.4
+  baseDamageType: 0
   goldBounty: 300
   xpBounty: 200
 --- !u!114 &6435598110545740951
@@ -301,7 +302,16 @@ MonoBehaviour:
   passiveExtraProjectiles: 0
   ultimateCooldownMultiplier: 1
   spellDamageMultiplier: 1
+  ultimateDamageMultiplier: 1
+  ultimateRadiusMultiplier: 1
   ultimateLocked: 0
+  affinities:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!114 &4961412688424434199
 MonoBehaviour:
   m_ObjectHideFlags: 0

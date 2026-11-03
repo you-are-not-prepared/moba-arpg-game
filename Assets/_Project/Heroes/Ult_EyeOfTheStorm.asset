@@ -16,10 +16,27 @@ MonoBehaviour:
   description: For a few seconds your spells cost no mana and their cooldowns are
     50% shorter.
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.4, g: 0.85, b: 0.8, a: 1}
   glyph: ES
   tags: 0
+  damageType: 0
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 0
   unitFilter: 0
   range: 0

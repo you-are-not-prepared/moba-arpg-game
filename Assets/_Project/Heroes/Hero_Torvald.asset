@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.55, g: 0.68, b: 0.85, a: 1}
   glyph: T
   prefab: {fileID: 1353840264158424968, guid: 9bcbb793f915c874eadae9ecb3420f82, type: 3}
+  affinities:
+  - -0.1
+  - 0.1
+  - 0.05
+  - -0.1
+  - 0.25
+  - -0.05
+  spellColors:
+  - {r: 0.55, g: 0.68, b: 0.85, a: 1}
+  - {r: 0.82, g: 0.85, b: 0.9, a: 1}
+  - {r: 0.95, g: 0.8, b: 0.35, a: 1}
   passiveName: Iron Hide
   passiveDescription: +50 max health per level, but moves 15% slower.
   extraProjectiles: 0
@@ -42,44 +53,22 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: cb951955d797dd4439aefaf6063a5678, type: 2}
+      root:
         id: torvald_a
-        name: Juggernaut
-        flavor: Grow harder to stop with every fight.
-        maxHealth: 100
+        name: Aegis Wall
+        flavor: Raises a shield wall in front of you for 5 seconds that destroys
+          every enemy projectile flying into it. You can move and turn; the wall
+          stays with you. Tower shots pass through.
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 25
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      second:
-      - id: torvald_a1
-        name: Iron Skin
-        flavor: Blades bend on it.
-        maxHealth: 200
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -96,16 +85,47 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      - id: torvald_a2
-        name: Unstoppable
-        flavor: Heavy, but always moving.
+      second:
+      - id: torvald_a1
+        name: Lasting Aegis Wall
+        flavor: 'Iron Hide: +15 more max health per level.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 15
+        isolationDamage: 0
+        ultimateDuration: 1
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: torvald_a2
+        name: Swift Aegis Wall
+        flavor: 'Thick skin: +150 max health.'
+        maxHealth: 150
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -124,61 +144,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: torvald_a3
-        name: Mountain
-        flavor: Immovable.
-        maxHealth: 300
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: torvald_a4
-        name: Crushing Blows
-        flavor: Every swing lands like a landslide.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 20
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-    - root:
-        id: torvald_b
-        name: Aegis Warden
-        flavor: Hold the wall a little longer.
+        name: Endless Aegis Wall
+        flavor: 'Iron Hide: +25 more max health per level.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -186,10 +153,12 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
-        healthPerLevel: 0
+        healthPerLevel: 25
         isolationDamage: 0
         ultimateDuration: 2
         stunDuration: 0
@@ -202,17 +171,18 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      second:
-      - id: torvald_b1
-        name: Bulwark Drill
-        flavor: Raise the shield on instinct.
+      - id: torvald_a4
+        name: Ever-Ready Aegis Wall
+        flavor: 'Light on your feet: 8% faster.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0
+        moveSpeed: 0.08
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -229,16 +199,77 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      - id: torvald_b2
-        name: Shield Bash
-        flavor: The best defence hits back.
+    - ultimate: {fileID: 11400000, guid: 0e9eedbb68dade74faf7667482141615, type: 2}
+      root:
+        id: torvald_b
+        name: Unbreakable
+        flavor: For a few seconds you take far less damage and move a little faster.
         maxHealth: 0
         maxMana: 0
-        attackDamage: 15
+        attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      second:
+      - id: torvald_b1
+        name: Lasting Unbreakable
+        flavor: 'Iron Hide: +15 more max health per level.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 15
+        isolationDamage: 0
+        ultimateDuration: 1
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: torvald_b2
+        name: Swift Unbreakable
+        flavor: 'Thick skin: +150 max health.'
+        maxHealth: 150
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -257,8 +288,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: torvald_b3
-        name: Unbreakable Wall
-        flavor: Nothing gets through. Nothing.
+        name: Endless Unbreakable
+        flavor: 'Iron Hide: +25 more max health per level.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -266,10 +297,12 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
-        healthPerLevel: 0
+        healthPerLevel: 25
         isolationDamage: 0
         ultimateDuration: 2
         stunDuration: 0
@@ -283,15 +316,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: torvald_b4
-        name: Rapid Guard
-        flavor: Always ready to block.
+        name: Ever-Ready Unbreakable
+        flavor: 'Light on your feet: 8% faster.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0
+        moveSpeed: 0.08
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -308,23 +343,27 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: 27f0291f6d610d046a5040ea773a103d, type: 2}
+      root:
         id: torvald_c
-        name: Warlord
-        flavor: Lead the charge behind the shield.
+        name: Whirlwind
+        flavor: Physical, melee. Spin for a few seconds, hitting everything around
+          you twice a second while moving faster.
         maxHealth: 0
         maxMana: 0
-        attackDamage: 12
+        attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 1
+        ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -337,21 +376,23 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: torvald_c1
-        name: Battle Cry
-        flavor: Swing faster, push harder.
+        name: Lasting Whirlwind
+        flavor: 'Iron Hide: +15 more max health per level.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.15
+        attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
-        healthPerLevel: 0
+        healthPerLevel: 15
         isolationDamage: 0
-        ultimateDuration: 0
+        ultimateDuration: 1
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -363,15 +404,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: torvald_c2
-        name: Forced March
-        flavor: Never fall behind the front line.
-        maxHealth: 0
+        name: Empowered Whirlwind
+        flavor: 'Thick skin: +150 max health.'
+        maxHealth: 150
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -390,21 +433,23 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: torvald_c3
-        name: Shield Charge
-        flavor: The wall moves forward.
+        name: Sweeping Whirlwind
+        flavor: 'Iron Hide: +25 more max health per level.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
-        healthPerLevel: 0
+        healthPerLevel: 25
         isolationDamage: 0
-        ultimateDuration: 1
+        ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -416,15 +461,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: torvald_c4
-        name: Warlord's Might
-        flavor: One blow ends the fight.
+        name: Mighty Whirlwind
+        flavor: 'Light on your feet: 8% faster.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 25
+        attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0
+        moveSpeed: 0.08
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -441,4 +488,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: cb951955d797dd4439aefaf6063a5678, type: 2}
+  signature: {fileID: 11400000, guid: 60b38f90168bdd54b933ab60ed039617, type: 2}

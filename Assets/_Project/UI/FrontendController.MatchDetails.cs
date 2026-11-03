@@ -65,7 +65,11 @@ namespace Moba.UI
             player.AddToClassList("details-player");
             player.Add(Glyph(p.heroId, "history-mini"));
             VisualElement names = Block(null);
-            names.Add(Text($"{HeroName(p.heroId)}  ·  Lv {p.level}", "details-player__hero"));
+            var heroLine = Block("details-player__hero-line");
+            heroLine.Add(Text($"{HeroName(p.heroId)}  ·  Lv {p.level}", "details-player__hero"));
+            HeroDefinition hero = roster.Find(p.heroId);
+            if (hero != null) heroLine.Add(DamageTypeBadge.Create(hero.BaseDamageType, "damage-type--small"));
+            names.Add(heroLine);
             names.Add(Text(isMe ? "You" : p.isBot ? "Bot" : p.username ?? "Player", "details-player__name"));
             player.Add(names);
             row.Add(player);
@@ -236,7 +240,11 @@ namespace Moba.UI
                     foreach (InventoryItem item in items.items)
                         if (item != null) _itemsById[item.name] = item;
                 foreach (HeroDefinition hero in roster.heroes)
-                    if (hero != null && hero.ultimate != null) _itemsById[hero.ultimate.name] = hero.ultimate;
+                {
+                    if (hero == null) continue;
+                    if (hero.signature != null) _itemsById[hero.signature.name] = hero.signature;
+                    foreach (AbilityDefinition ultimate in hero.UltimateOptions) _itemsById[ultimate.name] = ultimate;
+                }
             }
             return _itemsById.TryGetValue(id, out InventoryItem found) ? found : null;
         }

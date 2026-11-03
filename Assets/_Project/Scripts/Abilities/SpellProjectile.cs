@@ -15,6 +15,7 @@ namespace Moba.Abilities
             public Unit Caster;
             public Team Team;
             public float Damage;
+            public DamageType DamageType;
             public float ExplosionRadius;
             public float BurnDps;
             public float BurnDuration;
@@ -22,12 +23,18 @@ namespace Moba.Abilities
             public float ForkAngle;
             public bool Pierce;
             public float StunDuration;
+            public float Slow;
+            public float SlowSeconds;
+            // The first hit shortens the caster's other basic cooldowns by this many seconds.
+            public float CooldownRefund;
             public float Speed;
             public float MaxDistance;
             public float Size;
             public float Height;
             public Material ProjectileMaterial;
             public Material ExplosionMaterial;
+            // Adaptive spells: drawn in this type's shape and the caster's colours (SpellLook) instead of the materials.
+            public DamageType Look;
             // Chain (a charged spell, see StaticCharge): the first hit jumps to this many more enemies within ChainRange
             // for ChainFraction of the damage each.
             public int ChainJumps;
@@ -44,7 +51,7 @@ namespace Moba.Abilities
         Vector3 _dir;
         float _travelled;
         Unit _ignore;
-        Renderer _renderer;
+        Renderer[] _renderers;
         HashSet<Unit> _pierced;
         int _netId;
         bool _visualOnly;
@@ -77,19 +84,35 @@ namespace Moba.Abilities
 
         static SpellProjectile Create(Vector3 position, Vector3 direction, in Payload payload)
         {
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            go.name = "SpellProjectile";
-            DestroyImmediate(go.GetComponent<Collider>());
-            go.transform.SetPositionAndRotation(position, Quaternion.LookRotation(direction));
-            go.transform.localScale = Vector3.one * payload.Size;
-            if (payload.ProjectileMaterial != null) go.GetComponent<Renderer>().sharedMaterial = payload.ProjectileMaterial;
+            GameObject go;
+            if (payload.Look != DamageType.None)
+            {
+                go = new GameObject("SpellProjectile");
+                go.transform.SetPositionAndRotation(position, Quaternion.LookRotation(direction));
+                SpellLook.BuildProjectile(go.transform, payload.Look, SpellLook.ColorsOf(payload.Caster), payload.Size);
+            }
+            else
+            {
+                go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                go.name = "SpellProjectile";
+                DestroyImmediate(go.GetComponent<Collider>());
+                go.transform.SetPositionAndRotation(position, Quaternion.LookRotation(direction));
+                go.transform.localScale = Vector3.one * payload.Size;
+                if (payload.ProjectileMaterial != null) go.GetComponent<Renderer>().sharedMaterial = payload.ProjectileMaterial;
+            }
 
             var p = go.AddComponent<SpellProjectile>();
             p._p = payload;
             p._dir = direction.normalized;
-            p._renderer = go.GetComponent<Renderer>();
-            p._renderer.enabled = FogOfWar.ShouldShow(payload.Team, go.transform.position);
+            p._renderers = go.GetComponentsInChildren<Renderer>();
+            p.SetVisible(FogOfWar.ShouldShow(payload.Team, go.transform.position));
             return p;
+        }
+
+        void SetVisible(bool visible)
+        {
+            foreach (Renderer r in _renderers)
+                if (r != null && r.enabled != visible) r.enabled = visible;
         }
 
         void OnDestroy()
@@ -108,7 +131,7 @@ namespace Moba.Abilities
             if (_visualOnly)
             {
                 transform.position = to;
-                _renderer.enabled = FogOfWar.ShouldShow(_p.Team, to);
+                SetVisible(FogOfWar.ShouldShow(_p.Team, to));
                 _travelled += step;
                 if (_travelled >= _p.MaxDistance) Destroy(gameObject);
                 return;
@@ -129,7 +152,7 @@ namespace Moba.Abilities
             }
 
             transform.position = to;
-            _renderer.enabled = FogOfWar.ShouldShow(_p.Team, to);
+            SetVisible(FogOfWar.ShouldShow(_p.Team, to));
             _travelled += step;
             if (_travelled >= _p.MaxDistance) Destroy(gameObject);
         }
@@ -178,6 +201,8 @@ namespace Moba.Abilities
             }
 
             if (_p.ChainJumps > 0 && firstHit) Chain(hit);
+            if (_p.CooldownRefund > 0f && firstHit && _p.Caster != null && _p.Caster.TryGetComponent(out AbilityCaster abilities))
+                abilities.ReduceBasicCooldowns(_p.CooldownRefund);
 
             if (_p.Pierce)
             {
@@ -210,7 +235,7 @@ namespace Moba.Abilities
                 struck.Add(next);
                 float damage = _p.Damage * _p.ChainFraction;
                 LightningBolt.Spawn(previous.AimPoint, next.AimPoint, _p.BoltMaterial, _p.Team);
-                next.TakeDamage(damage, _p.Caster);
+                next.TakeDamage(damage, _p.Caster, _p.DamageType);
                 SpellEvents.RaiseHit(_p.Caster, next, damage);
                 previous = next;
             }
@@ -236,14 +261,19 @@ namespace Moba.Abilities
 
             foreach (Unit u in s_Targets)
             {
-                u.TakeDamage(_p.Damage, _p.Caster);
+                u.TakeDamage(_p.Damage, _p.Caster, _p.DamageType);
                 SpellEvents.RaiseHit(_p.Caster, u, _p.Damage);
-                if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster);
+                if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster, _p.DamageType);
                 if (_p.StunDuration > 0f && u.IsAlive) Stun.Apply(u, _p.StunDuration);
+                if (_p.Slow > 0f && u.IsAlive) Slow.Apply(u, _p.Slow, _p.SlowSeconds);
             }
             s_Targets.Clear();
 
-            if (_p.ExplosionRadius > 0f) SpellExplosion.Spawn(center, _p.ExplosionRadius, _p.ExplosionMaterial);
+            if (_p.ExplosionRadius <= 0f) return;
+            if (_p.Look != DamageType.None)
+                SpellLook.Play(SpellLookKind.Explosion, _p.Look, _p.Caster, center, Vector3.zero, _p.ExplosionRadius, 0f);
+            else
+                SpellExplosion.Spawn(center, _p.ExplosionRadius, _p.ExplosionMaterial);
         }
     }
 }

@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4977d03c3231d438bc7ae87808a993, type: 3}
+  m_Name: Ult_Shared_Blizzard
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.ZoneSpell
+  displayName: Blizzard
+  description: Frost, ranged. A blizzard rages over a wide area for a few seconds,
+    hurting and slowing everything in it.
+  cost: 0
+  sellsAtFullPrice: 0
+  icon: {fileID: 0}
+  color: {r: 0.85, g: 0.75, b: 0.45, a: 1}
+  glyph: BZ
+  tags: 0
+  damageType: 2
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  targeting: 1
+  unitFilter: 0
+  range: 10
+  areaRadius: 4.5
+  cooldownByRank:
+  - 90
+  - 80
+  - 70
+  manaCostByRank:
+  - 100
+  radius: 4.5
+  delay: 0
+  durationByRank:
+  - 4
+  - 4.5
+  - 5
+  freezeByRank:
+  - 0
+  enemySlow: 0.4
+  enemyDamagePerSecond: 60
+  allyHealByRank:
+  - 0
+  allyMoveSpeed: 0
+  zoneMaterial: {fileID: 2100000, guid: 52dd415f77eda524989c0f9a38851f0e, type: 2}
+  warningMaterial: {fileID: 0}

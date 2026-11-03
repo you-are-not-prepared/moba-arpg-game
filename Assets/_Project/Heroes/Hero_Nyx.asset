@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 0.85, g: 0.25, b: 0.4, a: 1}
   glyph: N
   prefab: {fileID: 723370757552622355, guid: f4b646396f898584ea93dc24d69b3328, type: 3}
+  affinities:
+  - 0
+  - -0.05
+  - 0.1
+  - -0.1
+  - 0.25
+  - 0.1
+  spellColors:
+  - {r: 0.85, g: 0.2, b: 0.35, a: 1}
+  - {r: 0.32, g: 0.1, b: 0.2, a: 1}
+  - {r: 1, g: 0.55, b: 0.65, a: 1}
   passiveName: Lone Prey
   passiveDescription: Deal 15% more damage to targets with no allied hero within
     7m of them.
@@ -44,10 +55,12 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 6868062af2eb1b3489a088ddbd33aff8, type: 2}
+      root:
         id: nyx_a
-        name: Lone Hunter
-        flavor: Separate them, then strike.
+        name: Bloodrush
+        flavor: 'For 7 seconds: 60% more movement speed and 20% more attack speed.
+          Killing an enemy hero refreshes the duration.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -55,33 +68,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0.1
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      second:
-      - id: nyx_a1
-        name: Predator
-        flavor: Sharper claws.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 15
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -98,16 +86,47 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      - id: nyx_a2
-        name: Stalker's Pace
-        flavor: Close the gap before they notice.
+      second:
+      - id: nyx_a1
+        name: Lasting Bloodrush
+        flavor: 'Lone Prey: another +5% damage to isolated targets.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0.05
+        ultimateDuration: 1.5
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: nyx_a2
+        name: Swift Bloodrush
+        flavor: 'Frenzy: 10% more attack speed.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.1
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -126,8 +145,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: nyx_a3
-        name: Apex
-        flavor: Nothing hunts the hunter.
+        name: Endless Bloodrush
+        flavor: 'Lone Prey: another +10% damage to isolated targets.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -135,12 +154,14 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
-        isolationDamage: 0.15
-        ultimateDuration: 0
+        isolationDamage: 0.1
+        ultimateDuration: 2
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -152,15 +173,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: nyx_a4
-        name: Frenzy
-        flavor: Faster and faster.
+        name: Ever-Ready Bloodrush
+        flavor: 'Sharpened claws: +15 attack damage.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0.2
+        attackDamage: 15
+        attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -177,10 +200,12 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: aebcbffa345aa9943ac0906c0b911194, type: 2}
+      root:
         id: nyx_b
-        name: Blood Frenzy
-        flavor: The rush lasts longer.
+        name: Shadow Execute
+        flavor: 'Dash onto your prey and cut into it: the more health it has lost,
+          the harder it hits.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -188,12 +213,14 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 2
+        ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -206,20 +233,22 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: nyx_b1
-        name: Hemorrhage
-        flavor: Strike while they bleed.
+        name: Empowered Shadow Execute
+        flavor: 'Lone Prey: another +5% damage to isolated targets.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.15
+        attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
-        isolationDamage: 0
+        isolationDamage: 0.05
         ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
@@ -232,15 +261,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: nyx_b2
-        name: Thirst
-        flavor: Feed on the fight.
-        maxHealth: 150
+        name: Swift Shadow Execute
+        flavor: 'Frenzy: 10% more attack speed.'
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0
+        attackSpeed: 0.1
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -259,8 +290,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: nyx_b3
-        name: Endless Hunt
-        flavor: The rush never ends.
+        name: Mighty Shadow Execute
+        flavor: 'Lone Prey: another +10% damage to isolated targets.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -268,165 +299,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 2
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: nyx_b4
-        name: Quick Return
-        flavor: Rush again, sooner.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0.3
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-    - root:
-        id: nyx_c
-        name: Shadowstep
-        flavor: In, out, gone.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0.1
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0.05
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      second:
-      - id: nyx_c1
-        name: Ambush
-        flavor: The first strike is the deepest.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 15
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: nyx_c2
-        name: Night Run
-        flavor: The rush carries you further.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 1.5
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      third:
-      - id: nyx_c3
-        name: Phantom
-        flavor: Too fast to pin down.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0.1
-        moveSpeed: 0.1
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: nyx_c4
-        name: Execution
-        flavor: Alone, and out of time.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 10
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -443,4 +317,177 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 6868062af2eb1b3489a088ddbd33aff8, type: 2}
+      - id: nyx_b4
+        name: Ever-Ready Shadow Execute
+        flavor: 'Sharpened claws: +15 attack damage.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 15
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+    - ultimate: {fileID: 11400000, guid: 27f0291f6d610d046a5040ea773a103d, type: 2}
+      root:
+        id: nyx_c
+        name: Whirlwind
+        flavor: Physical, melee. Spin for a few seconds, hitting everything around
+          you twice a second while moving faster.
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      second:
+      - id: nyx_c1
+        name: Lasting Whirlwind
+        flavor: 'Lone Prey: another +5% damage to isolated targets.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0.05
+        ultimateDuration: 1
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: nyx_c2
+        name: Empowered Whirlwind
+        flavor: 'Frenzy: 10% more attack speed.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.1
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      third:
+      - id: nyx_c3
+        name: Sweeping Whirlwind
+        flavor: 'Lone Prey: another +10% damage to isolated targets.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0.1
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: nyx_c4
+        name: Mighty Whirlwind
+        flavor: 'Sharpened claws: +15 attack damage.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 15
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+  signature: {fileID: 11400000, guid: 430f9a5bac2beca4b96f96f33ee87cc7, type: 2}

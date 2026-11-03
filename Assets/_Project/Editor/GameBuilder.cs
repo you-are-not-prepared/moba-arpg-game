@@ -166,9 +166,23 @@ namespace Moba.EditorTools
             public float SpellSlow, SpellSlowSeconds = 1.5f, SlowedDamageBonus, AllyHealFraction;
             public int ChargeEvery, ChargeJumps = 1;
             public bool Melee;
-            public System.Func<Mats, AbilityDefinition> Ultimate;
-            public System.Func<AscensionTree> Ascension;
+            // Fire, Frost, Nature, Lightning, Physical, Air (see Aff); the highest is the base damage type.
+            public float[] Affinities = new float[DamageTypes.Count];
+            // Main, secondary, highlight.
+            public Color[] SpellColors;
+            // Starts in Q (GameBuilder.Kits).
+            public System.Func<Mats, AbilityDefinition> Signature;
+            // Three paths, one per ultimate (GameBuilder.Ascension).
+            public System.Func<Mats, AscensionTree> Ascension;
         }
+
+        // Affinities in DamageTypes.All order, as percentages: Aff(25, -20, 0, 10, -10, 5) = Fire +25%, Frost -20%...
+        static float[] Aff(float fire, float frost, float nature, float lightning, float physical, float air) =>
+            new[] { fire / 100f, frost / 100f, nature / 100f, lightning / 100f, physical / 100f, air / 100f };
+
+        static Color[] Colors(Color main, Color secondary, Color highlight) => new[] { main, secondary, highlight };
+
+        static Color Rgb(float r, float g, float b) => new(r, g, b);
 
         static List<HeroSpec> Heroes() => new()
         {
@@ -179,7 +193,8 @@ namespace Moba.EditorTools
                 Health = 560f, Damage = 32f, Range = 6.5f, AttacksPerSecond = 1.25f, Speed = 6.6f, Mana = 300f,
                 PassiveName = "Split Shot", PassiveDescription = "Your projectile spells fire 1 extra projectile.",
                 ExtraProjectiles = 1,
-                Ultimate = m => SkybreakerArrow(m),
+                Affinities = Aff(-5, -5, 15, -10, 25, 5), SpellColors = Colors(Rgb(0.33f, 0.6f, 0.22f), Rgb(0.62f, 0.85f, 0.4f), Rgb(0.66f, 0.68f, 0.72f)),
+                Signature = m => PiercingShot(m),
             },
             new HeroSpec
             {
@@ -188,7 +203,8 @@ namespace Moba.EditorTools
                 Health = 580f, Damage = 27f, Range = 5.5f, AttacksPerSecond = 1.1f, Speed = 6.5f, Mana = 400f,
                 PassiveName = "Quickened Mind", PassiveDescription = "All your cooldowns are 20% shorter.",
                 CooldownMultiplier = 0.8f,
-                Ultimate = _ => Rewind(),
+                Affinities = Aff(5, 5, -10, 25, -5, 10), SpellColors = Colors(Rgb(0.55f, 0.35f, 0.95f), Rgb(0.8f, 0.65f, 1f), Rgb(0.88f, 0.92f, 1f)),
+                Signature = m => ChronoBolt(m),
             },
             new HeroSpec
             {
@@ -197,7 +213,8 @@ namespace Moba.EditorTools
                 Health = 660f, Damage = 30f, Range = 5f, AttacksPerSecond = 1.15f, Speed = 6.4f, Mana = 300f,
                 PassiveName = "Masterwork Gear", PassiveDescription = "Items give 10% more stats.",
                 ItemStatMultiplier = 1.1f,
-                Ultimate = _ => OverchargedSockets(),
+                Affinities = Aff(25, -20, 0, 10, 5, -10), SpellColors = Colors(Rgb(1f, 0.55f, 0.15f), Rgb(0.85f, 0.65f, 0.3f), Rgb(0.7f, 0.2f, 0.1f)),
+                Signature = m => BlastCharge(m),
             },
             new HeroSpec
             {
@@ -206,7 +223,8 @@ namespace Moba.EditorTools
                 Health = 720f, Damage = 30f, Range = 1f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 300f, Melee = true,
                 PassiveName = "Iron Hide", PassiveDescription = "+50 max health per level, but moves 15% slower.",
                 HealthPerLevelBonus = 50f, MoveSpeedMultiplier = 0.85f,
-                Ultimate = m => AegisWall(m),
+                Affinities = Aff(-10, 10, 5, -10, 25, -5), SpellColors = Colors(Rgb(0.55f, 0.68f, 0.85f), Rgb(0.82f, 0.85f, 0.9f), Rgb(0.95f, 0.8f, 0.35f)),
+                Signature = m => ShieldBash(m),
             },
             new HeroSpec
             {
@@ -215,7 +233,8 @@ namespace Moba.EditorTools
                 Health = 590f, Damage = 34f, Range = 1f, AttacksPerSecond = 1.2f, Speed = 6.7f, Mana = 300f, Melee = true,
                 PassiveName = "Lone Prey", PassiveDescription = "Deal 15% more damage to targets with no allied hero within 7m of them.",
                 IsolationDamageBonus = 0.15f, IsolationRadius = 7f,
-                Ultimate = m => Bloodrush(m),
+                Affinities = Aff(0, -5, 10, -10, 25, 10), SpellColors = Colors(Rgb(0.85f, 0.2f, 0.35f), Rgb(0.32f, 0.1f, 0.2f), Rgb(1f, 0.55f, 0.65f)),
+                Signature = m => Pounce(m),
             },
             new HeroSpec
             {
@@ -224,7 +243,8 @@ namespace Moba.EditorTools
                 Health = 550f, Damage = 30f, Range = 6f, AttacksPerSecond = 1.2f, Speed = 6.8f, Mana = 320f,
                 PassiveName = "Tailwind", PassiveDescription = "Each spell you cast gives 25% movement speed for 2s (casting again refreshes it).",
                 TailwindSpeed = 0.25f, TailwindDuration = 2f,
-                Ultimate = m => EyeOfTheStorm(m),
+                Affinities = Aff(-10, 5, 5, 15, -10, 25), SpellColors = Colors(Rgb(0.4f, 0.85f, 0.8f), Rgb(0.8f, 0.97f, 0.95f), Rgb(0.7f, 0.75f, 0.78f)),
+                Signature = m => GaleShot(m),
             },
             new HeroSpec
             {
@@ -233,7 +253,8 @@ namespace Moba.EditorTools
                 Health = 680f, Damage = 35f, Range = 1f, AttacksPerSecond = 1.15f, Speed = 6.6f, Mana = 300f, Melee = true,
                 PassiveName = "Kindled Blade", PassiveDescription = "Each attack builds Heat (up to 5, +4% attack speed each). At 5, your next attack bursts for 50 fire damage around the target and burns.",
                 HeatMaxStacks = 5, HeatAttackSpeed = 0.04f, HeatBurstDamage = 50f, PassiveMaterial = m => m.Explosion,
-                Ultimate = m => BlazingLeap(m),
+                Affinities = Aff(25, -20, -5, 5, 10, -10), SpellColors = Colors(Rgb(0.9f, 0.25f, 0.15f), Rgb(1f, 0.55f, 0.15f), Rgb(1f, 0.82f, 0.3f)),
+                Signature = m => SearingStrike(m),
             },
             new HeroSpec
             {
@@ -242,7 +263,8 @@ namespace Moba.EditorTools
                 Health = 540f, Damage = 26f, Range = 6f, AttacksPerSecond = 1f, Speed = 6.4f, Mana = 400f,
                 PassiveName = "Chilling Touch", PassiveDescription = "Your spell hits slow enemies by 20% for 1.5s. Slowed enemies take 10% more damage from you.",
                 SpellSlow = 0.2f, SpellSlowSeconds = 1.5f, SlowedDamageBonus = 0.1f,
-                Ultimate = m => GlacialPrison(m),
+                Affinities = Aff(-20, 25, 5, 0, -10, 10), SpellColors = Colors(Rgb(0.15f, 0.45f, 0.95f), Rgb(0.45f, 0.8f, 1f), Rgb(0.95f, 0.98f, 1f)),
+                Signature = m => IceLance(m),
             },
             new HeroSpec
             {
@@ -251,7 +273,8 @@ namespace Moba.EditorTools
                 Health = 580f, Damage = 25f, Range = 5.5f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 420f,
                 PassiveName = "Verdant Bond", PassiveDescription = "Your spell hits heal the nearest allied hero (within 8m) for 15% of the damage dealt.",
                 AllyHealFraction = 0.15f,
-                Ultimate = m => Sanctuary(m),
+                Affinities = Aff(-15, -5, 25, -10, 0, 10), SpellColors = Colors(Rgb(0.35f, 0.75f, 0.25f), Rgb(0.65f, 0.9f, 0.4f), Rgb(1f, 0.8f, 0.9f)),
+                Signature = m => MendingSeed(m),
             },
             new HeroSpec
             {
@@ -260,7 +283,8 @@ namespace Moba.EditorTools
                 Health = 550f, Damage = 27f, Range = 6f, AttacksPerSecond = 1.1f, Speed = 6.5f, Mana = 380f,
                 PassiveName = "Static Charge", PassiveDescription = "Every 4th spell you cast is charged: its first hit jumps to 1 more enemy within 5m for 50% damage.",
                 ChargeEvery = 4, ChargeJumps = 1, PassiveMaterial = m => m.Lightning,
-                Ultimate = m => Thunderhead(m),
+                Affinities = Aff(0, -5, -15, 25, -10, 15), SpellColors = Colors(Rgb(0.6f, 0.35f, 1f), Rgb(0.65f, 0.85f, 1f), Rgb(0.95f, 0.95f, 1f)),
+                Signature = m => ArcBolt(m),
             },
         };
 
@@ -268,6 +292,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<ProjectileSpell>($"{HeroesDir}/Ult_SkybreakerArrow.asset");
             spell.displayName = "Skybreaker Arrow";
+            spell.damageType = DamageType.Physical;
             spell.description = "Looses a huge arrow that flies across the map, piercing and stunning every enemy it passes.";
             spell.cost = 0;
             spell.glyph = "SA";
@@ -296,6 +321,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<CooldownResetSpell>($"{HeroesDir}/Ult_Rewind.asset");
             spell.displayName = "Rewind";
+            spell.damageType = DamageType.None;
             spell.description = "Instantly resets the cooldowns of your Q, W and E spells.";
             spell.cost = 0;
             spell.glyph = "RW";
@@ -312,6 +338,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<ShieldWallSpell>($"{HeroesDir}/Ult_AegisWall.asset");
             spell.displayName = "Aegis Wall";
+            spell.damageType = DamageType.None;
             spell.description = "Raises a shield wall in front of you for 5 seconds that destroys every enemy projectile " +
                                 "flying into it. You can move and turn; the wall stays with you. Tower shots pass through.";
             spell.cost = 0;
@@ -335,6 +362,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<HasteSpell>($"{HeroesDir}/Ult_Bloodrush.asset");
             spell.displayName = "Bloodrush";
+            spell.damageType = DamageType.None;
             spell.description = "For 7 seconds: 60% more movement speed and 20% more attack speed. " +
                                 "Killing an enemy hero refreshes the duration.";
             spell.cost = 0;
@@ -357,6 +385,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<LeapSpell>($"{HeroesDir}/Ult_BlazingLeap.asset");
             spell.displayName = "Blazing Leap";
+            spell.damageType = DamageType.Fire;
             spell.description = "Leap to a point, burning enemies where you land. Your attacks burn for 5s afterwards.";
             spell.cost = 0;
             spell.glyph = "BL";
@@ -381,6 +410,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<ZoneSpell>($"{HeroesDir}/Ult_GlacialPrison.asset");
             spell.displayName = "Glacial Prison";
+            spell.damageType = DamageType.Frost;
             spell.description = "Mark an area: after a moment, enemies inside are frozen, and the ice slows anyone in it for 3s.";
             spell.cost = 0;
             spell.glyph = "GP";
@@ -408,6 +438,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<ZoneSpell>($"{HeroesDir}/Ult_Sanctuary.asset");
             spell.displayName = "Sanctuary";
+            spell.damageType = DamageType.Nature;
             spell.description = "Grow a grove for 6s: allies inside heal and move faster, enemies inside are slowed.";
             spell.cost = 0;
             spell.glyph = "SN";
@@ -435,6 +466,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<StormCloudSpell>($"{HeroesDir}/Ult_Thunderhead.asset");
             spell.displayName = "Thunderhead";
+            spell.damageType = DamageType.Lightning;
             spell.description = "A storm cloud follows you for 6s, striking a nearby enemy every half second (heroes first).";
             spell.cost = 0;
             spell.glyph = "TH";
@@ -457,6 +489,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<SpellStormSpell>($"{HeroesDir}/Ult_EyeOfTheStorm.asset");
             spell.displayName = "Eye of the Storm";
+            spell.damageType = DamageType.None;
             spell.description = "For a few seconds your spells cost no mana and their cooldowns are 50% shorter.";
             spell.cost = 0;
             spell.glyph = "ES";
@@ -477,6 +510,7 @@ namespace Moba.EditorTools
         {
             var spell = LoadOrCreate<ExtraSocketUltimate>($"{HeroesDir}/Ult_OverchargedSockets.asset");
             spell.displayName = "Overcharged Sockets";
+            spell.damageType = DamageType.None;
             spell.description = "Passive once learned: Q, W and E each get a 4th mod socket.";
             spell.cost = 0;
             spell.glyph = "OS";
@@ -506,6 +540,7 @@ namespace Moba.EditorTools
             // Shared assets, saved to disk first. A throwaway scene hosts the temporary objects prefab building creates.
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Mats m = CreateMaterials();
+            CreateSpellLooks(m);
             CreateItems(m);
             CreateCreepPrefab("Creep_Melee", m, ranged: false);
             CreateCreepPrefab("Creep_Ranged", m, ranged: true);
@@ -844,8 +879,10 @@ namespace Moba.EditorTools
                 def.allyHealFraction = spec.AllyHealFraction;
                 def.chargeEvery = spec.ChargeEvery;
                 def.chargeJumps = spec.ChargeJumps;
-                def.ultimate = spec.Ultimate(m);
-                def.ascension = spec.Ascension?.Invoke() ?? new AscensionTree();
+                def.affinities = spec.Affinities;
+                def.spellColors = spec.SpellColors ?? Colors(spec.Color, spec.Color, Color.white);
+                def.signature = spec.Signature?.Invoke(m);
+                def.ascension = spec.Ascension?.Invoke(m) ?? new AscensionTree();
                 def.prefab = CreateHeroPrefab(spec, m);
                 EditorUtility.SetDirty(def);
                 roster.heroes.Add(def);
@@ -1052,7 +1089,10 @@ namespace Moba.EditorTools
                     "Two hands, no regrets."),
                 Item("Executioner", "Executioner", 3000, 70f, "EX", new Color(0.75f, 0.25f, 0.25f),
                     "The finishing blow, sharpened."),
-                Fireball(m),
+                Projectile(m),
+                Burst(),
+                Cleave(),
+                Lunge(),
                 Mod("Mod_Volley", "Volley", 500, "VO", new Color(0.3f, 0.55f, 0.85f),
                     "The spell fires 2 extra projectiles in a fan.",
                     SpellTags.Projectile, mod => mod.extraProjectiles = 2),
@@ -1093,15 +1133,51 @@ namespace Moba.EditorTools
             return item;
         }
 
-        static ProjectileSpell Fireball(Mats m)
+        // The tinted materials adaptive spells are drawn with (SpellLook loads them from Resources).
+        static void CreateSpellLooks(Mats m)
         {
-            var spell = LoadOrCreate<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset");
-            spell.displayName = "Fireball";
-            spell.description = "Hurls a fireball that explodes on the first enemy it hits.";
-            spell.cost = Price(450);
-            spell.glyph = "FB";
-            spell.color = TestKindColors ? TestSpellColor : new Color(0.9f, 0.42f, 0.1f);
-            spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect | SpellTags.Fire;
+            EnsureFolder(ResourcesDir);
+            var library = LoadOrCreate<SpellLookLibrary>($"{ResourcesDir}/{SpellLookLibrary.ResourcePath}.asset");
+            library.glow = m.Fire;
+            library.lines = m.Lightning;
+            library.ring = m.FrostWarning;
+            library.slash = m.MeleeSlash;
+            EditorUtility.SetDirty(library);
+        }
+
+        // Adaptive shop spells: a blank slate that takes the caster's base damage type, name and look.
+        static T Adaptive<T>(string id, string name, string description, int cost, string glyph, string[] names,
+            string[] glyphs) where T : AbilityDefinition
+        {
+            var spell = LoadOrCreate<T>($"{ItemsDir}/{id}.asset");
+            spell.displayName = name;
+            spell.description = description;
+            spell.cost = Price(cost);
+            spell.glyph = glyph;
+            spell.color = TestKindColors ? TestSpellColor : new Color(0.55f, 0.6f, 0.7f);
+            spell.adaptive = true;
+            spell.damageType = DamageType.None;
+            spell.typeNames = names;
+            spell.typeGlyphs = glyphs;
+            return spell;
+        }
+
+        // Fire, Frost, Nature, Lightning, Physical, Air.
+        static string[] PerType(string fire, string frost, string nature, string lightning, string physical, string air) =>
+            new[] { fire, frost, nature, lightning, physical, air };
+
+        static ProjectileSpell Projectile(Mats m)
+        {
+            // Was Spell_Fireball: moving the asset keeps its GUID, so scenes and prefabs still point at it.
+            const string path = ItemsDir + "/Spell_Projectile.asset";
+            if (AssetDatabase.LoadAssetAtPath<ProjectileSpell>(path) == null
+                && AssetDatabase.LoadAssetAtPath<ProjectileSpell>($"{ItemsDir}/Spell_Fireball.asset") != null)
+                AssetDatabase.MoveAsset($"{ItemsDir}/Spell_Fireball.asset", path);
+            var spell = Adaptive<ProjectileSpell>("Spell_Projectile", "Projectile",
+                "Fires a projectile that explodes on the first enemy it hits. It takes your hero's damage type and look.",
+                450, "PR", PerType("Fireball", "Ice Shard", "Thorn", "Spark", "Arrow", "Wind Blade"),
+                PerType("FB", "IS", "TH", "SP", "AR", "WB"));
+            spell.tags = SpellTags.Projectile | SpellTags.AreaOfEffect;
             spell.targeting = AbilityTargeting.Point;
             spell.range = 0f; // skillshot: fires immediately toward the clicked point
             spell.cooldownByRank = new[] { 1.5f, 1.4f, 1.3f, 1.2f, 1f };
@@ -1117,6 +1193,65 @@ namespace Moba.EditorTools
             spell.spreadAngle = 15f;
             spell.projectileMaterial = m.Fire;
             spell.explosionMaterial = m.Explosion;
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static BurstSpell Burst()
+        {
+            var spell = Adaptive<BurstSpell>("Spell_Burst", "Burst",
+                "Marks a circle; after a moment everything inside is hit. It takes your hero's damage type and look.",
+                500, "BU", PerType("Meteor", "Ice Spikes", "Thornburst", "Lightning Strike", "Arrow Rain", "Cyclone"),
+                PerType("ME", "IC", "TB", "LS", "RA", "CY"));
+            spell.tags = SpellTags.AreaOfEffect;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 9f;
+            spell.radius = 2.5f;
+            spell.areaRadius = spell.radius;
+            spell.delay = 0.6f;
+            spell.damageByRank = new[] { 80f, 110f, 140f, 170f, 200f };
+            spell.cooldownByRank = new[] { 6f, 5.5f, 5f, 4.5f, 4f };
+            spell.manaCostByRank = new[] { 50f, 55f, 60f, 65f, 70f };
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static MeleeSpell Cleave()
+        {
+            var spell = Adaptive<MeleeSpell>("Spell_Cleave", "Cleave",
+                "A wide swing that hits every enemy in front of you. It takes your hero's damage type and look.",
+                400, "CL", PerType("Flame Arc", "Frost Arc", "Bramble Swipe", "Storm Arc", "Cleave", "Gale Arc"),
+                PerType("FA", "FR", "BS", "SA", "CL", "GA"));
+            spell.tags = SpellTags.Melee | SpellTags.AreaOfEffect;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 0f;
+            spell.lunge = false;
+            spell.reach = 3f;
+            spell.coneAngle = 120f;
+            spell.damageByRank = new[] { 70f, 100f, 130f, 160f, 190f };
+            spell.cooldownByRank = new[] { 4f, 3.75f, 3.5f, 3.25f, 3f };
+            spell.manaCostByRank = new[] { 30f, 33f, 36f, 39f, 42f };
+            EditorUtility.SetDirty(spell);
+            return spell;
+        }
+
+        static MeleeSpell Lunge()
+        {
+            var spell = Adaptive<MeleeSpell>("Spell_Lunge", "Lunge",
+                "Dashes to a point and hits every enemy around where you land. It takes your hero's damage type and look.",
+                450, "LU", PerType("Flame Dash", "Frost Dash", "Root Leap", "Thunder Dash", "Lunge", "Gust Dash"),
+                PerType("FD", "FD", "RL", "TD", "LU", "GD"));
+            spell.tags = SpellTags.Melee | SpellTags.AreaOfEffect;
+            spell.targeting = AbilityTargeting.Point;
+            spell.range = 6f;
+            spell.areaRadius = 2.2f;
+            spell.lunge = true;
+            spell.lungeSeconds = 0.25f;
+            spell.lungeHeight = 0.8f;
+            spell.landingRadius = 2.2f;
+            spell.damageByRank = new[] { 60f, 85f, 110f, 135f, 160f };
+            spell.cooldownByRank = new[] { 8f, 7.5f, 7f, 6.5f, 6f };
+            spell.manaCostByRank = new[] { 40f, 44f, 48f, 52f, 56f };
             EditorUtility.SetDirty(spell);
             return spell;
         }

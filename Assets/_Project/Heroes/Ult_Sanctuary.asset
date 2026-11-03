@@ -16,10 +16,27 @@ MonoBehaviour:
   description: 'Grow a grove for 6s: allies inside heal and move faster, enemies
     inside are slowed.'
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.45, g: 0.8, b: 0.35, a: 1}
   glyph: SN
   tags: 0
+  damageType: 3
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 1
   unitFilter: 0
   range: 8

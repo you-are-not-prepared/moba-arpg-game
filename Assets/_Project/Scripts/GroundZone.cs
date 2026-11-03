@@ -17,6 +17,7 @@ namespace Moba
         Team _team;
         float _radius, _delay, _duration;
         float _freeze, _slow, _damagePerSecond, _healPerSecond, _haste;
+        DamageType _damageType;
         Material _warning, _zone;
         bool _visualOnly, _triggered;
         float _time, _nextTick;
@@ -26,10 +27,12 @@ namespace Moba
 
         // `healPerSecond` is a fraction of max health per second (0.04 = 4%); `haste` 0.2 = 20% faster.
         public static GroundZone Create(Unit caster, Vector3 center, float radius, float delay, float duration, float freeze,
-            float slow, float damagePerSecond, float healPerSecond, float haste, Material warning, Material zone)
+            float slow, float damagePerSecond, float healPerSecond, float haste, Material warning, Material zone,
+            DamageType damageType = DamageType.None)
         {
             GroundZone z = Spawn(center, radius, delay, duration, caster.team, warning, zone);
             z._caster = caster;
+            z._damageType = damageType;
             z._freeze = freeze;
             z._slow = slow;
             z._damagePerSecond = damagePerSecond;
@@ -95,7 +98,7 @@ namespace Moba
                 if (_slow > 0f) Slow.Apply(u, _slow, Tick + 0.15f);
                 if (_damagePerSecond > 0f && _caster != null)
                 {
-                    u.TakeDamage(_damagePerSecond * Tick, _caster);
+                    u.TakeDamage(_damagePerSecond * Tick, _caster, _damageType);
                     SpellEvents.RaiseHit(_caster, u, _damagePerSecond * Tick);
                 }
             }

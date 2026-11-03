@@ -16,10 +16,27 @@ MonoBehaviour:
   description: Looses a huge arrow that flies across the map, piercing and stunning
     every enemy it passes.
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
   glyph: SA
   tags: 1
+  damageType: 5
+  adaptive: 0
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   targeting: 1
   unitFilter: 0
   range: 0
@@ -35,6 +52,12 @@ MonoBehaviour:
   explosionRadius: 0
   pierce: 1
   stunDuration: 1.5
+  slow: 0
+  slowSeconds: 2
+  chainJumps: 0
+  chainFraction: 0.6
+  boltMaterial: {fileID: 0}
+  cooldownRefund: 0
   projectileSpeed: 26
   maxDistance: 32
   projectileSize: 1.4

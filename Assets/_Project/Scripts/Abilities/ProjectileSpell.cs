@@ -18,6 +18,15 @@ namespace Moba.Abilities
         public bool pierce;
         [Tooltip("Seconds each enemy hit is stunned. 0 = no stun.")]
         public float stunDuration;
+        [Tooltip("0.4 = enemies hit move 40% slower for slowSeconds. 0 = no slow.")]
+        [Range(0f, 0.9f)] public float slow;
+        public float slowSeconds = 2f;
+        [Tooltip("The first hit jumps to this many more enemies within 5m, for chainFraction of the damage each.")]
+        public int chainJumps;
+        public float chainFraction = 0.6f;
+        public Material boltMaterial;
+        [Tooltip("The first hit shortens the caster's other basic cooldowns by this many seconds.")]
+        public float cooldownRefund;
 
         [Header("Projectile")]
         public float projectileSpeed = 18f;
@@ -55,6 +64,7 @@ namespace Moba.Abilities
                 Caster = caster,
                 Team = caster.team,
                 Damage = damage,
+                DamageType = m.damageType,
                 ExplosionRadius = explosionRadius,
                 BurnDps = m.burnFraction > 0f && m.burnDuration > 0f ? damage * m.burnFraction / m.burnDuration : 0f,
                 BurnDuration = m.burnDuration,
@@ -62,17 +72,25 @@ namespace Moba.Abilities
                 ForkAngle = m.forkAngle,
                 Pierce = pierce,
                 StunDuration = stunDuration > 0f ? stunDuration + HeroAscension.StunBonusOf(caster) : 0f,
+                Slow = slow,
+                SlowSeconds = slowSeconds,
+                CooldownRefund = cooldownRefund,
+                ChainJumps = chainJumps,
+                ChainFraction = chainFraction,
+                ChainRange = 5f,
+                BoltMaterial = boltMaterial,
                 Speed = projectileSpeed,
                 MaxDistance = maxDistance,
                 Size = projectileSize,
                 Height = launchHeight,
                 ProjectileMaterial = projectileMaterial,
                 ExplosionMaterial = explosionMaterial,
+                Look = adaptive ? m.damageType : DamageType.None,
             };
 
             if (caster.TryGetComponent(out StaticCharge charge) && charge.NextIsCharged)
             {
-                payload.ChainJumps = charge.jumps;
+                payload.ChainJumps += charge.jumps;
                 payload.ChainFraction = charge.fraction;
                 payload.ChainRange = charge.range;
                 payload.BoltMaterial = charge.boltMaterial;
@@ -95,13 +113,16 @@ namespace Moba.Abilities
             var parts = new List<string>
             {
                 explosionRadius > 0f
-                    ? $"{damage:0} damage in a {explosionRadius:0.#}m explosion"
-                    : $"{damage:0} damage",
+                    ? $"{damage:0} {DamageWord(m)} in a {explosionRadius:0.#}m explosion"
+                    : $"{damage:0} {DamageWord(m)}",
             };
             int count = 1 + Mathf.Max(0, m.extraProjectiles);
             if (count > 1) parts.Add($"{count} projectiles");
             if (pierce) parts.Add("pierces");
             if (stunDuration > 0f) parts.Add($"stuns for {stunDuration:0.#}s");
+            if (slow > 0f) parts.Add($"slows {slow * 100f:0}% for {slowSeconds:0.#}s");
+            if (chainJumps > 0) parts.Add($"jumps to {chainJumps} more {(chainJumps == 1 ? "enemy" : "enemies")} for {chainFraction * 100f:0}%");
+            if (cooldownRefund > 0f) parts.Add($"a hit shortens your other cooldowns by {cooldownRefund:0.#}s");
             if (m.forkCount > 0) parts.Add(m.forkCount == 1 ? "forks once" : $"forks {m.forkCount} times");
             if (m.burnFraction > 0f) parts.Add($"burns for {damage * m.burnFraction:0} over {m.burnDuration:0.#}s");
             return string.Join(" · ", parts);

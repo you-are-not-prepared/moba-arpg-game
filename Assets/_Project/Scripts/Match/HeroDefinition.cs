@@ -5,7 +5,8 @@ using UnityEngine.AI;
 
 namespace Moba
 {
-    // A playable hero: its prefab (stats, model), a passive, and an ultimate that is locked into the R slot.
+    // A playable hero: its prefab (stats, model), a passive, a signature spell that starts in Q, and an ascension
+    // tree whose first choice (level 6) is the hero's ultimate, locked into R from then on (see HeroAscension).
     // Passives are plain numbers applied on spawn, so new simple passives are just new fields here.
     [CreateAssetMenu(menuName = "MOBA/Hero", fileName = "Hero")]
     public class HeroDefinition : ScriptableObject
@@ -18,6 +19,13 @@ namespace Moba
         [Tooltip("1-2 characters shown on the portrait.")]
         public string glyph = "H";
         public HeroController prefab;
+
+        [Header("Damage types")]
+        [Tooltip("Affinity per type, in DamageTypes.All order (Fire, Frost, Nature, Lightning, Physical, Air): 0.25 = the " +
+                 "hero's spells of that type deal 25% more damage. The highest one is the hero's base damage type.")]
+        public float[] affinities = new float[DamageTypes.Count];
+        [Tooltip("The hero's spell colours (main, secondary, highlight).")]
+        public Color[] spellColors = { Color.white, Color.white, Color.white };
 
         [Header("Passive")]
         public string passiveName;
@@ -56,18 +64,57 @@ namespace Moba
         public Material passiveEffectMaterial;
 
         [Header("Ascension")]
-        [Tooltip("Talent choices at levels 6, 11 and 18: path A or B, then two options within that path.")]
+        [Tooltip("Choices at levels 6, 11 and 18: the first picks a path, whose ultimate goes into R; then two talents " +
+                 "within that path.")]
         public AscensionTree ascension = new();
 
-        [Header("Ultimate")]
-        [Tooltip("Locked into the R slot; bought spells go in Q/W/E.")]
-        public AbilityDefinition ultimate;
+        [Header("Signature spell")]
+        [Tooltip("The hero's own basic spell: in Q at the start, sells back at full price, and only this hero's shop " +
+                 "sells it again.")]
+        public AbilityDefinition signature;
 
-        // Applies the passive and the ultimate to a freshly spawned hero.
+        // The ultimates offered at the first ascension, one per path.
+        public System.Collections.Generic.IEnumerable<AbilityDefinition> UltimateOptions
+        {
+            get
+            {
+                if (ascension?.paths == null) yield break;
+                foreach (AscensionPath path in ascension.paths)
+                    if (path?.ultimate != null) yield return path.ultimate;
+            }
+        }
+
+        // The type with the highest affinity (None if the hero has none above 0).
+        public DamageType BaseDamageType
+        {
+            get
+            {
+                DamageType best = DamageType.None;
+                float bestValue = 0f;
+                for (int i = 0; i < DamageTypes.Count && affinities != null && i < affinities.Length; i++)
+                {
+                    if (affinities[i] <= bestValue) continue;
+                    bestValue = affinities[i];
+                    best = DamageTypes.All[i];
+                }
+                return best;
+            }
+        }
+
+        public float Affinity(DamageType type)
+        {
+            int i = DamageTypes.Index(type);
+            return i >= 0 && affinities != null && i < affinities.Length ? affinities[i] : 0f;
+        }
+
+        // Applies the damage types, the passive and the signature spell to a freshly spawned hero.
         public void ApplyTo(HeroController hero)
         {
             hero.definition = this;
             AbilityCaster caster = hero.Abilities;
+            hero.Unit.baseDamageType = BaseDamageType;
+            caster.affinities = new float[DamageTypes.Count];
+            if (affinities != null) System.Array.Copy(affinities, caster.affinities, Mathf.Min(affinities.Length, DamageTypes.Count));
             caster.passiveExtraProjectiles = extraProjectiles;
             caster.cooldownMultiplier = cooldownMultiplier;
             if (hero.TryGetComponent(out Inventory inventory)) inventory.SetStatMultiplier(itemStatMultiplier);
@@ -109,11 +156,7 @@ namespace Moba
                 onHit.healFraction = allyHealFraction;
             }
             if (ascension != null && ascension.IsComplete) hero.gameObject.AddComponent<HeroAscension>().Init(ascension);
-            if (ultimate != null)
-            {
-                caster.SetAbility(AbilityCaster.UltimateSlot, ultimate);
-                caster.ultimateLocked = true;
-            }
+            if (signature != null) caster.SetAbility(0, signature);
         }
 
         // "600 HP · 30 damage · 5.5 range · 6.5 speed" from the prefab (passives included), for champion select.

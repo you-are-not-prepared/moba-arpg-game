@@ -48,8 +48,9 @@ namespace Moba.Abilities
             float freeze = Freeze(context.Rank);
             if (freeze > 0f) freeze += HeroAscension.StunBonusOf(caster);
             float damage = enemyDamagePerSecond * context.Modifiers.damageMultiplier;
-            GroundZone.Create(caster, context.Point, radius, delay, Duration(context.Rank) + HeroAscension.DurationBonusOf(caster),
-                freeze, enemySlow, damage, AllyHeal(context.Rank), allyMoveSpeed, warningMaterial, zoneMaterial);
+            GroundZone.Create(caster, context.Point, context.Modifiers.Radius(radius), delay, Duration(context.Rank) + HeroAscension.DurationBonusOf(caster),
+                freeze, enemySlow, damage, AllyHeal(context.Rank), allyMoveSpeed, warningMaterial, zoneMaterial,
+                context.Modifiers.damageType);
         }
 
         public override string StatsText => Describe(1, SpellModifiers.None);
@@ -59,7 +60,7 @@ namespace Moba.Abilities
             var parts = new List<string>();
             if (Freeze(rank) > 0f) parts.Add($"after {delay:0.##}s freezes enemies for {Freeze(rank):0.##}s");
             if (enemySlow > 0f) parts.Add($"slows enemies {enemySlow * 100f:0}%");
-            if (enemyDamagePerSecond > 0f) parts.Add($"{enemyDamagePerSecond * modifiers.damageMultiplier:0} damage/s to enemies");
+            if (enemyDamagePerSecond > 0f) parts.Add($"{enemyDamagePerSecond * modifiers.damageMultiplier:0} {DamageWord(modifiers)}/s to enemies");
             if (AllyHeal(rank) > 0f) parts.Add($"allies heal {AllyHeal(rank) * 100f:0}% max health/s");
             if (allyMoveSpeed > 0f) parts.Add($"+{allyMoveSpeed * 100f:0}% ally movement speed");
             return $"{radius:0.#}m area for {Duration(rank):0.#}s: " + string.Join(" · ", parts);

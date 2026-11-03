@@ -8,6 +8,8 @@ namespace Moba.Items
         public string displayName = "Item";
         [TextArea] public string description;
         public int cost = 300;
+        [Tooltip("Sells back for its full cost (a hero's signature spell).")]
+        public bool sellsAtFullPrice;
 
         [Header("Display")]
         [Tooltip("Optional. Without an icon the slot shows the colour and glyph below.")]
@@ -21,5 +23,9 @@ namespace Moba.Items
 
         // One-line summary of what the item gives (e.g. "+10 attack damage").
         public virtual string StatsText => "";
+
+        // The name and glyph as `holder` sees them (adaptive spells take the hero's version; null = generic).
+        public virtual string NameFor(Unit holder) => displayName;
+        public virtual string GlyphFor(Unit holder) => glyph;
     }
 }

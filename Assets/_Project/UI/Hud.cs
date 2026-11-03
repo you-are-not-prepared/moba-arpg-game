@@ -19,6 +19,9 @@ namespace Moba.UI
         static Hud s_Instance;
         public static Hud Instance => s_Instance;
 
+        // The local hero, for adaptive spells' names and glyphs (null before it spawns).
+        static Unit Holder => s_Instance != null && s_Instance._hero != null ? s_Instance._hero.Unit : null;
+
         UIDocument _document;
         VisualElement _root;
         VisualElement _worldLayer;
@@ -293,6 +296,8 @@ namespace Moba.UI
 
             string rankLine = $"Rank {slot.rank}/{maxRank}";
             if (_abilities.CanLevelUp(index)) rankLine += $"   ·   {GameInput.Display(input.LevelUpModifier)}+{key} or + to level up";
+            else if (index == AbilityCaster.UltimateSlot && slot.rank < maxRank)
+                rankLine += $"   ·   next rank at your next ascension (level {HeroAscension.Levels[Mathf.Min(slot.rank, HeroAscension.Levels.Length - 1)]})";
             else if (slot.rank < maxRank) rankLine += $"   ·   next rank at level {AbilityCaster.RequiredLevel(index, slot.rank + 1)}";
 
             if (a == null)
@@ -309,7 +314,7 @@ namespace Moba.UI
             if (!string.IsNullOrEmpty(effect)) stats += $"\n{effect}";
 
             string suffix = _abilities.IsSlotLocked(index) ? (a.IsPassive ? " (passive ultimate)" : " (ultimate)") : "";
-            SetText(_tooltipTitle, $"[{key}] {a.displayName}{suffix}");
+            SetText(_tooltipTitle, $"[{key}] {a.NameFor(_hero.Unit)}{suffix}");
             SetText(_tooltipStats, stats);
             SetText(_tooltipBody, string.IsNullOrEmpty(a.description) ? DescribeMods(index) : $"{a.description}\n{DescribeMods(index)}");
         }
@@ -321,8 +326,8 @@ namespace Moba.UI
             _tooltip.RemoveFromClassList("hidden");
             SetText(_tooltipTitle, string.IsNullOrEmpty(def.title) ? def.displayName : $"{def.displayName}, {def.title}");
             SetText(_tooltipStats, $"Passive: {def.passiveName}");
-            string ult = def.ultimate != null ? $"\nUltimate: {def.ultimate.displayName}. {def.ultimate.description}" : "";
-            SetText(_tooltipBody, def.passiveDescription + ult + AscensionSummary());
+            string signature = def.signature != null ? $"\nSignature: {def.signature.displayName}. {def.signature.description}" : "";
+            SetText(_tooltipBody, def.passiveDescription + signature + AscensionSummary());
             return true;
         }
 
@@ -450,7 +455,7 @@ namespace Moba.UI
             {
                 AbilityDefinition a = _abilities.GetSlot(targeting).ability;
                 string what = a.targeting == AbilityTargeting.Unit ? "a target" : "a location";
-                SetText(_targetingHint, $"{a.displayName}: {confirm} {what}   ·   {cancel}");
+                SetText(_targetingHint, $"{a.NameFor(_hero.Unit)}: {confirm} {what}   ·   {cancel}");
             }
             else if (attackMove)
             {
@@ -539,7 +544,7 @@ namespace Moba.UI
                     _shownAbility = a;
                     bool hasIcon = a != null && a.icon != null;
                     _icon.style.backgroundImage = hasIcon ? new StyleBackground(a.icon) : new StyleBackground(StyleKeyword.None);
-                    _glyph.text = a != null && !hasIcon ? a.glyph : "";
+                    _glyph.text = a != null && !hasIcon ? a.GlyphFor(caster.Unit) : "";
                     // Per-spell colour is data; clearing it falls back to the USS slot colour.
                     Frame.style.backgroundColor = a != null && !hasIcon ? new StyleColor(a.color) : new StyleColor(StyleKeyword.Null);
                 }

@@ -175,7 +175,7 @@ namespace Moba.Online
         public PlayerBuild build;
     }
 
-    // Final build. Item ids are asset names ("IronBlade", "Spell_Fireball"); "" is an empty slot.
+    // Final build. Item ids are asset names ("IronBlade", "Spell_Projectile"); "" is an empty slot.
     [Serializable]
     public class PlayerBuild
     {

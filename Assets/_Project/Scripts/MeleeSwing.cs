@@ -19,7 +19,7 @@ namespace Moba
 
         static readonly int ProgressId = Shader.PropertyToID("_Progress");
         // Children that are effects rather than the model, so they don't lunge.
-        static readonly HashSet<string> s_Effects = new() { "MeleeSlash", "HasteAura", "ShieldWall" };
+        static readonly HashSet<string> s_Effects = new() { "MeleeSlash", "HasteAura", "ShieldWall", "BuffAura" };
 
         Unit _unit;
         readonly List<Transform> _parts = new();
@@ -38,7 +38,16 @@ namespace Moba
             // Hidden in fog of war: no swing either.
             if (!FogOfWar.ShouldShow(attacker.team, attacker.transform.position)) return;
             if (!attacker.TryGetComponent(out MeleeSwing swing)) swing = attacker.gameObject.AddComponent<MeleeSwing>();
-            swing.Begin(target, slashMaterial);
+            swing.Begin(target.transform.position - attacker.transform.position, slashMaterial, 1f);
+        }
+
+        // A melee spell's swing toward `direction`, its arc reaching `reach` metres from the attacker's centre.
+        public static void PlayToward(Unit attacker, Vector3 direction, Material slashMaterial, float reach)
+        {
+            if (attacker == null || slashMaterial == null) return;
+            if (!FogOfWar.ShouldShow(attacker.team, attacker.transform.position)) return;
+            if (!attacker.TryGetComponent(out MeleeSwing swing)) swing = attacker.gameObject.AddComponent<MeleeSwing>();
+            swing.Begin(direction, slashMaterial, Mathf.Max(1f, reach / (attacker.radius + 0.45f + BladeWidth)));
         }
 
         void Awake()
@@ -65,9 +74,9 @@ namespace Moba
             if (_mesh != null) Destroy(_mesh);
         }
 
-        void Begin(Unit target, Material material)
+        // `scale` enlarges the arc (melee spells reach further than attacks).
+        void Begin(Vector3 dir, Material material, float scale)
         {
-            Vector3 dir = target.transform.position - transform.position;
             dir.y = 0f;
             if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
             dir.Normalize();
@@ -79,7 +88,7 @@ namespace Moba
             _flip = !_flip;
             _slash.localPosition = Vector3.up * (_unit.barHeight * 0.45f);
             _slash.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(0f, 0f, _flip ? Tilt : -Tilt);
-            _slash.localScale = new Vector3(_flip ? -1f : 1f, 1f, 1f);
+            _slash.localScale = new Vector3(_flip ? -scale : scale, scale, scale);
             _slashRenderer.enabled = true;
 
             _time = 0f;

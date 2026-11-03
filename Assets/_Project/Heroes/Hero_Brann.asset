@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.85, g: 0.55, b: 0.25, a: 1}
   glyph: B
   prefab: {fileID: 5034245646948570538, guid: db2529743976f1840893bb08cead3b49, type: 3}
+  affinities:
+  - 0.25
+  - -0.2
+  - 0
+  - 0.1
+  - 0.05
+  - -0.1
+  spellColors:
+  - {r: 1, g: 0.55, b: 0.15, a: 1}
+  - {r: 0.85, g: 0.65, b: 0.3, a: 1}
+  - {r: 0.7, g: 0.2, b: 0.1, a: 1}
   passiveName: Masterwork Gear
   passiveDescription: Items give 10% more stats.
   extraProjectiles: 0
@@ -42,10 +53,11 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: bae89fe7b40dd634b9c21c569170aa15, type: 2}
+      root:
         id: brann_a
-        name: Master Smith
-        flavor: Better hands, better steel.
+        name: Overcharged Sockets
+        flavor: 'Passive once learned: Q, W and E each get a 4th mod socket.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -53,6 +65,94 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      second:
+      - id: brann_a1
+        name: Tuned Overcharged Sockets
+        flavor: 'Masterwork Gear: items give another 5% more.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0.05
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: brann_a2
+        name: Tuned Overcharged Sockets
+        flavor: 'Weighted tools: +10 attack damage.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 10
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0.05
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      third:
+      - id: brann_a3
+        name: Masterwork Overcharged Sockets
+        flavor: 'Masterwork Gear: items give another 10% more.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0.1
@@ -69,99 +169,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      second:
-      - id: brann_a1
-        name: Tempered Steel
-        flavor: Folded a hundred times.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 10
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: brann_a2
-        name: Reinforced Plating
-        flavor: Rivets in all the right places.
-        maxHealth: 150
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      third:
-      - id: brann_a3
-        name: Perfect Alloy
-        flavor: The forge's finest work.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0.15
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
       - id: brann_a4
-        name: Heavy Hands
-        flavor: Swing the hammer faster.
-        maxHealth: 0
+        name: Masterwork Overcharged Sockets
+        flavor: 'Reinforced plating: +200 max health.'
+        maxHealth: 200
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.15
+        attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
-        itemStats: 0
+        itemStats: 0.1
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
@@ -175,10 +197,12 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: 20488a8c61041c34684e11f845c341a4, type: 2}
+      root:
         id: brann_b
-        name: Runesmith
-        flavor: Every socket hums with power.
+        name: Bombardment
+        flavor: Three charges blow up one after another in a line toward the point,
+          setting everything alight.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -186,7 +210,9 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -204,18 +230,20 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: brann_b1
-        name: Arcane Battery
-        flavor: Store the spark for later.
+        name: Empowered Bombardment
+        flavor: 'Masterwork Gear: items give another 5% more.'
         maxHealth: 0
-        maxMana: 100
+        maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
-        itemStats: 0
+        itemStats: 0.05
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
@@ -230,15 +258,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: brann_b2
-        name: Efficient Runes
-        flavor: Waste nothing.
+        name: Wide Bombardment
+        flavor: 'Weighted tools: +10 attack damage.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 0
+        attackDamage: 10
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0.15
+        cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -257,8 +287,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: brann_b3
-        name: Overload
-        flavor: Push the runes past their limit.
+        name: Mighty Bombardment
+        flavor: 'Masterwork Gear: items give another 10% more.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -266,7 +296,37 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.25
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0.1
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: brann_b4
+        name: Ever-Ready Bombardment
+        flavor: 'Reinforced plating: +200 max health.'
+        maxHealth: 200
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -282,9 +342,12 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      - id: brann_b4
-        name: Splitting Rune
-        flavor: One spell, many paths.
+    - ultimate: {fileID: 11400000, guid: aade13204fd24c14b90e992a514f1778, type: 2}
+      root:
+        id: brann_c
+        name: Meteor
+        flavor: Fire, ranged. A meteor crashes down on a wide area after a second
+          and leaves it burning.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -292,8 +355,10 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
-        extraProjectiles: 1
+        extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
@@ -308,17 +373,19 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
-        id: brann_c
-        name: Bastion
-        flavor: Build it to last.
-        maxHealth: 150
+      second:
+      - id: brann_c1
+        name: Wide Meteor
+        flavor: 'Masterwork Gear: items give another 5% more.'
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0.05
@@ -335,44 +402,19 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      second:
-      - id: brann_c1
-        name: Riveted Armor
-        flavor: One more plate. Then another.
-        maxHealth: 200
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
       - id: brann_c2
-        name: Socket Ward
-        flavor: Runes that hit back.
+        name: Empowered Meteor
+        flavor: 'Weighted tools: +10 attack damage.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 0
+        attackDamage: 10
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.1
+        ultimateDamage: 0.2
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -390,8 +432,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: brann_c3
-        name: Living Fortress
-        flavor: Grows sturdier with every fight.
+        name: Mighty Meteor
+        flavor: 'Masterwork Gear: items give another 10% more.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -399,10 +441,12 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 30
+        itemStats: 0.1
+        healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
@@ -416,16 +460,18 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: brann_c4
-        name: Rune Hammer
-        flavor: Steel and sorcery in one swing.
-        maxHealth: 0
+        name: Ever-Ready Meteor
+        flavor: 'Reinforced plating: +200 max health.'
+        maxHealth: 200
         maxMana: 0
-        attackDamage: 15
+        attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0.1
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -441,4 +487,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: bae89fe7b40dd634b9c21c569170aa15, type: 2}
+  signature: {fileID: 11400000, guid: 30c02c1c5a2ae674096558c38870a1e2, type: 2}

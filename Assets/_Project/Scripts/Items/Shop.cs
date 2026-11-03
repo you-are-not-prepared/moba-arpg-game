@@ -50,7 +50,8 @@ namespace Moba.Items
             return d.magnitude <= radius;
         }
 
-        public int SellPrice(InventoryItem item) => item != null ? Mathf.FloorToInt(item.cost * sellRefund) : 0;
+        public int SellPrice(InventoryItem item) =>
+            item == null ? 0 : item.sellsAtFullPrice ? item.cost : Mathf.FloorToInt(item.cost * sellRefund);
 
         public ShopResult CanBuy(Unit hero, HeroProgression wallet, Inventory inventory, InventoryItem item)
         {

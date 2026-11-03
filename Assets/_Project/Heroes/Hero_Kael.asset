@@ -19,6 +19,17 @@ MonoBehaviour:
   color: {r: 0.35, g: 0.78, b: 0.45, a: 1}
   glyph: K
   prefab: {fileID: 2743056027716994260, guid: f72166844e96afa46b5e89a06b1b8bd2, type: 3}
+  affinities:
+  - -0.05
+  - -0.05
+  - 0.15
+  - -0.1
+  - 0.25
+  - 0.05
+  spellColors:
+  - {r: 0.33, g: 0.6, b: 0.22, a: 1}
+  - {r: 0.62, g: 0.85, b: 0.4, a: 1}
+  - {r: 0.66, g: 0.68, b: 0.72, a: 1}
   passiveName: Split Shot
   passiveDescription: Your projectile spells fire 1 extra projectile.
   extraProjectiles: 1
@@ -42,10 +53,12 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 0}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 7bd2db61be6dec244ba12523ec7649a7, type: 2}
+      root:
         id: kael_a
-        name: Storm of Arrows
-        flavor: Every shot becomes a volley.
+        name: Skybreaker Arrow
+        flavor: Looses a huge arrow that flies across the map, piercing and stunning
+          every enemy it passes.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -53,8 +66,10 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
-        extraProjectiles: 1
+        extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
@@ -71,8 +86,8 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: kael_a1
-        name: Splintering Shots
-        flavor: Arrowheads that shatter on impact.
+        name: Crushing Skybreaker Arrow
+        flavor: 'Split Shot: your arrows hit 10% harder.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -80,13 +95,15 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.1
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0
+        stunDuration: 0.5
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -97,15 +114,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: kael_a2
-        name: Quickdraw
-        flavor: Nock, draw, loose. Again.
+        name: Empowered Skybreaker Arrow
+        flavor: 'Quick hands: 15% more attack speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.2
+        attackSpeed: 0.15
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -124,8 +143,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: kael_a3
-        name: Endless Quiver
-        flavor: There is always one more arrow.
+        name: Mighty Skybreaker Arrow
+        flavor: 'Split Shot: one more projectile on every projectile spell.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -133,6 +152,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 1
         itemStats: 0
@@ -150,16 +171,18 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: kael_a4
-        name: Barrage Rhythm
-        flavor: Fall into the rhythm of the hunt.
+        name: Ever-Ready Skybreaker Arrow
+        flavor: 'Split Shot: your arrows hit 20% harder.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0.15
-        ultimateCooldownReduction: 0
-        spellDamage: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.2
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -175,17 +198,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: 2b99c3432877b6841aed48c82f70a917, type: 2}
+      root:
         id: kael_b
-        name: Skybreaker
-        flavor: The great bow is always strung.
+        name: Hawk Eye
+        flavor: 'For a few seconds you see further and shoot faster: more attack
+          range and attack speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.25
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -204,8 +231,8 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: kael_b1
-        name: Pinning Shot
-        flavor: Nail them where they stand.
+        name: Lasting Hawk Eye
+        flavor: 'Split Shot: your arrows hit 10% harder.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -213,13 +240,15 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.1
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0.75
+        ultimateDuration: 1
+        stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -230,15 +259,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: kael_b2
-        name: Hunter's Focus
-        flavor: Patience sharpens every arrow.
+        name: Swift Hawk Eye
+        flavor: 'Quick hands: 15% more attack speed.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 15
-        attackSpeed: 0
+        attackDamage: 0
+        attackSpeed: 0.15
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -257,8 +288,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: kael_b3
-        name: Heaven's Fall
-        flavor: The sky itself holds them down.
+        name: Endless Hawk Eye
+        flavor: 'Split Shot: one more projectile on every projectile spell.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -266,13 +297,15 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.2
-        extraProjectiles: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 1
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0.75
+        ultimateDuration: 2
+        stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -283,8 +316,8 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: kael_b4
-        name: Sky Hunter
-        flavor: Draw the great bow again and again.
+        name: Ever-Ready Hawk Eye
+        flavor: 'Split Shot: your arrows hit 20% harder.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -292,7 +325,9 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
-        spellDamage: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.2
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -308,17 +343,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: 25bd07efaeef9c34da3a7eda8f07a324, type: 2}
+      root:
         id: kael_c
-        name: Windrunner
-        flavor: Never where they aim.
+        name: Arrow Storm
+        flavor: 'Physical, ranged. A storm of arrows falls on a wide area: heavy
+          damage, and everything in it is slowed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0.1
-        moveSpeed: 0.1
+        attackSpeed: 0
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -337,16 +376,18 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: kael_c1
-        name: Hit and Run
-        flavor: Shoot, step, shoot.
+        name: Wide Arrow Storm
+        flavor: 'Split Shot: your arrows hit 10% harder.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
-        moveSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.2
+        spellDamage: 0.1
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -363,15 +404,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: kael_c2
-        name: Steady Aim
-        flavor: Every arrow counts.
+        name: Empowered Arrow Storm
+        flavor: 'Quick hands: 15% more attack speed.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 12
-        attackSpeed: 0
+        attackDamage: 0
+        attackSpeed: 0.15
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -390,15 +433,17 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: kael_c3
-        name: Gale Volley
-        flavor: The wind carries extra arrows.
+        name: Sweeping Arrow Storm
+        flavor: 'Split Shot: one more projectile on every projectile spell.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.15
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0
         extraProjectiles: 1
         itemStats: 0
@@ -416,8 +461,8 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: kael_c4
-        name: Sky Piercer
-        flavor: Strike from the edge of sight.
+        name: Mighty Arrow Storm
+        flavor: 'Split Shot: your arrows hit 20% harder.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -425,13 +470,15 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.1
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0.2
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0.5
+        stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -441,4 +488,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 7bd2db61be6dec244ba12523ec7649a7, type: 2}
+  signature: {fileID: 11400000, guid: 635a2e86736471945a8188c8c31f06a4, type: 2}

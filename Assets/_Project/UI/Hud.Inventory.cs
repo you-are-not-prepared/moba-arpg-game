@@ -200,15 +200,18 @@ namespace Moba.UI
             _shopItems.Clear();
             if (_shop == null || _shop.catalog == null) return;
 
-            AddShopSection<ItemDefinition>("ITEMS");
-            AddShopSection<AbilityDefinition>("SPELLS");
-            AddShopSection<ModDefinition>("MODS");
+            // Your own signature spell, to buy back after selling it.
+            InventoryItem signature = _hero != null && _hero.definition != null ? _hero.definition.signature : null;
+            if (signature != null) AddShopSection<AbilityDefinition>("SIGNATURE", new[] { signature });
+            AddShopSection<ItemDefinition>("ITEMS", _shop.catalog.items);
+            AddShopSection<AbilityDefinition>("SPELLS", _shop.catalog.items);
+            AddShopSection<ModDefinition>("MODS", _shop.catalog.items);
         }
 
-        void AddShopSection<T>(string title) where T : InventoryItem
+        void AddShopSection<T>(string title, IEnumerable<InventoryItem> items) where T : InventoryItem
         {
             bool any = false;
-            foreach (InventoryItem item in _shop.catalog.items)
+            foreach (InventoryItem item in items)
             {
                 if (item is not T) continue;
                 if (!any)
@@ -267,9 +270,9 @@ namespace Moba.UI
             ShowShopMessage(result switch
             {
                 ShopResult.Ok => item is ItemDefinition
-                    ? $"Bought {item.displayName}."
-                    : $"Bought {item.displayName}. Drag it onto a spell slot to equip it.",
-                ShopResult.NotEnoughGold => $"Not enough gold: {item.displayName} needs {item.cost - _progression.Gold}g more.",
+                    ? $"Bought {item.NameFor(_hero.Unit)}."
+                    : $"Bought {item.NameFor(_hero.Unit)}. Drag it onto a spell slot to equip it.",
+                ShopResult.NotEnoughGold => $"Not enough gold: {item.NameFor(_hero.Unit)} needs {item.cost - _progression.Gold}g more.",
                 ShopResult.InventoryFull => "Inventory full. Sell or equip something first.",
                 ShopResult.NotInShopRange => "Return to your base to buy.",
                 _ => "",
@@ -298,7 +301,7 @@ namespace Moba.UI
                 result = _shop.TrySell(_hero.Unit, _progression, _inventory, slot);
             }
             ShowShopMessage(result == ShopResult.Ok
-                ? $"Sold {item.displayName} for {price}g."
+                ? $"Sold {item.NameFor(_hero.Unit)} for {price}g."
                 : "Return to your base to sell.");
         }
 
@@ -325,7 +328,7 @@ namespace Moba.UI
             hint += IsShopOpen ? "Right-click to sell." : "Open the shop in base to sell.";
 
             _tooltip.RemoveFromClassList("hidden");
-            SetText(_tooltipTitle, item.displayName);
+            SetText(_tooltipTitle, item.NameFor(_hero.Unit));
             SetText(_tooltipStats, string.Join("   ·   ", lines));
             SetText(_tooltipBody, string.IsNullOrEmpty(item.description) ? hint : $"{item.description}\n{hint}");
             return true;
@@ -479,7 +482,7 @@ namespace Moba.UI
                 _shown = item;
                 bool hasIcon = item != null && item.icon != null;
                 _icon.style.backgroundImage = hasIcon ? new StyleBackground(item.icon) : new StyleBackground(StyleKeyword.None);
-                _glyph.text = item != null && !hasIcon ? item.glyph : "";
+                _glyph.text = item != null && !hasIcon ? item.GlyphFor(Holder) : "";
                 // Per-item colour is data, not style; clear it to fall back to the USS slot colour.
                 Root.style.backgroundColor = item != null && !hasIcon ? new StyleColor(item.color) : new StyleColor(StyleKeyword.Null);
             }
@@ -516,7 +519,10 @@ namespace Moba.UI
 
                 var info = new VisualElement { pickingMode = PickingMode.Ignore };
                 info.AddToClassList("shop-item__info");
-                var name = new Label(item.displayName) { pickingMode = PickingMode.Ignore };
+                // Adaptive spells show what they become for this hero: "Projectile → Fireball".
+                string adapted = item.NameFor(Holder);
+                var name = new Label(adapted != item.displayName ? $"{item.displayName} → {adapted}" : item.displayName)
+                    { pickingMode = PickingMode.Ignore };
                 name.AddToClassList("shop-item__name");
                 var stats = new Label(item.StatsText) { pickingMode = PickingMode.Ignore };
                 stats.AddToClassList("shop-item__stats");

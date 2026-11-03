@@ -46,10 +46,12 @@ namespace Moba.Abilities
             else to = caster.transform.position;
             float damage = DamageAt(context.Rank) * context.Modifiers.damageMultiplier;
             float bladesDuration = bladesSeconds + HeroAscension.DurationBonusOf(caster);
-            Leap.Perform(caster, to, leapSeconds, arcHeight, () => Land(caster, damage, bladesDuration));
+            DamageType type = context.Modifiers.damageType;
+            float radius = context.Modifiers.Radius(landingRadius);
+            Leap.Perform(caster, to, leapSeconds, arcHeight, () => Land(caster, damage, type, radius, bladesDuration));
         }
 
-        void Land(Unit caster, float damage, float bladesDuration)
+        void Land(Unit caster, float damage, DamageType type, float radius, float bladesDuration)
         {
             if (caster == null || !caster.IsAlive) return;
             Vector3 center = caster.transform.position;
@@ -59,23 +61,23 @@ namespace Moba.Abilities
                 if (!u.IsEnemyOf(caster) || !u.IsTargetable) continue;
                 Vector3 d = u.transform.position - center;
                 d.y = 0f;
-                if (d.magnitude - u.radius <= landingRadius) s_Targets.Add(u);
+                if (d.magnitude - u.radius <= radius) s_Targets.Add(u);
             }
             foreach (Unit u in s_Targets)
             {
-                u.TakeDamage(damage, caster);
+                u.TakeDamage(damage, caster, type);
                 SpellEvents.RaiseHit(caster, u, damage);
-                if (u.IsAlive && burnFraction > 0f) Burning.Apply(u, damage * burnFraction / burnSeconds, burnSeconds, caster);
+                if (u.IsAlive && burnFraction > 0f) Burning.Apply(u, damage * burnFraction / burnSeconds, burnSeconds, caster, type);
             }
             s_Targets.Clear();
-            SpellExplosion.Spawn(center, landingRadius, landingMaterial);
+            SpellExplosion.Spawn(center, radius, landingMaterial);
             BurningBlades.Apply(caster, bladesDuration, bladesBurnPerSecond);
         }
 
         public override string StatsText => Describe(1, SpellModifiers.None);
 
         public override string Describe(int rank, in SpellModifiers modifiers) =>
-            $"Leap up to {range:0.#}m: {DamageAt(rank) * modifiers.damageMultiplier:0} damage in {landingRadius:0.#}m and a burn · " +
+            $"Leap up to {range:0.#}m: {DamageAt(rank) * modifiers.damageMultiplier:0} {DamageWord(modifiers)} in {landingRadius:0.#}m and a burn · " +
             $"attacks burn for {bladesSeconds:0.#}s";
     }
 }

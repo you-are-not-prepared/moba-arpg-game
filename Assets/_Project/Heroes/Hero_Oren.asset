@@ -20,6 +20,17 @@ MonoBehaviour:
   color: {r: 1, g: 0.45, b: 0.2, a: 1}
   glyph: O
   prefab: {fileID: 8974533869058034922, guid: bff3ad6219f9ce448989217ae9ae9070, type: 3}
+  affinities:
+  - 0.25
+  - -0.2
+  - -0.05
+  - 0.05
+  - 0.1
+  - -0.1
+  spellColors:
+  - {r: 0.9, g: 0.25, b: 0.15, a: 1}
+  - {r: 1, g: 0.55, b: 0.15, a: 1}
+  - {r: 1, g: 0.82, b: 0.3, a: 1}
   passiveName: Kindled Blade
   passiveDescription: Each attack builds Heat (up to 5, +4% attack speed each). At
     5, your next attack bursts for 50 fire damage around the target and burns.
@@ -44,10 +55,12 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 2100000, guid: 83fa0e9ef5907c2428d52873ef3ed591, type: 2}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 8ad6fec8cad2c3645bd89f169f497816, type: 2}
+      root:
         id: oren_a
-        name: Wildfire
-        flavor: The fire spreads.
+        name: Blazing Leap
+        flavor: Leap to a point, burning enemies where you land. Your attacks burn
+          for 5s afterwards.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -55,6 +68,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -65,7 +80,7 @@ MonoBehaviour:
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
-        heatBurstDamage: 25
+        heatBurstDamage: 0
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
@@ -73,8 +88,8 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: oren_a1
-        name: Flashpoint
-        flavor: Bigger flames.
+        name: Empowered Blazing Leap
+        flavor: 'Kindled Blade: Heat bursts deal +25 damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -82,6 +97,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -99,8 +116,8 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: oren_a2
-        name: Stoke
-        flavor: Fan the flames faster.
+        name: Lasting Blazing Leap
+        flavor: 'Stoked: 10% more attack speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -108,12 +125,14 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 0
+        ultimateDuration: 2
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -126,8 +145,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: oren_a3
-        name: Inferno
-        flavor: Everything burns.
+        name: Mighty Blazing Leap
+        flavor: 'Kindled Blade: Heat bursts deal +50 damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -135,6 +154,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -152,15 +173,17 @@ MonoBehaviour:
         chainJumps: 0
         chargeSooner: 0
       - id: oren_a4
-        name: Forge Heart
-        flavor: Hot iron doesn't break.
+        name: Ever-Ready Blazing Leap
+        flavor: 'Forge heart: +200 max health.'
         maxHealth: 200
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -177,10 +200,12 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: e0c514f21d59cc742bd6d65de1c06670, type: 2}
+      root:
         id: oren_b
-        name: Meteor
-        flavor: The blades stay hot longer.
+        name: Phoenix Form
+        flavor: 'For a few seconds you burn brighter: more attack speed and movement
+          speed, and every attack builds 2 Heat.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -188,12 +213,14 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 2
+        ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
@@ -206,34 +233,8 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: oren_b1
-        name: Quick Ignition
-        flavor: Ready to leap again.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0.2
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      - id: oren_b2
-        name: Scorch
-        flavor: Landings hit harder.
+        name: Lasting Phoenix Form
+        flavor: 'Kindled Blade: Heat bursts deal +25 damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -241,7 +242,37 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 1
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 25
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 0
+      - id: oren_b2
+        name: Swift Phoenix Form
+        flavor: 'Stoked: 10% more attack speed.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0.1
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -259,8 +290,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: oren_b3
-        name: Afterburn
-        flavor: The fire refuses to die.
+        name: Endless Phoenix Form
+        flavor: 'Kindled Blade: Heat bursts deal +50 damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -268,32 +299,36 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 3
+        ultimateDuration: 2
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
-        heatBurstDamage: 0
+        heatBurstDamage: 50
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       - id: oren_b4
-        name: Second Wind
-        flavor: Always another leap.
-        maxHealth: 0
+        name: Ever-Ready Phoenix Form
+        flavor: 'Forge heart: +200 max health.'
+        maxHealth: 200
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -310,17 +345,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: a8694e91bebf6d54da604b550435b275, type: 2}
+      root:
         id: oren_c
-        name: Phoenix
-        flavor: Rises from the ashes.
-        maxHealth: 150
+        name: Inferno
+        flavor: Fire, melee. Become a blaze for a few seconds, burning everything
+          around you twice a second.
+        maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -339,41 +378,45 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: oren_c1
-        name: Searing Edge
-        flavor: Every cut burns deeper.
+        name: Lasting Inferno
+        flavor: 'Kindled Blade: Heat bursts deal +25 damage.'
         maxHealth: 0
         maxMana: 0
-        attackDamage: 15
+        attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
-        ultimateDuration: 0
+        ultimateDuration: 1
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
-        heatBurstDamage: 0
+        heatBurstDamage: 25
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       - id: oren_c2
-        name: Ember Stride
-        flavor: Close the gap.
+        name: Empowered Inferno
+        flavor: 'Stoked: 10% more attack speed.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0.08
+        attackSpeed: 0.1
+        moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -392,8 +435,8 @@ MonoBehaviour:
         chargeSooner: 0
       third:
       - id: oren_c3
-        name: Rebirth
-        flavor: Stronger with every level.
+        name: Sweeping Inferno
+        flavor: 'Kindled Blade: Heat bursts deal +50 damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -401,32 +444,36 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
-        healthPerLevel: 30
+        healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
         stunDuration: 0
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
-        heatBurstDamage: 0
+        heatBurstDamage: 50
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
       - id: oren_c4
-        name: Sunfire
-        flavor: The last blow lands hardest.
-        maxHealth: 0
+        name: Mighty Inferno
+        flavor: 'Forge heart: +200 max health.'
+        maxHealth: 200
         maxMana: 0
-        attackDamage: 25
+        attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -443,4 +490,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 8ad6fec8cad2c3645bd89f169f497816, type: 2}
+  signature: {fileID: 11400000, guid: 077c3c29aca9bc44885fd62afb21c840, type: 2}

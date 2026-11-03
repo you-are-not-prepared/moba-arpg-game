@@ -528,6 +528,11 @@ namespace Moba.UI
             names.Add(Text(hero.displayName, "hero-detail__name"));
             names.Add(Text(hero.title, "hero-detail__title"));
             top.Add(names);
+            var typeBlock = new VisualElement { pickingMode = PickingMode.Ignore };
+            typeBlock.AddToClassList("hero-detail__type-block");
+            typeBlock.Add(Text("BASE DAMAGE TYPE", "hero-detail__section"));
+            typeBlock.Add(DamageTypeBadge.Create(hero.BaseDamageType, "hero-detail__type"));
+            top.Add(typeBlock);
             _heroDetail.Add(top);
 
             _heroDetail.Add(Text(hero.StatsLine, "hero-detail__stats"));
@@ -536,8 +541,19 @@ namespace Moba.UI
             var abilities = new VisualElement { pickingMode = PickingMode.Ignore };
             abilities.AddToClassList("hero-detail__abilities");
             abilities.Add(AbilityBlock("PASSIVE", hero.passiveName, hero.passiveDescription));
-            if (hero.ultimate != null)
-                abilities.Add(AbilityBlock("ULTIMATE (R)", hero.ultimate.displayName, hero.ultimate.description));
+            if (hero.signature != null)
+                abilities.Add(AbilityBlock("SIGNATURE (Q)", hero.signature.displayName, hero.signature.description));
+            var ultimates = new List<string>();
+            foreach (Abilities.AbilityDefinition ultimate in hero.UltimateOptions) ultimates.Add(ultimate.displayName);
+            if (ultimates.Count > 0)
+                abilities.Add(AbilityBlock("ULTIMATE (R)", "Chosen at level 6", string.Join(" · ", ultimates)));
+            var affinities = new VisualElement { pickingMode = PickingMode.Ignore };
+            affinities.AddToClassList("hero-detail__affinities");
+            affinities.Add(Text("AFFINITIES", "hero-detail__section"));
+            var hexagon = new AffinityHexagon();
+            hexagon.SetHero(hero);
+            affinities.Add(hexagon);
+            abilities.Add(affinities);
             _heroDetail.Add(abilities);
         }
 

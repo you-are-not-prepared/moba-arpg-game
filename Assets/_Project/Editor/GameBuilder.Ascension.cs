@@ -1,11 +1,16 @@
 using System;
+using Moba.Abilities;
 
 namespace Moba.EditorTools
 {
-    // Placeholder ascension trees. Path A builds on each hero's passive, path B on the ultimate, and path C is a
-    // hybrid playstyle that draws on both. Level 6 picks the path; levels 11 and 18 each offer two of its talents.
+    // Ascension trees (first versions, to tune). Each hero has three paths, one per ultimate: two unique ones and the
+    // one shared by its damage type and range (see GameBuilder.Kits). Level 6 picks the path, which puts its ultimate
+    // in R; levels 11 and 16 each offer two talents that make that ultimate stronger AND build on the hero's passive.
     public static partial class GameBuilder
     {
+        // How a talent improves the ultimate.
+        enum Up { Damage, Cooldown, Duration, Radius, Stun, Items }
+
         static Talent T(string id, string name, string flavor, Action<Talent> stats)
         {
             var talent = new Talent { id = id, name = name, flavor = flavor };
@@ -13,327 +18,180 @@ namespace Moba.EditorTools
             return talent;
         }
 
-        static AscensionPath AscPath(Talent root, Talent second1, Talent second2, Talent third1, Talent third2) => new()
+        static (Up, float) U(Up up, float value) => (up, value);
+
+        // A passive part of a talent: its flavour line and its stats.
+        static (string, Action<Talent>) P(string flavor, Action<Talent> stats) => (flavor, stats);
+
+        // Three paths for `hero`. Each path: its ultimate and four ultimate upgrades (level 11 options, then level 16
+        // options). `passives`: the four passive upgrades, paired with the ultimate upgrades in the same order.
+        static AscensionTree Tree(string hero, (string, Action<Talent>)[] passives,
+            params (AbilityDefinition ultimate, (Up, float)[] ups)[] paths)
         {
-            root = root,
-            second = new[] { second1, second2 },
-            third = new[] { third1, third2 },
+            var tree = new AscensionTree();
+            for (int p = 0; p < paths.Length; p++)
+            {
+                (AbilityDefinition ultimate, (Up, float)[] ups) = paths[p];
+                string letter = AscensionTree.Letter(p).ToLowerInvariant();
+                var talents = new Talent[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    (Up up, float value) = ups[i];
+                    (string flavor, Action<Talent> passive) = passives[i];
+                    talents[i] = T($"{hero}_{letter}{i + 1}", $"{UpName(up, i >= 2)} {ultimate.displayName}", flavor, t =>
+                    {
+                        Apply(t, up, value);
+                        passive(t);
+                    });
+                }
+                tree.paths.Add(new AscensionPath
+                {
+                    ultimate = ultimate,
+                    root = T($"{hero}_{letter}", ultimate.displayName, ultimate.description, _ => { }),
+                    second = new[] { talents[0], talents[1] },
+                    third = new[] { talents[2], talents[3] },
+                });
+            }
+            return tree;
+        }
+
+        static string UpName(Up up, bool strong) => up switch
+        {
+            Up.Damage => strong ? "Mighty" : "Empowered",
+            Up.Cooldown => strong ? "Ever-Ready" : "Swift",
+            Up.Duration => strong ? "Endless" : "Lasting",
+            Up.Radius => strong ? "Sweeping" : "Wide",
+            Up.Items => strong ? "Masterwork" : "Tuned",
+            _ => strong ? "Paralyzing" : "Crushing",
         };
 
-        // Kael: projectiles (Split Shot), the Skybreaker Arrow, or a mobile kiting archer.
-        static AscensionTree KaelAscension() => new()
+        static void Apply(Talent t, Up up, float value)
         {
-            paths =
+            switch (up)
             {
-                AscPath(
-                    T("kael_a", "Storm of Arrows", "Every shot becomes a volley.", t => t.extraProjectiles = 1),
-                    T("kael_a1", "Splintering Shots", "Arrowheads that shatter on impact.", t => t.spellDamage = 0.15f),
-                    T("kael_a2", "Quickdraw", "Nock, draw, loose. Again.", t => t.attackSpeed = 0.2f),
-                    T("kael_a3", "Endless Quiver", "There is always one more arrow.", t => t.extraProjectiles = 1),
-                    T("kael_a4", "Barrage Rhythm", "Fall into the rhythm of the hunt.", t => t.cooldownReduction = 0.15f)),
-                AscPath(
-                    T("kael_b", "Skybreaker", "The great bow is always strung.", t => t.ultimateCooldownReduction = 0.25f),
-                    T("kael_b1", "Pinning Shot", "Nail them where they stand.", t => t.stunDuration = 0.75f),
-                    T("kael_b2", "Hunter's Focus", "Patience sharpens every arrow.", t => t.attackDamage = 15f),
-                    T("kael_b3", "Heaven's Fall", "The sky itself holds them down.", t =>
-                    {
-                        t.stunDuration = 0.75f;
-                        t.spellDamage = 0.2f;
-                    }),
-                    T("kael_b4", "Sky Hunter", "Draw the great bow again and again.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("kael_c", "Windrunner", "Never where they aim.", t =>
-                    {
-                        t.moveSpeed = 0.1f;
-                        t.attackSpeed = 0.1f;
-                    }),
-                    T("kael_c1", "Hit and Run", "Shoot, step, shoot.", t => t.moveSpeed = 0.1f),
-                    T("kael_c2", "Steady Aim", "Every arrow counts.", t => t.attackDamage = 12f),
-                    T("kael_c3", "Gale Volley", "The wind carries extra arrows.", t =>
-                    {
-                        t.extraProjectiles = 1;
-                        t.ultimateCooldownReduction = 0.15f;
-                    }),
-                    T("kael_c4", "Sky Piercer", "Strike from the edge of sight.", t =>
-                    {
-                        t.stunDuration = 0.5f;
-                        t.spellDamage = 0.1f;
-                    })),
-            },
-        };
+                case Up.Damage: t.ultimateDamage += value; break;
+                case Up.Cooldown: t.ultimateCooldownReduction += value; break;
+                case Up.Duration: t.ultimateDuration += value; break;
+                case Up.Radius: t.ultimateRadius += value; break;
+                case Up.Stun: t.stunDuration += value; break;
+                // Overcharged Sockets is a passive ultimate: its path makes the gear in those sockets better.
+                case Up.Items: t.itemStats += value; break;
+            }
+        }
 
-        // Vesh: cooldowns (Quickened Mind), Rewind, or burst casting.
-        static AscensionTree VeshAscension() => new()
-        {
-            paths =
-            {
-                AscPath(
-                    T("vesh_a", "Time Weaver", "Seconds bend around your spells.", t => t.cooldownReduction = 0.1f),
-                    T("vesh_a1", "Accelerated Mind", "Think faster, cast more.", t => t.maxMana = 80f),
-                    T("vesh_a2", "Temporal Flow", "Every spell lands a moment sooner.", t => t.spellDamage = 0.15f),
-                    T("vesh_a3", "Perpetual Motion", "Never stop casting.", t => t.cooldownReduction = 0.1f),
-                    T("vesh_a4", "Echo", "Each spell leaves an echo behind.", t => t.extraProjectiles = 1)),
-                AscPath(
-                    T("vesh_b", "Chronoshift", "Rewind comes around sooner.", t => t.ultimateCooldownReduction = 0.3f),
-                    T("vesh_b1", "Borrowed Time", "Take a few years from tomorrow.", t => t.maxHealth = 120f),
-                    T("vesh_b2", "Haste of Ages", "Walk between the ticks of the clock.", t => t.moveSpeed = 0.1f),
-                    T("vesh_b3", "Rewound Wounds", "Some injuries never happened.", t => t.maxHealth = 200f),
-                    T("vesh_b4", "Endless Loop", "Again. And again. And again.", t => t.ultimateCooldownReduction = 0.3f)),
-                AscPath(
-                    T("vesh_c", "Paradox", "Cast it all, rewind, cast it all again.", t =>
-                    {
-                        t.spellDamage = 0.1f;
-                        t.ultimateCooldownReduction = 0.15f;
-                    }),
-                    T("vesh_c1", "Temporal Spike", "A moment, sharpened to a point.", t => t.spellDamage = 0.15f),
-                    T("vesh_c2", "Mana Loop", "Spend it twice.", t => t.maxMana = 100f),
-                    T("vesh_c3", "Collapse", "Every second lands at once.", t => t.spellDamage = 0.2f),
-                    T("vesh_c4", "Infinite Loop", "There is no last cast.", t =>
-                    {
-                        t.cooldownReduction = 0.1f;
-                        t.ultimateCooldownReduction = 0.2f;
-                    })),
-            },
-        };
+        // Ultimate upgrade sets: level 11 (two options), then level 16 (two options).
+        static (Up, float)[] Ups(params (Up, float)[] ups) => ups;
 
-        // Brann: items (Masterwork Gear), mod sockets (Overcharged Sockets), or a sturdy frontline builder.
-        static AscensionTree BrannAscension() => new()
-        {
-            paths =
-            {
-                AscPath(
-                    T("brann_a", "Master Smith", "Better hands, better steel.", t => t.itemStats = 0.1f),
-                    T("brann_a1", "Tempered Steel", "Folded a hundred times.", t => t.attackDamage = 10f),
-                    T("brann_a2", "Reinforced Plating", "Rivets in all the right places.", t => t.maxHealth = 150f),
-                    T("brann_a3", "Perfect Alloy", "The forge's finest work.", t => t.itemStats = 0.15f),
-                    T("brann_a4", "Heavy Hands", "Swing the hammer faster.", t => t.attackSpeed = 0.15f)),
-                AscPath(
-                    T("brann_b", "Runesmith", "Every socket hums with power.", t => t.spellDamage = 0.15f),
-                    T("brann_b1", "Arcane Battery", "Store the spark for later.", t => t.maxMana = 100f),
-                    T("brann_b2", "Efficient Runes", "Waste nothing.", t => t.cooldownReduction = 0.15f),
-                    T("brann_b3", "Overload", "Push the runes past their limit.", t => t.spellDamage = 0.25f),
-                    T("brann_b4", "Splitting Rune", "One spell, many paths.", t => t.extraProjectiles = 1)),
-                AscPath(
-                    T("brann_c", "Bastion", "Build it to last.", t =>
-                    {
-                        t.itemStats = 0.05f;
-                        t.maxHealth = 150f;
-                    }),
-                    T("brann_c1", "Riveted Armor", "One more plate. Then another.", t => t.maxHealth = 200f),
-                    T("brann_c2", "Socket Ward", "Runes that hit back.", t => t.spellDamage = 0.1f),
-                    T("brann_c3", "Living Fortress", "Grows sturdier with every fight.", t => t.healthPerLevel = 30f),
-                    T("brann_c4", "Rune Hammer", "Steel and sorcery in one swing.", t =>
-                    {
-                        t.attackDamage = 15f;
-                        t.spellDamage = 0.1f;
-                    })),
-            },
-        };
+        // ---------- Heroes ----------
 
-        // Torvald: toughness (Iron Hide), the Aegis Wall, or an aggressive warlord.
-        static AscensionTree TorvaldAscension() => new()
-        {
-            paths =
+        static AscensionTree KaelAscension(Mats m) => Tree("kael", new[]
             {
-                AscPath(
-                    T("torvald_a", "Juggernaut", "Grow harder to stop with every fight.", t =>
-                    {
-                        t.healthPerLevel = 25f;
-                        t.maxHealth = 100f;
-                    }),
-                    T("torvald_a1", "Iron Skin", "Blades bend on it.", t => t.maxHealth = 200f),
-                    T("torvald_a2", "Unstoppable", "Heavy, but always moving.", t => t.moveSpeed = 0.1f),
-                    T("torvald_a3", "Mountain", "Immovable.", t => t.maxHealth = 300f),
-                    T("torvald_a4", "Crushing Blows", "Every swing lands like a landslide.", t => t.attackDamage = 20f)),
-                AscPath(
-                    T("torvald_b", "Aegis Warden", "Hold the wall a little longer.", t => t.ultimateDuration = 2f),
-                    T("torvald_b1", "Bulwark Drill", "Raise the shield on instinct.", t => t.ultimateCooldownReduction = 0.25f),
-                    T("torvald_b2", "Shield Bash", "The best defence hits back.", t => t.attackDamage = 15f),
-                    T("torvald_b3", "Unbreakable Wall", "Nothing gets through. Nothing.", t => t.ultimateDuration = 2f),
-                    T("torvald_b4", "Rapid Guard", "Always ready to block.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("torvald_c", "Warlord", "Lead the charge behind the shield.", t =>
-                    {
-                        t.attackDamage = 12f;
-                        t.ultimateDuration = 1f;
-                    }),
-                    T("torvald_c1", "Battle Cry", "Swing faster, push harder.", t => t.attackSpeed = 0.15f),
-                    T("torvald_c2", "Forced March", "Never fall behind the front line.", t => t.moveSpeed = 0.1f),
-                    T("torvald_c3", "Shield Charge", "The wall moves forward.", t =>
-                    {
-                        t.ultimateDuration = 1f;
-                        t.moveSpeed = 0.1f;
-                    }),
-                    T("torvald_c4", "Warlord's Might", "One blow ends the fight.", t => t.attackDamage = 25f)),
+                P("Split Shot: your arrows hit 10% harder.", t => t.spellDamage = 0.1f),
+                P("Quick hands: 15% more attack speed.", t => t.attackSpeed = 0.15f),
+                P("Split Shot: one more projectile on every projectile spell.", t => t.extraProjectiles = 1),
+                P("Split Shot: your arrows hit 20% harder.", t => t.spellDamage = 0.2f),
             },
-        };
+            (SkybreakerArrow(m), Ups(U(Up.Stun, 0.5f), U(Up.Damage, 0.2f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (HawkEye(m), Ups(U(Up.Duration, 1f), U(Up.Cooldown, 0.15f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (ArrowStorm(m), Ups(U(Up.Radius, 0.2f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
 
-        // Nyx: lone targets (Lone Prey), Bloodrush, or a slippery skirmisher.
-        // Thessa: Tailwind (casting gives speed), Eye of the Storm, or a hit-and-run skirmisher.
-        static AscensionTree ThessaAscension() => new()
-        {
-            paths =
+        static AscensionTree VeshAscension(Mats m) => Tree("vesh", new[]
             {
-                AscPath(
-                    T("thessa_a", "Gale", "The wind never quite lets go.", t => t.tailwindDuration = 0.5f),
-                    T("thessa_a1", "Jet Stream", "Ride the gust.", t => t.tailwindSpeed = 0.1f),
-                    T("thessa_a2", "Updraft", "One spell carries her further.", t => t.tailwindDuration = 1f),
-                    T("thessa_a3", "Slipstream", "Strike while the wind is behind you.", t => t.tailwindAttackSpeed = 0.2f),
-                    T("thessa_a4", "Second Gust", "The wind keeps blowing.", t => t.tailwindDuration = 1.5f)),
-                AscPath(
-                    T("thessa_b", "Hurricane", "The storm gathers a little longer.", t => t.ultimateDuration = 1f),
-                    T("thessa_b1", "Eye Widens", "A longer calm at the centre.", t => t.ultimateDuration = 2f),
-                    T("thessa_b2", "Charged Air", "Every spell crackles.", t => t.spellDamage = 0.15f),
-                    T("thessa_b3", "Ceaseless", "Spells come back faster, always.", t => t.cooldownReduction = 0.1f),
-                    T("thessa_b4", "Calm Before", "The next storm is never far.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("thessa_c", "Skirmisher", "Never stand still.", t => t.attackSpeed = 0.1f),
-                    T("thessa_c1", "Quickdraw", "Faster hands.", t => t.attackSpeed = 0.15f),
-                    T("thessa_c2", "Light Feet", "Faster feet.", t => t.moveSpeed = 0.1f),
-                    T("thessa_c3", "Crosswind", "One more on the wind.", t => t.extraProjectiles = 1),
-                    T("thessa_c4", "Windward", "Spells come back faster.", t => t.cooldownReduction = 0.1f)),
+                P("Quickened Mind: cooldowns another 5% shorter.", t => t.cooldownReduction = 0.05f),
+                P("Deep reserves: +150 max mana.", t => t.maxMana = 150f),
+                P("Quickened Mind: cooldowns another 10% shorter.", t => t.cooldownReduction = 0.1f),
+                P("Folded time: spells deal 15% more damage.", t => t.spellDamage = 0.15f),
             },
-        };
+            (Rewind(), Ups(U(Up.Cooldown, 0.15f), U(Up.Cooldown, 0.1f), U(Up.Cooldown, 0.2f), U(Up.Cooldown, 0.15f))),
+            (TimeStop(m), Ups(U(Up.Stun, 0.25f), U(Up.Radius, 0.2f), U(Up.Stun, 0.5f), U(Up.Cooldown, 0.2f))),
+            (Thunderstrike(m), Ups(U(Up.Stun, 0.25f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
 
-        // Oren: Heat bursts (Kindled Blade), Blazing Leap, or a sturdier Phoenix.
-        static AscensionTree OrenAscension() => new()
-        {
-            paths =
+        static AscensionTree BrannAscension(Mats m) => Tree("brann", new[]
             {
-                AscPath(
-                    T("oren_a", "Wildfire", "The fire spreads.", t => t.heatBurstDamage = 25f),
-                    T("oren_a1", "Flashpoint", "Bigger flames.", t => t.heatBurstDamage = 25f),
-                    T("oren_a2", "Stoke", "Fan the flames faster.", t => t.attackSpeed = 0.1f),
-                    T("oren_a3", "Inferno", "Everything burns.", t => t.heatBurstDamage = 50f),
-                    T("oren_a4", "Forge Heart", "Hot iron doesn't break.", t => t.maxHealth = 200f)),
-                AscPath(
-                    T("oren_b", "Meteor", "The blades stay hot longer.", t => t.ultimateDuration = 2f),
-                    T("oren_b1", "Quick Ignition", "Ready to leap again.", t => t.ultimateCooldownReduction = 0.2f),
-                    T("oren_b2", "Scorch", "Landings hit harder.", t => t.spellDamage = 0.15f),
-                    T("oren_b3", "Afterburn", "The fire refuses to die.", t => t.ultimateDuration = 3f),
-                    T("oren_b4", "Second Wind", "Always another leap.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("oren_c", "Phoenix", "Rises from the ashes.", t => t.maxHealth = 150f),
-                    T("oren_c1", "Searing Edge", "Every cut burns deeper.", t => t.attackDamage = 15f),
-                    T("oren_c2", "Ember Stride", "Close the gap.", t => t.moveSpeed = 0.08f),
-                    T("oren_c3", "Rebirth", "Stronger with every level.", t => t.healthPerLevel = 30f),
-                    T("oren_c4", "Sunfire", "The last blow lands hardest.", t => t.attackDamage = 25f)),
+                P("Masterwork Gear: items give another 5% more.", t => t.itemStats = 0.05f),
+                P("Weighted tools: +10 attack damage.", t => t.attackDamage = 10f),
+                P("Masterwork Gear: items give another 10% more.", t => t.itemStats = 0.1f),
+                P("Reinforced plating: +200 max health.", t => t.maxHealth = 200f),
             },
-        };
+            (OverchargedSockets(), Ups(U(Up.Items, 0.05f), U(Up.Items, 0.05f), U(Up.Items, 0.1f), U(Up.Items, 0.1f))),
+            (Bombardment(m), Ups(U(Up.Damage, 0.2f), U(Up.Radius, 0.2f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (Meteor(m), Ups(U(Up.Radius, 0.2f), U(Up.Damage, 0.2f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))));
 
-        // Ilsa: stronger slows (Chilling Touch), Glacial Prison, or a kiting Glacier Walker.
-        static AscensionTree IlsaAscension() => new()
-        {
-            paths =
+        static AscensionTree TorvaldAscension(Mats m) => Tree("torvald", new[]
             {
-                AscPath(
-                    T("ilsa_a", "Deep Freeze", "The cold bites harder.", t => t.spellSlow = 0.05f),
-                    T("ilsa_a1", "Frostbite", "Hardly able to move.", t => t.spellSlow = 0.1f),
-                    T("ilsa_a2", "Lingering Frost", "The chill stays.", t => t.spellSlowSeconds = 1f),
-                    T("ilsa_a3", "Shatter", "Frozen things break.", t => t.spellDamage = 0.2f),
-                    T("ilsa_a4", "Permafrost", "Winter never ends.", t => t.spellSlow = 0.1f)),
-                AscPath(
-                    T("ilsa_b", "Winter's Grasp", "The ice holds longer.", t => t.ultimateDuration = 1f),
-                    T("ilsa_b1", "Deep Ice", "Frozen solid.", t => t.stunDuration = 0.5f),
-                    T("ilsa_b2", "Cold Snap", "Ready sooner.", t => t.ultimateCooldownReduction = 0.15f),
-                    T("ilsa_b3", "Endless Winter", "The field lingers.", t => t.ultimateDuration = 2f),
-                    T("ilsa_b4", "Glacial Age", "Ice, again and again.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("ilsa_c", "Glacier Walker", "Glide over the ice.", t => t.moveSpeed = 0.05f),
-                    T("ilsa_c1", "Frost Armour", "A shell of ice.", t => t.maxHealth = 150f),
-                    T("ilsa_c2", "Hailstorm", "One more shard.", t => t.extraProjectiles = 1),
-                    T("ilsa_c3", "Arctic Mind", "Clear and cold thoughts.", t => t.cooldownReduction = 0.1f),
-                    T("ilsa_c4", "Glacier Heart", "A deep well of power.", t => t.maxMana = 150f)),
+                P("Iron Hide: +15 more max health per level.", t => t.healthPerLevel = 15f),
+                P("Thick skin: +150 max health.", t => t.maxHealth = 150f),
+                P("Iron Hide: +25 more max health per level.", t => t.healthPerLevel = 25f),
+                P("Light on your feet: 8% faster.", t => t.moveSpeed = 0.08f),
             },
-        };
+            (AegisWall(m), Ups(U(Up.Duration, 1f), U(Up.Cooldown, 0.15f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (Unbreakable(m), Ups(U(Up.Duration, 1f), U(Up.Cooldown, 0.15f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (Whirlwind(m), Ups(U(Up.Duration, 1f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
 
-        // Maela: stronger healing (Verdant Bond), Sanctuary, or a sturdy Warden of the Wild.
-        static AscensionTree MaelaAscension() => new()
-        {
-            paths =
+        static AscensionTree NyxAscension(Mats m) => Tree("nyx", new[]
             {
-                AscPath(
-                    T("maela_a", "Lifebloom", "Life flows further.", t => t.allyHeal = 0.05f),
-                    T("maela_a1", "Deep Roots", "Draw life from deeper.", t => t.allyHeal = 0.1f),
-                    T("maela_a2", "Wildgrowth", "Every spell grows stronger.", t => t.spellDamage = 0.1f),
-                    T("maela_a3", "Full Bloom", "Life overflowing.", t => t.allyHeal = 0.1f),
-                    T("maela_a4", "Barkskin", "Hard to cut down.", t => t.maxHealth = 200f)),
-                AscPath(
-                    T("maela_b", "Sacred Grove", "The grove stands longer.", t => t.ultimateDuration = 1f),
-                    T("maela_b1", "Old Growth", "Ancient and patient.", t => t.ultimateDuration = 2f),
-                    T("maela_b2", "Quick Sprouts", "The seeds are ready.", t => t.ultimateCooldownReduction = 0.15f),
-                    T("maela_b3", "Seasons", "Everything comes back.", t => t.cooldownReduction = 0.1f),
-                    T("maela_b4", "Evergreen", "Never bare.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("maela_c", "Warden of the Wild", "The forest protects its own.", t => t.maxHealth = 150f),
-                    T("maela_c1", "Thorns", "Even she has teeth.", t => t.attackDamage = 10f),
-                    T("maela_c2", "Swiftwood", "Light on her feet.", t => t.moveSpeed = 0.08f),
-                    T("maela_c3", "Sap", "A deep reserve.", t => t.maxMana = 150f),
-                    T("maela_c4", "Ironbark", "Grows tougher every season.", t => t.healthPerLevel = 25f)),
+                P("Lone Prey: another +5% damage to isolated targets.", t => t.isolationDamage = 0.05f),
+                P("Frenzy: 10% more attack speed.", t => t.attackSpeed = 0.1f),
+                P("Lone Prey: another +10% damage to isolated targets.", t => t.isolationDamage = 0.1f),
+                P("Sharpened claws: +15 attack damage.", t => t.attackDamage = 15f),
             },
-        };
+            (Bloodrush(m), Ups(U(Up.Duration, 1.5f), U(Up.Cooldown, 0.15f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (ShadowExecute(m), Ups(U(Up.Damage, 0.2f), U(Up.Cooldown, 0.15f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (Whirlwind(m), Ups(U(Up.Duration, 1f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
 
-        // Corvin: more chains (Static Charge), Thunderhead, or a Conduit for constant casting.
-        static AscensionTree CorvinAscension() => new()
-        {
-            paths =
+        static AscensionTree ThessaAscension(Mats m) => Tree("thessa", new[]
             {
-                AscPath(
-                    T("corvin_a", "Overcharge", "The charge builds faster.", t => t.chargeSooner = 1),
-                    T("corvin_a1", "Arc", "The lightning reaches further.", t => t.chainJumps = 1),
-                    T("corvin_a2", "Voltage", "Every spell hits harder.", t => t.spellDamage = 0.1f),
-                    T("corvin_a3", "Chain Reaction", "It never stops at one.", t => t.chainJumps = 1),
-                    T("corvin_a4", "Full Charge", "Always crackling.", t => t.chargeSooner = 1)),
-                AscPath(
-                    T("corvin_b", "Tempest", "The storm lingers.", t => t.ultimateDuration = 1f),
-                    T("corvin_b1", "Brewing Storm", "Thunder that won't pass.", t => t.ultimateDuration = 2f),
-                    T("corvin_b2", "Thunderclap", "Every strike shakes the ground.", t => t.spellDamage = 0.15f),
-                    T("corvin_b3", "Gathering Clouds", "The sky darkens sooner.", t => t.ultimateCooldownReduction = 0.2f),
-                    T("corvin_b4", "Eye of Thunder", "Storms on call.", t => t.ultimateCooldownReduction = 0.25f)),
-                AscPath(
-                    T("corvin_c", "Conduit", "Power flows through him.", t => t.cooldownReduction = 0.05f),
-                    T("corvin_c1", "Flow", "Spells return faster.", t => t.cooldownReduction = 0.1f),
-                    T("corvin_c2", "Battery", "A deeper charge.", t => t.maxMana = 150f),
-                    T("corvin_c3", "Forked Bolt", "One more spark.", t => t.extraProjectiles = 1),
-                    T("corvin_c4", "Storm Mind", "Thought becomes lightning.", t => t.spellDamage = 0.15f)),
+                P("Tailwind: another +10% movement speed.", t => t.tailwindSpeed = 0.1f),
+                P("Tailwind: lasts 1s longer.", t => t.tailwindDuration = 1f),
+                P("Tailwind: +20% attack speed while it lasts.", t => t.tailwindAttackSpeed = 0.2f),
+                P("Tailwind: another +15% movement speed.", t => t.tailwindSpeed = 0.15f),
             },
-        };
+            (EyeOfTheStorm(m), Ups(U(Up.Duration, 1f), U(Up.Cooldown, 0.15f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (GaleForce(m), Ups(U(Up.Damage, 0.2f), U(Up.Cooldown, 0.15f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (Cyclone(m), Ups(U(Up.Radius, 0.2f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
 
-        static AscensionTree NyxAscension() => new()
-        {
-            paths =
+        static AscensionTree OrenAscension(Mats m) => Tree("oren", new[]
             {
-                AscPath(
-                    T("nyx_a", "Lone Hunter", "Separate them, then strike.", t => t.isolationDamage = 0.1f),
-                    T("nyx_a1", "Predator", "Sharper claws.", t => t.attackDamage = 15f),
-                    T("nyx_a2", "Stalker's Pace", "Close the gap before they notice.", t => t.moveSpeed = 0.1f),
-                    T("nyx_a3", "Apex", "Nothing hunts the hunter.", t => t.isolationDamage = 0.15f),
-                    T("nyx_a4", "Frenzy", "Faster and faster.", t => t.attackSpeed = 0.2f)),
-                AscPath(
-                    T("nyx_b", "Blood Frenzy", "The rush lasts longer.", t => t.ultimateDuration = 2f),
-                    T("nyx_b1", "Hemorrhage", "Strike while they bleed.", t => t.attackSpeed = 0.15f),
-                    T("nyx_b2", "Thirst", "Feed on the fight.", t => t.maxHealth = 150f),
-                    T("nyx_b3", "Endless Hunt", "The rush never ends.", t => t.ultimateDuration = 2f),
-                    T("nyx_b4", "Quick Return", "Rush again, sooner.", t => t.ultimateCooldownReduction = 0.3f)),
-                AscPath(
-                    T("nyx_c", "Shadowstep", "In, out, gone.", t =>
-                    {
-                        t.moveSpeed = 0.1f;
-                        t.isolationDamage = 0.05f;
-                    }),
-                    T("nyx_c1", "Ambush", "The first strike is the deepest.", t => t.attackDamage = 15f),
-                    T("nyx_c2", "Night Run", "The rush carries you further.", t => t.ultimateDuration = 1.5f),
-                    T("nyx_c3", "Phantom", "Too fast to pin down.", t =>
-                    {
-                        t.moveSpeed = 0.1f;
-                        t.attackSpeed = 0.1f;
-                    }),
-                    T("nyx_c4", "Execution", "Alone, and out of time.", t =>
-                    {
-                        t.isolationDamage = 0.1f;
-                        t.attackDamage = 10f;
-                    })),
+                P("Kindled Blade: Heat bursts deal +25 damage.", t => t.heatBurstDamage = 25f),
+                P("Stoked: 10% more attack speed.", t => t.attackSpeed = 0.1f),
+                P("Kindled Blade: Heat bursts deal +50 damage.", t => t.heatBurstDamage = 50f),
+                P("Forge heart: +200 max health.", t => t.maxHealth = 200f),
             },
-        };
+            (BlazingLeap(m), Ups(U(Up.Damage, 0.2f), U(Up.Duration, 2f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (PhoenixForm(m), Ups(U(Up.Duration, 1f), U(Up.Cooldown, 0.15f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (Inferno(m), Ups(U(Up.Duration, 1f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
+
+        static AscensionTree IlsaAscension(Mats m) => Tree("ilsa", new[]
+            {
+                P("Chilling Touch: spell hits slow 5% more.", t => t.spellSlow = 0.05f),
+                P("Chilling Touch: slows last 0.5s longer.", t => t.spellSlowSeconds = 0.5f),
+                P("Chilling Touch: spell hits slow 10% more.", t => t.spellSlow = 0.1f),
+                P("Shatter: spells deal 15% more damage.", t => t.spellDamage = 0.15f),
+            },
+            (GlacialPrison(m), Ups(U(Up.Stun, 0.25f), U(Up.Radius, 0.2f), U(Up.Stun, 0.5f), U(Up.Cooldown, 0.2f))),
+            (Avalanche(m), Ups(U(Up.Stun, 0.25f), U(Up.Damage, 0.2f), U(Up.Stun, 0.5f), U(Up.Damage, 0.3f))),
+            (Blizzard(m), Ups(U(Up.Duration, 1f), U(Up.Radius, 0.2f), U(Up.Damage, 0.3f), U(Up.Radius, 0.25f))));
+
+        static AscensionTree MaelaAscension(Mats m) => Tree("maela", new[]
+            {
+                P("Verdant Bond: heals 5% more of the damage dealt.", t => t.allyHeal = 0.05f),
+                P("Sap: +150 max mana.", t => t.maxMana = 150f),
+                P("Verdant Bond: heals 10% more of the damage dealt.", t => t.allyHeal = 0.1f),
+                P("Wildgrowth: spells deal (and heal) 15% more.", t => t.spellDamage = 0.15f),
+            },
+            (Sanctuary(m), Ups(U(Up.Duration, 1f), U(Up.Radius, 0.2f), U(Up.Duration, 2f), U(Up.Cooldown, 0.25f))),
+            (WildGrowth(m), Ups(U(Up.Damage, 0.2f), U(Up.Radius, 0.2f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (Overgrowth(m), Ups(U(Up.Stun, 0.25f), U(Up.Radius, 0.2f), U(Up.Stun, 0.5f), U(Up.Damage, 0.3f))));
+
+        static AscensionTree CorvinAscension(Mats m) => Tree("corvin", new[]
+            {
+                P("Static Charge: charged hits jump to 1 more enemy.", t => t.chainJumps = 1),
+                P("Static Charge: charged one cast sooner.", t => t.chargeSooner = 1),
+                P("Static Charge: charged hits jump to 1 more enemy.", t => t.chainJumps = 1),
+                P("Voltage: spells deal 15% more damage.", t => t.spellDamage = 0.15f),
+            },
+            (Thunderhead(m), Ups(U(Up.Duration, 1f), U(Up.Damage, 0.2f), U(Up.Duration, 2f), U(Up.Radius, 0.25f))),
+            (ChainStorm(m), Ups(U(Up.Damage, 0.2f), U(Up.Cooldown, 0.15f), U(Up.Damage, 0.3f), U(Up.Cooldown, 0.25f))),
+            (Thunderstrike(m), Ups(U(Up.Stun, 0.25f), U(Up.Damage, 0.2f), U(Up.Radius, 0.25f), U(Up.Damage, 0.3f))));
     }
 }

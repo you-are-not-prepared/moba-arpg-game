@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34f0ccdc6d8e50642a33b84bd854ce2a, type: 3}
+  m_Name: Sig_MendingSeed
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.HealSpell
+  displayName: Mending Seed
+  description: Heals an allied hero (or yourself).
+  cost: 300
+  sellsAtFullPrice: 1
+  icon: {fileID: 0}
+  color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
+  glyph: MS
+  tags: 0
+  damageType: 0
+  adaptive: 1
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  targeting: 2
+  unitFilter: 1
+  range: 7
+  areaRadius: 0
+  cooldownByRank:
+  - 9
+  - 8.5
+  - 8
+  - 7.5
+  - 7
+  manaCostByRank:
+  - 50
+  - 54
+  - 58
+  - 62
+  - 66
+  healByRank:
+  - 70
+  - 100
+  - 130
+  - 160
+  - 190
+  area: 0
+  radius: 12
