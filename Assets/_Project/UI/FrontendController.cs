@@ -547,13 +547,14 @@ namespace Moba.UI
             foreach (Abilities.AbilityDefinition ultimate in hero.UltimateOptions) ultimates.Add(ultimate.displayName);
             if (ultimates.Count > 0)
                 abilities.Add(AbilityBlock("ULTIMATE (R)", "Chosen at level 6", string.Join(" · ", ultimates)));
-            var affinities = new VisualElement { pickingMode = PickingMode.Ignore };
-            affinities.AddToClassList("hero-detail__affinities");
-            affinities.Add(Text("AFFINITIES", "hero-detail__section"));
-            var hexagon = new AffinityHexagon();
+            var resistances = new VisualElement { pickingMode = PickingMode.Ignore };
+            resistances.AddToClassList("hero-detail__resistances");
+            resistances.Add(Text("RESISTANCES", "hero-detail__section"));
+            var hexagon = new ResistanceHexagon();
             hexagon.SetHero(hero);
-            affinities.Add(hexagon);
-            abilities.Add(affinities);
+            resistances.Add(hexagon);
+            resistances.Add(Text("Damage taken: +25% = 25% less from that type, −20% = 20% more.", "hero-detail__text"));
+            abilities.Add(resistances);
             _heroDetail.Add(abilities);
         }
 

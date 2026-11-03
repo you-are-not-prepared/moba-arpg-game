@@ -165,6 +165,9 @@ namespace Moba.UI
             AddToggle("Attack move: quick cast at cursor",
                 "On: attack move fires the moment its key is pressed.\nOff: press the key, then confirm with a click.",
                 () => GameSettings.Current.attackMoveQuickCast, v => GameSettings.Current.attackMoveQuickCast = v);
+            AddToggle("Damage numbers",
+                "On: numbers over what your hero hits, in the damage type's colour, and over your hero when it's hit.",
+                () => GameSettings.Current.damageNumbers, v => GameSettings.Current.damageNumbers = v);
 
             foreach (GameInput.Category category in Enum.GetValues(typeof(GameInput.Category)))
             {
@@ -365,7 +368,7 @@ namespace Moba.UI
             AddSlider("Minimap", () => GameSettings.Current.minimapScale, v => GameSettings.Current.minimapScale = v);
             AddSlider("Stats bar (gold, CS, timer)", () => GameSettings.Current.statsBarScale, v => GameSettings.Current.statsBarScale = v);
             AddSlider("Unit health bars", () => GameSettings.Current.healthBarScale, v => GameSettings.Current.healthBarScale = v);
-            AddSlider("Gold / XP pop-ups", () => GameSettings.Current.popupTextScale, v => GameSettings.Current.popupTextScale = v);
+            AddSlider("Pop-ups (gold, XP, damage)", () => GameSettings.Current.popupTextScale, v => GameSettings.Current.popupTextScale = v);
         }
 
         void AddSlider(string label, Func<float> get, Action<float> set)

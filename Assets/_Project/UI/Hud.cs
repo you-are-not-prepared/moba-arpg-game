@@ -166,12 +166,15 @@ namespace Moba.UI
                 _portraitGlyph.style.color = _hero.definition.color;
             }
             if (_progression != null) _progression.BountyEarned += OnBountyEarned;
+            Unit.AnyDamageNumber -= OnDamageNumber;
+            Unit.AnyDamageNumber += OnDamageNumber;
             BindInventory();
         }
 
         void Unbind()
         {
             if (_progression != null) _progression.BountyEarned -= OnBountyEarned;
+            Unit.AnyDamageNumber -= OnDamageNumber;
         }
 
         // Interface sizes from the options menu. The overall HUD scale multiplies every element.
@@ -397,22 +400,39 @@ namespace Moba.UI
             }
         }
 
-        // ---------- Bounty pop-ups ----------
+        // ---------- Bounty pop-ups and damage numbers ----------
 
         void OnBountyEarned(int gold, float xp, Vector3 worldPos)
         {
-            if (gold > 0) SpawnFloatingText($"+{gold}g", worldPos + Vector3.up * 1.5f, xp: false);
-            if (xp > 0f) SpawnFloatingText($"+{xp:0} xp", worldPos + Vector3.up * 0.6f, xp: true);
+            if (gold > 0) SpawnFloatingText($"+{gold}g", worldPos + Vector3.up * 1.5f, null);
+            if (xp > 0f) SpawnFloatingText($"+{xp:0} xp", worldPos + Vector3.up * 0.6f, "floating-text--xp");
         }
 
-        void SpawnFloatingText(string text, Vector3 worldPos, bool xp)
+        // What your hero hits shows its damage in the type's colour (white for auto attacks); hits on your hero show
+        // as "-N" (red when untyped).
+        void OnDamageNumber(Unit victim, Unit source, float amount, DamageType type, Vector3 at)
+        {
+            if (!GameSettings.Current.damageNumbers || _hero == null) return;
+            Unit self = _hero.Unit;
+            bool taken = victim != null && victim == self;
+            if (!taken && (source == null || source != self)) return;
+            string text = Mathf.Max(1f, Mathf.Round(amount)).ToString("0");
+            Color color = type != DamageType.None ? DamageTypes.ColorOf(type)
+                : taken ? new Color(1f, 0.42f, 0.38f) : new Color(0.96f, 0.96f, 0.96f);
+            Label label = SpawnFloatingText(taken ? $"-{text}" : text, at + Vector3.up * 0.4f,
+                taken ? "floating-text--taken" : "floating-text--damage", UnityEngine.Random.Range(-18f, 18f));
+            label.style.color = color; // the type colour is data, so it's set here rather than in USS
+        }
+
+        Label SpawnFloatingText(string text, Vector3 worldPos, string modifier, float drift = 0f)
         {
             var label = new Label(text) { pickingMode = PickingMode.Ignore };
             label.AddToClassList("floating-text");
-            label.EnableInClassList("floating-text--xp", xp);
+            if (modifier != null) label.AddToClassList(modifier);
             label.style.scale = new Scale(Vector2.one * _popupScale);
             _worldLayer.Add(label);
-            _floating.Add(new FloatingText { Label = label, World = worldPos });
+            _floating.Add(new FloatingText { Label = label, World = worldPos, Drift = drift });
+            return label;
         }
 
         void UpdateFloatingText()
@@ -430,7 +450,7 @@ namespace Moba.UI
                 }
                 float t = f.Age / FloatingTextLifetime;
                 Vector2 p = RuntimePanelUtils.CameraTransformWorldToPanel(panel, f.World, _camera);
-                f.Label.style.left = p.x;
+                f.Label.style.left = p.x + f.Drift;
                 f.Label.style.top = p.y - t * FloatingTextRise;
                 f.Label.style.opacity = 1f - t * t;
                 _floating[i] = f;
@@ -665,6 +685,8 @@ namespace Moba.UI
         {
             public Label Label;
             public Vector3 World;
+            // Sideways offset in panel pixels, so quick hits don't stack exactly.
+            public float Drift;
             public float Age;
         }
     }

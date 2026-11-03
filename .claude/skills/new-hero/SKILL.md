@@ -1,6 +1,6 @@
 ---
 name: new-hero
-description: Add a new hero (champion) to moba-arpg-game, or change an existing hero's stats, affinities, passive, signature spell, ultimates or ascension talents. Covers the HeroSpec in GameBuilder, the signature spell in Q, the three ultimates chosen at level 6 (two unique + one shared), the ascension tree, new passive or spell mechanics (offline and on the game server), rebuilding scenes and the server, testing, and the README. Use when the user proposes a hero (often from a Discord hero proposal) or asks to rework one.
+description: Add a new hero (champion) to moba-arpg-game, or change an existing hero's stats, resistances, passive, signature spell, ultimates or ascension talents. Covers the HeroSpec in GameBuilder, the signature spell in Q, the three ultimates chosen at level 6 (two unique + one shared), the ascension tree, new passive or spell mechanics (offline and on the game server), rebuilding scenes and the server, testing, and the README. Use when the user proposes a hero (often from a Discord hero proposal) or asks to rework one.
 ---
 
 # New hero (moba-arpg-game)
@@ -20,7 +20,7 @@ Everything else picks the hero up from the roster on its own: champion select, b
 - **Base stats:** `Health`, `Damage`, `Range` (melee ≈ 1), `AttacksPerSecond`, `Speed`, `Mana`. Set `Melee = true` for melee (no attack projectile).
   - **Today's ranges:** HP 560–700, damage 30–40, speed 6.0–6.8, mana 300.
 - **Damage identity:**
-  - `Affinities = Aff(fire, frost, nature, lightning, physical, air)` in percent. The highest one is the hero's **base damage type**. The usual pattern is +25 on the base type, a small plus on one or two others, and minuses on the types the base is weak to or strong against.
+  - `Resistances = Res(fire, frost, nature, lightning, physical, air)` in percent. They only change the damage the hero takes (+25 = 25% less from that type); the highest one is the hero's **base damage type**. The usual pattern is +25 on the base type, a small plus on one or two others, and minuses on the types the base is weak to or strong against.
   - The cycle is Fire > Frost > Nature > Lightning > Physical > Air > Fire: +10% against the next type, −10% against the previous one.
   - `SpellColors = Colors(Rgb(...), Rgb(...), Rgb(...))`: three colours for the hero's spell looks.
 - **A passive.** `PassiveName` and `PassiveDescription` are shown in champion select, plus the numbers the passive uses.
@@ -49,7 +49,7 @@ Everything else picks the hero up from the roster on its own: champion select, b
 
 ## Steps
 
-1. **Pin down the design with the user** if the proposal leaves gaps: numbers, melee/ranged, affinities, what the signature and the two unique ultimates do.
+1. **Pin down the design with the user** if the proposal leaves gaps: numbers, melee/ranged, resistances, what the signature and the two unique ultimates do.
 2. **HeroSpec:** add an entry to `Heroes()` in `GameBuilder.cs`. Copy the closest existing hero; keep the field order and the one-line comment style.
 3. **Passive:**
    - **An existing passive field fits:** use it. The fields are `ExtraProjectiles`, `CooldownMultiplier`, `ItemStatMultiplier`, `HealthPerLevelBonus`, `MoveSpeedMultiplier`, and `IsolationDamageBonus` with `IsolationRadius`, plus the component passives (Tailwind, Kindled Blade's Heat, slow, charge).
@@ -77,7 +77,7 @@ Everything else picks the hero up from the roster on its own: champion select, b
      | `ExtraSocketUltimate` | passive, extra mod sockets |
 
    - **New spell type:** subclass `AbilityDefinition` in `Scripts/Abilities`, implement `Execute` (plus `Describe` and `StatsText` for tooltips), and give timed effects a component like `Heroes/Buff.cs`.
-     - Read `context.Modifiers`: `damageMultiplier`, `damageType`, and `Radius()` for areas, so that affinities and ultimate talents apply.
+     - Read `context.Modifiers`: `damageMultiplier`, `damageType`, and `Radius()` for areas, so that spell-damage bonuses and ultimate talents apply.
      - Add a case to `BotBrain` so bots cast it.
 6. **Ascension:** add `<Name>Ascension(Mats m)` to `GameBuilder.Ascension.cs` with `Tree("<id>", passives, paths...)`:
    - **`passives`:** four `P(flavor, t => ...)` passive upgrades, in order: the two level-11 options, then the two level-16 options.
@@ -102,7 +102,7 @@ Everything else picks the hero up from the roster on its own: champion select, b
    - Rebuild and redeploy the game server (game-server-deploy).
    - Afterwards reopen `Frontend.unity`.
 9. **Test** (unity-playtest; pvp-e2e-test for PvP):
-   - **Champion select:** the hero shows its type badge and affinity hexagon, passive, signature, and the three ultimate options.
+   - **Champion select:** the hero shows its type badge and resistance hexagon, passive, signature, and the three ultimate options.
    - **Offline match as the hero:**
      - stats, the passive and the signature (Q) work;
      - cheat to level 6, check there's no skill point, pick a card, and check the ultimate is in R at rank 1 and can be cast;

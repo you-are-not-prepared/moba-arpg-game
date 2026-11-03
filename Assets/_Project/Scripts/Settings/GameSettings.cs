@@ -17,6 +17,8 @@ namespace Moba
         public float statsBarScale = 1f;
         public float healthBarScale = 1f;
         public float popupTextScale = 1f;
+        [Tooltip("Damage numbers over the units your hero hits (in its damage type's colour) and over your hero.")]
+        public bool damageNumbers = true;
 
         [Header("Gameplay")]
         [Tooltip("Attack move fires instantly at the cursor when its key is pressed (otherwise press, then left-click).")]
