@@ -18,6 +18,8 @@ namespace Moba
         [Tooltip("Attack speed per stack (0.04 = 4%).")]
         public float attackSpeedPerStack = 0.04f;
         public float burstDamage = 50f;
+        // Heat gained per attack on top of the usual 1 (Phoenix Form).
+        [System.NonSerialized] public int extraStacksPerAttack;
         public DamageType burstType = DamageType.Fire;
         public Material burstMaterial;
 
@@ -57,7 +59,7 @@ namespace Moba
             _sinceAttack = 0f;
             if (_stacks < maxStacks)
             {
-                SetStacks(_stacks + 1);
+                SetStacks(Mathf.Min(maxStacks, _stacks + 1 + Mathf.Max(0, extraStacksPerAttack)));
                 return;
             }
             Burst(target);
@@ -82,6 +84,14 @@ namespace Moba
             }
             s_Targets.Clear();
             SpellExplosion.Spawn(center, BurstRadius, burstMaterial);
+        }
+
+        // Heat from a spell (Searing Strike); full Heat bursts on the next attack as usual.
+        public void AddStacks(int stacks)
+        {
+            if (stacks <= 0) return;
+            _sinceAttack = 0f;
+            SetStacks(Mathf.Min(maxStacks, _stacks + stacks));
         }
 
         // Swaps the previously applied attack speed for the new stack count, so other changes are kept.

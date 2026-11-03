@@ -168,7 +168,8 @@ namespace Moba
             if (_abilities != null)
             {
                 _abilities.AddMaxMana(manaPerLevel);
-                _abilities.SkillPoints++;
+                // Ascension levels give a choice (and the ultimate's next rank) instead of a skill point.
+                if (!HeroAscension.IsAscensionLevel(Level)) _abilities.SkillPoints++;
             }
             LeveledUp?.Invoke(Level);
         }

@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Iron Blade
   description: A plain, dependable blade.
   cost: 1
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 1, g: 0.55, b: 0.1, a: 1}
   glyph: IB

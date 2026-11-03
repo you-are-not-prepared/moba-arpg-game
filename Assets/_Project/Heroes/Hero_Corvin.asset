@@ -55,10 +55,12 @@ MonoBehaviour:
   passiveEffectMaterial: {fileID: 2100000, guid: fb47ad1f20172274daa9629526717469, type: 2}
   ascension:
     paths:
-    - root:
+    - ultimate: {fileID: 11400000, guid: 7c84d4484da79814db468c3440cdd4d4, type: 2}
+      root:
         id: corvin_a
-        name: Overcharge
-        flavor: The charge builds faster.
+        name: Thunderhead
+        flavor: A storm cloud follows you for 6s, striking a nearby enemy every half
+          second (heroes first).
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -66,6 +68,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -81,11 +85,11 @@ MonoBehaviour:
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
-        chargeSooner: 1
+        chargeSooner: 0
       second:
       - id: corvin_a1
-        name: Arc
-        flavor: The lightning reaches further.
+        name: Lasting Thunderhead
+        flavor: 'Static Charge: charged hits jump to 1 more enemy.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -93,112 +97,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 1
-        chargeSooner: 0
-      - id: corvin_a2
-        name: Voltage
-        flavor: Every spell hits harder.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0.1
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 0
-      third:
-      - id: corvin_a3
-        name: Chain Reaction
-        flavor: It never stops at one.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 1
-        chargeSooner: 0
-      - id: corvin_a4
-        name: Full Charge
-        flavor: Always crackling.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
-        spellDamage: 0
-        extraProjectiles: 0
-        itemStats: 0
-        healthPerLevel: 0
-        isolationDamage: 0
-        ultimateDuration: 0
-        stunDuration: 0
-        tailwindSpeed: 0
-        tailwindDuration: 0
-        tailwindAttackSpeed: 0
-        heatBurstDamage: 0
-        spellSlow: 0
-        spellSlowSeconds: 0
-        allyHeal: 0
-        chainJumps: 0
-        chargeSooner: 1
-    - root:
-        id: corvin_b
-        name: Tempest
-        flavor: The storm lingers.
-        maxHealth: 0
-        maxMana: 0
-        attackDamage: 0
-        attackSpeed: 0
-        moveSpeed: 0
-        cooldownReduction: 0
-        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -213,12 +113,11 @@ MonoBehaviour:
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
-        chainJumps: 0
+        chainJumps: 1
         chargeSooner: 0
-      second:
-      - id: corvin_b1
-        name: Brewing Storm
-        flavor: Thunder that won't pass.
+      - id: corvin_a2
+        name: Empowered Thunderhead
+        flavor: 'Static Charge: charged one cast sooner.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -226,6 +125,37 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 1
+      third:
+      - id: corvin_a3
+        name: Endless Thunderhead
+        flavor: 'Static Charge: charged hits jump to 1 more enemy.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -240,11 +170,11 @@ MonoBehaviour:
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
-        chainJumps: 0
+        chainJumps: 1
         chargeSooner: 0
-      - id: corvin_b2
-        name: Thunderclap
-        flavor: Every strike shakes the ground.
+      - id: corvin_a4
+        name: Sweeping Thunderhead
+        flavor: 'Voltage: spells deal 15% more damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -252,6 +182,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
@@ -268,17 +200,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-      third:
-      - id: corvin_b3
-        name: Gathering Clouds
-        flavor: The sky darkens sooner.
+    - ultimate: {fileID: 11400000, guid: 00bad632b1b3b10488c771703bd24e7c, type: 2}
+      root:
+        id: corvin_b
+        name: Chain Storm
+        flavor: A bolt that bursts on the first enemy, then arcs from enemy to enemy
+          up to five times.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
-        ultimateCooldownReduction: 0.2
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -295,9 +231,95 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
+      second:
+      - id: corvin_b1
+        name: Empowered Chain Storm
+        flavor: 'Static Charge: charged hits jump to 1 more enemy.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 1
+        chargeSooner: 0
+      - id: corvin_b2
+        name: Swift Chain Storm
+        flavor: 'Static Charge: charged one cast sooner.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0.15
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 0
+        chargeSooner: 1
+      third:
+      - id: corvin_b3
+        name: Mighty Chain Storm
+        flavor: 'Static Charge: charged hits jump to 1 more enemy.'
+        maxHealth: 0
+        maxMana: 0
+        attackDamage: 0
+        attackSpeed: 0
+        moveSpeed: 0
+        cooldownReduction: 0
+        ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
+        spellDamage: 0
+        extraProjectiles: 0
+        itemStats: 0
+        healthPerLevel: 0
+        isolationDamage: 0
+        ultimateDuration: 0
+        stunDuration: 0
+        tailwindSpeed: 0
+        tailwindDuration: 0
+        tailwindAttackSpeed: 0
+        heatBurstDamage: 0
+        spellSlow: 0
+        spellSlowSeconds: 0
+        allyHeal: 0
+        chainJumps: 1
+        chargeSooner: 0
       - id: corvin_b4
-        name: Eye of Thunder
-        flavor: Storms on call.
+        name: Ever-Ready Chain Storm
+        flavor: 'Voltage: spells deal 15% more damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -305,7 +327,9 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0.25
-        spellDamage: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
+        spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
@@ -321,17 +345,21 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-    - root:
+    - ultimate: {fileID: 11400000, guid: e85940b504925b443b6226405b9d4f72, type: 2}
+      root:
         id: corvin_c
-        name: Conduit
-        flavor: Power flows through him.
+        name: Thunderstrike
+        flavor: Lightning, ranged. Lightning hammers an area after a moment, stunning
+          everything in it.
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0.05
+        cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -350,22 +378,24 @@ MonoBehaviour:
         chargeSooner: 0
       second:
       - id: corvin_c1
-        name: Flow
-        flavor: Spells return faster.
+        name: Crushing Thunderstrike
+        flavor: 'Static Charge: charged hits jump to 1 more enemy.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
-        cooldownReduction: 0.1
+        cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
         ultimateDuration: 0
-        stunDuration: 0
+        stunDuration: 0.25
         tailwindSpeed: 0
         tailwindDuration: 0
         tailwindAttackSpeed: 0
@@ -373,18 +403,20 @@ MonoBehaviour:
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
-        chainJumps: 0
+        chainJumps: 1
         chargeSooner: 0
       - id: corvin_c2
-        name: Battery
-        flavor: A deeper charge.
+        name: Empowered Thunderstrike
+        flavor: 'Static Charge: charged one cast sooner.'
         maxHealth: 0
-        maxMana: 150
+        maxMana: 0
         attackDamage: 0
         attackSpeed: 0
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.2
+        ultimateRadius: 0
         spellDamage: 0
         extraProjectiles: 0
         itemStats: 0
@@ -400,11 +432,11 @@ MonoBehaviour:
         spellSlowSeconds: 0
         allyHeal: 0
         chainJumps: 0
-        chargeSooner: 0
+        chargeSooner: 1
       third:
       - id: corvin_c3
-        name: Forked Bolt
-        flavor: One more spark.
+        name: Sweeping Thunderstrike
+        flavor: 'Static Charge: charged hits jump to 1 more enemy.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -412,8 +444,10 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0
+        ultimateRadius: 0.25
         spellDamage: 0
-        extraProjectiles: 1
+        extraProjectiles: 0
         itemStats: 0
         healthPerLevel: 0
         isolationDamage: 0
@@ -426,11 +460,11 @@ MonoBehaviour:
         spellSlow: 0
         spellSlowSeconds: 0
         allyHeal: 0
-        chainJumps: 0
+        chainJumps: 1
         chargeSooner: 0
       - id: corvin_c4
-        name: Storm Mind
-        flavor: Thought becomes lightning.
+        name: Mighty Thunderstrike
+        flavor: 'Voltage: spells deal 15% more damage.'
         maxHealth: 0
         maxMana: 0
         attackDamage: 0
@@ -438,6 +472,8 @@ MonoBehaviour:
         moveSpeed: 0
         cooldownReduction: 0
         ultimateCooldownReduction: 0
+        ultimateDamage: 0.3
+        ultimateRadius: 0
         spellDamage: 0.15
         extraProjectiles: 0
         itemStats: 0
@@ -454,4 +490,4 @@ MonoBehaviour:
         allyHeal: 0
         chainJumps: 0
         chargeSooner: 0
-  ultimate: {fileID: 11400000, guid: 7c84d4484da79814db468c3440cdd4d4, type: 2}
+  signature: {fileID: 11400000, guid: de389febd76ce714c96faf82a5085978, type: 2}

@@ -25,6 +25,13 @@ namespace Moba.Abilities
         [Tooltip("Hits everything within this radius of where the caster lands.")]
         public float landingRadius = 2.2f;
 
+        [Header("On hit")]
+        public float stunSeconds;
+        [Tooltip("Bonus damage: this fraction of the target's missing health.")]
+        public float executeFraction;
+        [Tooltip("Heat the caster gains when the spell hits anything (Kindled Blade).")]
+        public int heatStacks;
+
         void Reset()
         {
             tags = SpellTags.Melee | SpellTags.AreaOfEffect;
@@ -45,25 +52,36 @@ namespace Moba.Abilities
             Vector3 dir = context.Point - caster.transform.position;
             dir.y = 0f;
             if (dir.sqrMagnitude < 0.001f) dir = caster.transform.forward;
+            var effects = new SpellHitEffects
+            {
+                Stun = stunSeconds > 0f ? stunSeconds + HeroAscension.StunBonusOf(caster) : 0f,
+                Execute = executeFraction,
+            };
+            int heat = heatStacks;
 
             if (!lunge)
             {
-                SpellLook.Play(SpellLookKind.Slash, m.damageType, caster, caster.transform.position, dir,
-                    caster.radius + reach, 0f);
-                SpellArea.Cone(caster, dir, reach, coneAngle, damage, m);
+                float r = m.Radius(reach);
+                SpellLook.Play(SpellLookKind.Slash, m.damageType, caster, caster.transform.position, dir, caster.radius + r, 0f);
+                if (SpellArea.Cone(caster, dir, r, coneAngle, damage, m, effects) > 0) AddHeat(caster, heat);
                 return;
             }
 
             Vector3 to = context.Point;
             to = NavMesh.SamplePosition(to, out NavMeshHit hit, 3f, NavMesh.AllAreas) ? hit.position : caster.transform.position;
-            float radius = landingRadius;
+            float radius = m.Radius(landingRadius);
             Leap.Perform(caster, to, lungeSeconds, lungeHeight, () =>
             {
                 if (caster == null || !caster.IsAlive) return;
                 Vector3 center = caster.transform.position;
                 SpellLook.Play(SpellLookKind.Explosion, m.damageType, caster, center, dir, radius, 0f);
-                SpellArea.Circle(caster, center, radius, damage, m);
+                if (SpellArea.Circle(caster, center, radius, damage, m, effects) > 0) AddHeat(caster, heat);
             });
+        }
+
+        static void AddHeat(Unit caster, int stacks)
+        {
+            if (stacks > 0 && caster.TryGetComponent(out KindledBlade blade)) blade.AddStacks(stacks);
         }
 
         public override string StatsText => Describe(1, SpellModifiers.None);
@@ -73,8 +91,11 @@ namespace Moba.Abilities
             string hit = $"{DamageAt(rank) * m.damageMultiplier:0} {DamageWord(m)}";
             var parts = new List<string>
             {
-                lunge ? $"dash up to {range:0.#}m, then {hit} within {landingRadius:0.#}m" : $"{hit} in a {coneAngle:0}° cone, {reach:0.#}m",
+                lunge ? $"dash up to {range:0.#}m, then {hit} within {m.Radius(landingRadius):0.#}m" : $"{hit} in a {coneAngle:0}° cone, {m.Radius(reach):0.#}m",
             };
+            if (stunSeconds > 0f) parts.Add($"stuns for {stunSeconds:0.##}s");
+            if (executeFraction > 0f) parts.Add($"+{executeFraction * 100f:0}% of the target's missing health");
+            if (heatStacks > 0) parts.Add($"+{heatStacks} Heat on hit");
             if (m.burnFraction > 0f) parts.Add($"burns for {DamageAt(rank) * m.damageMultiplier * m.burnFraction:0} over {m.burnDuration:0.#}s");
             return string.Join(" · ", parts);
         }

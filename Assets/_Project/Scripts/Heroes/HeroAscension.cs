@@ -9,11 +9,15 @@ namespace Moba
 {
     // Ascension for one hero: tracks which choices are due (one per threshold level reached), offers the
     // talents of the next tier (one per path at level 6, then two), and applies the picked talent's stats.
+    // The first pick puts the path's ultimate in R (locked); every pick raises the ultimate's rank (1, 2, 3).
     // Added by HeroDefinition.ApplyTo.
     [RequireComponent(typeof(HeroController))]
     public class HeroAscension : MonoBehaviour
     {
-        public static readonly int[] Levels = { 6, 11, 18 };
+        public static readonly int[] Levels = { 6, 11, 16 };
+
+        // Ascension levels give a choice instead of a skill point.
+        public static bool IsAscensionLevel(int level) => System.Array.IndexOf(Levels, level) >= 0;
 
         AscensionTree _tree;
         HeroProgression _progression;
@@ -99,6 +103,16 @@ namespace Moba
             _picked.Add(talent);
             _pickedOptions.Add(option);
             Apply(talent);
+            AbilityDefinition ultimate = _tree.Path(_path).ultimate;
+            if (ultimate != null && TryGetComponent(out AbilityCaster abilities))
+            {
+                if (tier == 0)
+                {
+                    abilities.SetAbility(AbilityCaster.UltimateSlot, ultimate);
+                    abilities.ultimateLocked = true;
+                }
+                abilities.SetUltimateRank(_picked.Count);
+            }
             Changed?.Invoke();
         }
 
@@ -116,6 +130,8 @@ namespace Moba
                 if (t.maxMana != 0f) caster.AddMaxMana(t.maxMana);
                 caster.cooldownMultiplier *= 1f - t.cooldownReduction;
                 caster.ultimateCooldownMultiplier *= 1f - t.ultimateCooldownReduction;
+                caster.ultimateDamageMultiplier *= 1f + t.ultimateDamage;
+                caster.ultimateRadiusMultiplier *= 1f + t.ultimateRadius;
                 caster.spellDamageMultiplier *= 1f + t.spellDamage;
                 caster.passiveExtraProjectiles += t.extraProjectiles;
             }
@@ -148,6 +164,12 @@ namespace Moba
         // Duration bonus for a timed ultimate cast by `unit` (0 without ascension).
         public static float DurationBonusOf(Unit unit) =>
             unit != null && unit.TryGetComponent(out HeroAscension a) ? a.UltimateDurationBonus : 0f;
+
+        // The path's ultimate (null before the first pick).
+        public AbilityDefinition ChosenUltimate => _path >= 0 ? _tree.Path(_path).ultimate : null;
+
+        // The ultimate path `index` gives (null if it gives none).
+        public AbilityDefinition UltimateOf(int path) => _tree != null && path >= 0 && path < _tree.PathCount ? _tree.Path(path).ultimate : null;
 
         public static float StunBonusOf(Unit unit) =>
             unit != null && unit.TryGetComponent(out HeroAscension a) ? a.StunDurationBonus : 0f;

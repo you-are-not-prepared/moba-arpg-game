@@ -302,6 +302,8 @@ MonoBehaviour:
   passiveExtraProjectiles: 0
   ultimateCooldownMultiplier: 1
   spellDamageMultiplier: 1
+  ultimateDamageMultiplier: 1
+  ultimateRadiusMultiplier: 1
   ultimateLocked: 0
   affinities:
   - 0

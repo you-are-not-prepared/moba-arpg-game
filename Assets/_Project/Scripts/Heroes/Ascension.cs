@@ -5,8 +5,9 @@ using UnityEngine;
 
 namespace Moba
 {
-    // A hero's ascension tree. At level 6 the player picks a path (one card per path: A, B, C...); that pick
-    // decides the later choices, two talents each at levels 11 and 18: A -> A1/A2 -> A3/A4, C -> C1/C2 -> C3/C4.
+    // A hero's ascension tree. At level 6 the player picks a path (one card per path: A, B, C...), which is also
+    // the hero's ultimate; that pick decides the later choices, two talents each at levels 11 and 16 that shape the
+    // ultimate and the passive: A -> A1/A2 -> A3/A4, C -> C1/C2 -> C3/C4.
     [Serializable]
     public class AscensionTree
     {
@@ -30,11 +31,13 @@ namespace Moba
     [Serializable]
     public class AscensionPath
     {
+        [Tooltip("The ultimate this path gives: picking the path at level 6 puts it in R.")]
+        public Abilities.AbilityDefinition ultimate;
         // Picked at level 6; choosing it commits to this path.
         public Talent root = new();
         // Level 11 options.
         public Talent[] second = { new(), new() };
-        // Level 18 options.
+        // Level 16 options.
         public Talent[] third = { new(), new() };
 
         public bool IsComplete =>
@@ -58,6 +61,8 @@ namespace Moba
         [Tooltip("0.1 = 10% faster.")] public float moveSpeed;
         [Tooltip("0.1 = all cooldowns 10% shorter.")] public float cooldownReduction;
         [Tooltip("0.2 = the ultimate's cooldown 20% shorter.")] public float ultimateCooldownReduction;
+        [Tooltip("0.2 = the ultimate deals (and heals) 20% more.")] public float ultimateDamage;
+        [Tooltip("0.2 = the ultimate's area is 20% wider.")] public float ultimateRadius;
         [Tooltip("0.15 = spells deal 15% more damage.")] public float spellDamage;
         [Tooltip("Extra projectiles on projectile spells.")] public int extraProjectiles;
         [Tooltip("Added to the item stat multiplier (0.1 = items give 10% more).")] public float itemStats;
@@ -65,8 +70,8 @@ namespace Moba
         [Header("Passive and ultimate hooks")]
         [Tooltip("Extra max health gained on each later level-up.")] public float healthPerLevel;
         [Tooltip("Added to an isolation passive's bonus (0.1 = +10% damage to isolated targets).")] public float isolationDamage;
-        [Tooltip("Seconds added to timed ultimates (shield wall, haste).")] public float ultimateDuration;
-        [Tooltip("Seconds added to stuns from projectile spells.")] public float stunDuration;
+        [Tooltip("Seconds added to timed ultimates (shield wall, haste, zones, buffs, auras).")] public float ultimateDuration;
+        [Tooltip("Seconds added to every stun and freeze the hero's spells cause.")] public float stunDuration;
         [Tooltip("Added to a Tailwind passive's speed (0.1 = +10% movement speed).")] public float tailwindSpeed;
         [Tooltip("Seconds added to a Tailwind passive.")] public float tailwindDuration;
         [Tooltip("Attack speed while Tailwind lasts (0.2 = +20%).")] public float tailwindAttackSpeed;
@@ -95,6 +100,8 @@ namespace Moba
             Pct(moveSpeed, "movement speed");
             if (cooldownReduction != 0f) lines.Add($"{cooldownReduction * 100f:0.#}% shorter cooldowns");
             if (ultimateCooldownReduction != 0f) lines.Add($"{ultimateCooldownReduction * 100f:0.#}% shorter ultimate cooldown");
+            Pct(ultimateDamage, "ultimate damage and healing");
+            Pct(ultimateRadius, "ultimate area");
             Pct(spellDamage, "spell damage");
             if (extraProjectiles != 0) lines.Add($"{Signed(extraProjectiles)} projectile{(Math.Abs(extraProjectiles) == 1 ? "" : "s")} on projectile spells");
             Pct(itemStats, "stats from items");

@@ -17,6 +17,7 @@ MonoBehaviour:
     enemy projectile flying into it. You can move and turn; the wall stays with you.
     Tower shots pass through.
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.55, g: 0.68, b: 0.85, a: 1}
   glyph: AW

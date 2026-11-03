@@ -19,7 +19,7 @@ namespace Moba
 
         static readonly int ProgressId = Shader.PropertyToID("_Progress");
         // Children that are effects rather than the model, so they don't lunge.
-        static readonly HashSet<string> s_Effects = new() { "MeleeSlash", "HasteAura", "ShieldWall" };
+        static readonly HashSet<string> s_Effects = new() { "MeleeSlash", "HasteAura", "ShieldWall", "BuffAura" };
 
         Unit _unit;
         readonly List<Transform> _parts = new();

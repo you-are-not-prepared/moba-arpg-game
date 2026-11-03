@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Volley
   description: The spell fires 2 extra projectiles in a fan.
   cost: 1
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 0.25, g: 0.75, b: 0.3, a: 1}
   glyph: VO

@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86eaac281d467364cbe953ef8db44895, type: 3}
+  m_Name: Sig_ShieldBash
+  m_EditorClassIdentifier: Assembly-CSharp::Moba.Abilities.MeleeSpell
+  displayName: Shield Bash
+  description: Slams the shield into everything in front of you, stunning them for
+    a moment.
+  cost: 300
+  sellsAtFullPrice: 1
+  icon: {fileID: 0}
+  color: {r: 0.2, g: 0.45, b: 0.95, a: 1}
+  glyph: SB
+  tags: 10
+  damageType: 0
+  adaptive: 1
+  typeNames:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  typeGlyphs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  targeting: 1
+  unitFilter: 0
+  range: 0
+  areaRadius: 0
+  cooldownByRank:
+  - 8
+  - 7.5
+  - 7
+  - 6.5
+  - 6
+  manaCostByRank:
+  - 40
+  - 42
+  - 44
+  - 46
+  - 48
+  damageByRank:
+  - 55
+  - 75
+  - 95
+  - 115
+  - 135
+  reach: 2.5
+  coneAngle: 90
+  lunge: 0
+  lungeSeconds: 0.25
+  lungeHeight: 0.8
+  landingRadius: 2.2
+  stunSeconds: 0.75
+  executeFraction: 0
+  heatStacks: 0

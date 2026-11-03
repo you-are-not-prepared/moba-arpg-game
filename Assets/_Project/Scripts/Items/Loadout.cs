@@ -9,6 +9,8 @@ namespace Moba.Items
     // Every operation returns null on success, or a short message explaining why it didn't happen.
     public static class Loadout
     {
+        const string UltimateSlotMessage = "R is for your ultimate: you choose it at your first ascension (level 6).";
+
         // One move by name: (from, to) for items and spells, (spell slot, socket, to) for mods. The indexes are
         // checked first, since on the game server they come from the network.
         public static string Perform(Inventory inventory, AbilityCaster caster, LoadoutAction action, int a, int b, int c)
@@ -47,6 +49,7 @@ namespace Moba.Items
                     return null;
                 case AbilityDefinition spell:
                     if (caster.IsSlotLocked(spellSlot)) return "That slot holds your hero's ultimate.";
+                    if (spellSlot == AbilityCaster.UltimateSlot) return UltimateSlotMessage;
                     inventory.Set(inventorySlot, caster.SetAbility(spellSlot, spell));
                     return null;
                 case ModDefinition mod:
@@ -87,6 +90,7 @@ namespace Moba.Items
         {
             if (fromSlot == toSlot) return null;
             if (caster.IsSlotLocked(fromSlot) || caster.IsSlotLocked(toSlot)) return "Your ultimate stays in its slot.";
+            if (fromSlot == AbilityCaster.UltimateSlot || toSlot == AbilityCaster.UltimateSlot) return UltimateSlotMessage;
             AbilityDefinition moving = caster.GetSlot(fromSlot).ability;
             caster.SetAbility(fromSlot, caster.SetAbility(toSlot, moving));
             return null;

@@ -23,6 +23,10 @@ namespace Moba.Abilities
             public float ForkAngle;
             public bool Pierce;
             public float StunDuration;
+            public float Slow;
+            public float SlowSeconds;
+            // The first hit shortens the caster's other basic cooldowns by this many seconds.
+            public float CooldownRefund;
             public float Speed;
             public float MaxDistance;
             public float Size;
@@ -197,6 +201,8 @@ namespace Moba.Abilities
             }
 
             if (_p.ChainJumps > 0 && firstHit) Chain(hit);
+            if (_p.CooldownRefund > 0f && firstHit && _p.Caster != null && _p.Caster.TryGetComponent(out AbilityCaster abilities))
+                abilities.ReduceBasicCooldowns(_p.CooldownRefund);
 
             if (_p.Pierce)
             {
@@ -259,6 +265,7 @@ namespace Moba.Abilities
                 SpellEvents.RaiseHit(_p.Caster, u, _p.Damage);
                 if (_p.BurnDps > 0f && u.IsAlive) Burning.Apply(u, _p.BurnDps, _p.BurnDuration, _p.Caster, _p.DamageType);
                 if (_p.StunDuration > 0f && u.IsAlive) Stun.Apply(u, _p.StunDuration);
+                if (_p.Slow > 0f && u.IsAlive) Slow.Apply(u, _p.Slow, _p.SlowSeconds);
             }
             s_Targets.Clear();
 

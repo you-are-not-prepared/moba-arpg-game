@@ -5,9 +5,9 @@ using UnityEngine;
 namespace Moba.Bots
 {
     // Simple hero AI. Several times a second it:
-    //   - spends skill points (ultimate first) and, while at its shop, buys a spell for Q (with fullShopping: spells
-    //     for every slot, mods and items, finishing its shopping before it leaves base, and walking home to shop
-    //     once it has saved up recallGold);
+    //   - spends skill points (its ultimate comes from ascension) and, while at its shop, buys a spell for the first
+    //     free slot (with fullShopping: spells for every slot, mods and items, finishing its shopping before it
+    //     leaves base, and walking home to shop once it has saved up recallGold);
     //   - retreats to base below retreatHealth and stays until healed;
     //   - fights an enemy hero in reach when it isn't losing the trade, otherwise last-hits creeps, then hits
     //     structures that its own creeps are tanking;
@@ -242,6 +242,22 @@ namespace Moba.Bots
                         if (target != null && _hero.OrderCast(slot, target.transform.position, null)) return true;
                         break;
                     }
+                    case HealSpell heal when heal.area:
+                        if (HurtAlly(heal.radius, 0.6f) != null && _hero.OrderCast(slot, default, null)) return true;
+                        break;
+                    case HealSpell heal:
+                    {
+                        Unit ally = HurtAlly(heal.range, 0.7f);
+                        if (ally != null && _hero.OrderCast(slot, ally.transform.position, ally)) return true;
+                        break;
+                    }
+                    case BuffSpell:
+                        if (enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= 8f && _hero.OrderCast(slot, default, null)) return true;
+                        break;
+                    case AuraSpell aura:
+                        if (enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= aura.radius
+                            && _hero.OrderCast(slot, default, null)) return true;
+                        break;
                     case LeapSpell leap:
                         if (enemyHero != null && _unit.EdgeDistanceTo(enemyHero) <= leap.range
                             && _hero.OrderCast(slot, enemyHero.transform.position, null)) return true;
@@ -287,7 +303,26 @@ namespace Moba.Bots
             }
         }
 
-        bool AnyBasicOnCooldown(float minRemaining)
+        // The most hurt allied hero (this bot included) within `range` below `healthFraction`, or null.
+        Unit HurtAlly(float range, float healthFraction)
+        {
+            Unit best = null;
+            float lowest = healthFraction;
+            foreach (Unit u in Unit.All)
+            {
+                if (u.kind != UnitKind.Hero || u.IsEnemyOf(_unit) || !u.IsAlive) continue;
+                if (u != _unit && _unit.EdgeDistanceTo(u) > range) continue;
+                float fraction = u.Health / u.maxHealth;
+                if (fraction < lowest)
+                {
+                    lowest = fraction;
+                    best = u;
+                }
+            }
+            return best;
+        }
+
+                bool AnyBasicOnCooldown(float minRemaining)
         {
             for (int i = 0; i < AbilityCaster.SlotCount; i++)
                 if (i != AbilityCaster.UltimateSlot && _abilities.GetSlot(i).cooldownRemaining > minRemaining) return true;
@@ -298,7 +333,6 @@ namespace Moba.Bots
         {
             while (_abilities.SkillPoints > 0)
             {
-                if (_abilities.TryLevelUp(AbilityCaster.UltimateSlot)) continue;
                 int best = -1;
                 for (int i = 0; i < AbilityCaster.SlotCount; i++)
                 {

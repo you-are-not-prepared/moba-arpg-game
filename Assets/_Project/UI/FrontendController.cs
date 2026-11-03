@@ -541,8 +541,12 @@ namespace Moba.UI
             var abilities = new VisualElement { pickingMode = PickingMode.Ignore };
             abilities.AddToClassList("hero-detail__abilities");
             abilities.Add(AbilityBlock("PASSIVE", hero.passiveName, hero.passiveDescription));
-            if (hero.ultimate != null)
-                abilities.Add(AbilityBlock("ULTIMATE (R)", hero.ultimate.displayName, hero.ultimate.description));
+            if (hero.signature != null)
+                abilities.Add(AbilityBlock("SIGNATURE (Q)", hero.signature.displayName, hero.signature.description));
+            var ultimates = new List<string>();
+            foreach (Abilities.AbilityDefinition ultimate in hero.UltimateOptions) ultimates.Add(ultimate.displayName);
+            if (ultimates.Count > 0)
+                abilities.Add(AbilityBlock("ULTIMATE (R)", "Chosen at level 6", string.Join(" · ", ultimates)));
             var affinities = new VisualElement { pickingMode = PickingMode.Ignore };
             affinities.AddToClassList("hero-detail__affinities");
             affinities.Add(Text("AFFINITIES", "hero-detail__section"));

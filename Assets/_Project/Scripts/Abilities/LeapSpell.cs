@@ -47,10 +47,11 @@ namespace Moba.Abilities
             float damage = DamageAt(context.Rank) * context.Modifiers.damageMultiplier;
             float bladesDuration = bladesSeconds + HeroAscension.DurationBonusOf(caster);
             DamageType type = context.Modifiers.damageType;
-            Leap.Perform(caster, to, leapSeconds, arcHeight, () => Land(caster, damage, type, bladesDuration));
+            float radius = context.Modifiers.Radius(landingRadius);
+            Leap.Perform(caster, to, leapSeconds, arcHeight, () => Land(caster, damage, type, radius, bladesDuration));
         }
 
-        void Land(Unit caster, float damage, DamageType type, float bladesDuration)
+        void Land(Unit caster, float damage, DamageType type, float radius, float bladesDuration)
         {
             if (caster == null || !caster.IsAlive) return;
             Vector3 center = caster.transform.position;
@@ -60,7 +61,7 @@ namespace Moba.Abilities
                 if (!u.IsEnemyOf(caster) || !u.IsTargetable) continue;
                 Vector3 d = u.transform.position - center;
                 d.y = 0f;
-                if (d.magnitude - u.radius <= landingRadius) s_Targets.Add(u);
+                if (d.magnitude - u.radius <= radius) s_Targets.Add(u);
             }
             foreach (Unit u in s_Targets)
             {
@@ -69,7 +70,7 @@ namespace Moba.Abilities
                 if (u.IsAlive && burnFraction > 0f) Burning.Apply(u, damage * burnFraction / burnSeconds, burnSeconds, caster, type);
             }
             s_Targets.Clear();
-            SpellExplosion.Spawn(center, landingRadius, landingMaterial);
+            SpellExplosion.Spawn(center, radius, landingMaterial);
             BurningBlades.Apply(caster, bladesDuration, bladesBurnPerSecond);
         }
 

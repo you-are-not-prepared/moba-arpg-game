@@ -55,6 +55,7 @@ namespace Moba.Net
         readonly NetworkVariable<float> _shieldEnd = new();
         readonly NetworkVariable<float> _stormEnd = new();
         readonly NetworkVariable<float> _cloudEnd = new();
+        readonly NetworkVariable<float> _buffEnd = new();
         // Cheat toggles: 1 = no mana cost, 2 = no cooldowns.
         readonly NetworkVariable<byte> _cheatToggles = new();
         NetworkList<short> _kit;
@@ -261,6 +262,7 @@ namespace Moba.Net
                 _stormEnd.Value, now);
             _cloudEnd.Value = EndTime(TryGetComponent(out StormCloud cloud) && cloud.enabled ? cloud.Remaining : 0f,
                 _cloudEnd.Value, now);
+            _buffEnd.Value = EndTime(TryGetComponent(out Buff buff) && buff.enabled ? buff.Remaining : 0f, _buffEnd.Value, now);
         }
 
         void WriteKit(int index, short value)
@@ -306,6 +308,7 @@ namespace Moba.Net
             Haste.SyncFromServer(_hero.Unit, Remaining(_hasteEnd.Value, now), FindSpell<HasteSpell>()?.auraMaterial);
             StormCloudSpell cloudSpell = FindSpell<StormCloudSpell>();
             if (cloudSpell != null) StormCloud.SyncFromServer(_hero.Unit, Remaining(_cloudEnd.Value, now), cloudSpell.cloudMaterial);
+            Buff.SyncFromServer(_hero.Unit, Remaining(_buffEnd.Value, now));
             SpellStormSpell stormSpell = FindSpell<SpellStormSpell>();
             if (stormSpell != null)
                 SpellStorm.SyncFromServer(_hero.Unit, Remaining(_stormEnd.Value, now), stormSpell.CooldownMultiplier,
@@ -429,7 +432,10 @@ namespace Moba.Net
         {
             InventoryItem item = NetItems.Get(itemId);
             Shop shop = Shop.ForTeam(_hero.Unit.team);
-            if (item == null || shop == null || shop.catalog == null || !shop.catalog.items.Contains(item)) return;
+            // The shop's catalog, or this hero's own signature spell.
+            bool sold = shop != null && shop.catalog != null
+                        && (shop.catalog.items.Contains(item) || item == _hero.definition.signature);
+            if (item == null || !sold) return;
             shop.TryBuy(_hero.Unit, _progression, _inventory, item);
         }
 

@@ -16,6 +16,7 @@ MonoBehaviour:
   description: Leap to a point, burning enemies where you land. Your attacks burn
     for 5s afterwards.
   cost: 0
+  sellsAtFullPrice: 0
   icon: {fileID: 0}
   color: {r: 1, g: 0.45, b: 0.2, a: 1}
   glyph: BL
