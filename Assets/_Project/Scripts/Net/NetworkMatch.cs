@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Moba.Net
 {
     // Match-wide state on the game server (on the scene's Game object): the winner, the match clock, the next creep
-    // wave, whether cheats are allowed, and visuals for melee swings, attack and spell projectiles and explosions
-    // (the server applies the damage; clients only see them).
+    // wave, whether cheats are allowed, and visuals for melee swings, attack and spell projectiles, explosions and
+    // damage numbers (the server applies the damage; clients only see them).
     [RequireComponent(typeof(GameManager))]
     public class NetworkMatch : NetworkBehaviour
     {
@@ -46,10 +46,17 @@ namespace Moba.Net
             {
                 _cheats.Value = GameServer.CheatsAllowed;
                 _game.MatchEnded += winner => _winner.Value = (int)winner;
+                Unit.AnyDamageNumber += OnDamageNumber;
                 return;
             }
             _winner.OnValueChanged += (_, winner) => ApplyWinner(winner);
             ApplyWinner(_winner.Value);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            Unit.AnyDamageNumber -= OnDamageNumber;
+            base.OnNetworkDespawn();
         }
 
         void Update()
@@ -166,6 +173,22 @@ namespace Moba.Net
             if (IsServer) return;
             SpellLook.Play((SpellLookKind)kind, (DamageType)type, Resolve(caster), position, direction, radius, delay,
                 broadcast: false);
+        }
+
+        // Server: damage numbers. Only hits from or on a hero are sent, since clients only show their own hero's.
+        void OnDamageNumber(Unit victim, Unit source, float amount, DamageType type, Vector3 at)
+        {
+            if (!IsSpawned || !IsServer) return;
+            if (victim.kind != UnitKind.Hero && (source == null || source.kind != UnitKind.Hero)) return;
+            DamageNumberClientRpc(Reference(victim), Reference(source), amount, (byte)type, at);
+        }
+
+        [ClientRpc]
+        void DamageNumberClientRpc(NetworkObjectReference victim, NetworkObjectReference source, float amount, byte type,
+            Vector3 at)
+        {
+            if (IsServer) return;
+            Unit.ShowDamageFromServer(Resolve(victim), Resolve(source), amount, (DamageType)type, at);
         }
 
         // A unit as an RPC argument (an empty reference if it isn't a spawned network object).

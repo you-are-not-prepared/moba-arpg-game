@@ -124,10 +124,11 @@ Melee heroes and creeps show each attack as a swing: the model lunges at the tar
 
 ### Damage types
 Spells and ultimates deal one of six damage types: **Fire, Frost, Nature, Lightning, Physical, Air**. Auto attacks, creeps and towers stay untyped.
-- **Affinities:** every hero has an affinity per type (e.g. Oren: Fire +25%, Frost -20%). A spell of that type deals that much more or less damage when the hero casts it.
-- **Base damage type:** the hero's highest affinity. Champion select shows it with the full affinity hexagon; the Tab scoreboard and match details show it next to each hero.
+- **Resistances:** every hero has a resistance per type (e.g. Oren: Fire +25%, Frost -20%). They only change the damage the hero **takes**: Oren takes 25% less Fire damage and 20% more Frost damage. What a hero deals doesn't depend on its resistances.
+- **Base damage type:** the hero's highest resistance. Champion select shows it with the full resistance hexagon; the Tab scoreboard and match details show it next to each hero.
 - **Matchups:** the types form a cycle, in the hexagon's order: **Fire > Frost > Nature > Lightning > Physical > Air > Fire**. A typed hit on a hero deals +10% if its type beats the hero's base type, and -10% if the hero's type beats it. Creeps, towers and cores take every type normally.
 - **Spell tooltips** name the type: "75 Fire damage".
+- **Damage numbers** pop up over whatever your hero hits, in the hit's type colour (white for auto attacks), and over your hero as "-N" when it's hit (red when untyped). On the game server, the server sends each hit to the clients (`NetworkMatch`, only hits from or on a hero). They can be turned off in Options; their size follows the pop-up slider.
 - **Spell colours:** every hero also has three spell colours (`HeroDefinition.spellColors`), used by the shop spells' looks (below).
 
 | Hero | Base type | Hero | Base type |
@@ -138,7 +139,7 @@ Spells and ultimates deal one of six damage types: **Fire, Frost, Nature, Lightn
 | Torvald | Physical | Maela | Nature |
 | Nyx | Physical | Corvin | Lightning |
 
-The numbers are in `GameBuilder.Heroes()` (`Aff(...)`, `Colors(...)`); the cycle and type colours in `Scripts/DamageTypes.cs`.
+The numbers are in `GameBuilder.Heroes()` (`Res(...)`, `Colors(...)`); the cycle and type colours in `Scripts/DamageTypes.cs`.
 
 ### Ascension (levels 6, 11, 16)
 At levels 6, 11 and 16 cards appear in the middle of the screen. The game keeps running, and you click one to choose.
@@ -185,7 +186,7 @@ The trees are in `Assets/_Project/Editor/GameBuilder.Ascension.cs` (first versio
 
 ## Controls
 
-Every control except Esc can be rebound in **Options → Controls**, which also holds the HUD size and quick-cast settings.
+Every control except Esc can be rebound in **Options → Controls**, which also holds the HUD size, quick-cast and damage-number settings.
 
 | Action | Default |
 |---|---|
@@ -225,7 +226,7 @@ To run the backend locally, see [moba-arpg-backend](https://github.com/you-are-n
 **Saved data (PlayerPrefs)**
 | Key | Holds |
 |---|---|
-| `moba.settings` | Options (HUD sizes, quick cast) |
+| `moba.settings` | Options (HUD sizes, quick cast, damage numbers) |
 | `moba.input.bindingOverrides` | Rebound controls |
 | `moba.auth.token` | The remembered login session |
 | `moba.backend.url` | Backend address override (optional) |

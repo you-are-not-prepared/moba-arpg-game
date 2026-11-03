@@ -167,7 +167,7 @@ namespace Moba.EditorTools
             public int ChargeEvery, ChargeJumps = 1;
             public bool Melee;
             // Fire, Frost, Nature, Lightning, Physical, Air (see Aff); the highest is the base damage type.
-            public float[] Affinities = new float[DamageTypes.Count];
+            public float[] Resistances = new float[DamageTypes.Count];
             // Main, secondary, highlight.
             public Color[] SpellColors;
             // Starts in Q (GameBuilder.Kits).
@@ -176,8 +176,8 @@ namespace Moba.EditorTools
             public System.Func<Mats, AscensionTree> Ascension;
         }
 
-        // Affinities in DamageTypes.All order, as percentages: Aff(25, -20, 0, 10, -10, 5) = Fire +25%, Frost -20%...
-        static float[] Aff(float fire, float frost, float nature, float lightning, float physical, float air) =>
+        // Resistances in DamageTypes.All order, as percentages: Res(25, -20, 0, 10, -10, 5) = Fire +25%, Frost -20%...
+        static float[] Res(float fire, float frost, float nature, float lightning, float physical, float air) =>
             new[] { fire / 100f, frost / 100f, nature / 100f, lightning / 100f, physical / 100f, air / 100f };
 
         static Color[] Colors(Color main, Color secondary, Color highlight) => new[] { main, secondary, highlight };
@@ -193,7 +193,7 @@ namespace Moba.EditorTools
                 Health = 560f, Damage = 32f, Range = 6.5f, AttacksPerSecond = 1.25f, Speed = 6.6f, Mana = 300f,
                 PassiveName = "Split Shot", PassiveDescription = "Your projectile spells fire 1 extra projectile.",
                 ExtraProjectiles = 1,
-                Affinities = Aff(-5, -5, 15, -10, 25, 5), SpellColors = Colors(Rgb(0.33f, 0.6f, 0.22f), Rgb(0.62f, 0.85f, 0.4f), Rgb(0.66f, 0.68f, 0.72f)),
+                Resistances = Res(-5, -5, 15, -10, 25, 5), SpellColors = Colors(Rgb(0.33f, 0.6f, 0.22f), Rgb(0.62f, 0.85f, 0.4f), Rgb(0.66f, 0.68f, 0.72f)),
                 Signature = m => PiercingShot(m),
             },
             new HeroSpec
@@ -203,7 +203,7 @@ namespace Moba.EditorTools
                 Health = 580f, Damage = 27f, Range = 5.5f, AttacksPerSecond = 1.1f, Speed = 6.5f, Mana = 400f,
                 PassiveName = "Quickened Mind", PassiveDescription = "All your cooldowns are 20% shorter.",
                 CooldownMultiplier = 0.8f,
-                Affinities = Aff(5, 5, -10, 25, -5, 10), SpellColors = Colors(Rgb(0.55f, 0.35f, 0.95f), Rgb(0.8f, 0.65f, 1f), Rgb(0.88f, 0.92f, 1f)),
+                Resistances = Res(5, 5, -10, 25, -5, 10), SpellColors = Colors(Rgb(0.55f, 0.35f, 0.95f), Rgb(0.8f, 0.65f, 1f), Rgb(0.88f, 0.92f, 1f)),
                 Signature = m => ChronoBolt(m),
             },
             new HeroSpec
@@ -213,7 +213,7 @@ namespace Moba.EditorTools
                 Health = 660f, Damage = 30f, Range = 5f, AttacksPerSecond = 1.15f, Speed = 6.4f, Mana = 300f,
                 PassiveName = "Masterwork Gear", PassiveDescription = "Items give 10% more stats.",
                 ItemStatMultiplier = 1.1f,
-                Affinities = Aff(25, -20, 0, 10, 5, -10), SpellColors = Colors(Rgb(1f, 0.55f, 0.15f), Rgb(0.85f, 0.65f, 0.3f), Rgb(0.7f, 0.2f, 0.1f)),
+                Resistances = Res(25, -20, 0, 10, 5, -10), SpellColors = Colors(Rgb(1f, 0.55f, 0.15f), Rgb(0.85f, 0.65f, 0.3f), Rgb(0.7f, 0.2f, 0.1f)),
                 Signature = m => BlastCharge(m),
             },
             new HeroSpec
@@ -223,7 +223,7 @@ namespace Moba.EditorTools
                 Health = 720f, Damage = 30f, Range = 1f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 300f, Melee = true,
                 PassiveName = "Iron Hide", PassiveDescription = "+50 max health per level, but moves 15% slower.",
                 HealthPerLevelBonus = 50f, MoveSpeedMultiplier = 0.85f,
-                Affinities = Aff(-10, 10, 5, -10, 25, -5), SpellColors = Colors(Rgb(0.55f, 0.68f, 0.85f), Rgb(0.82f, 0.85f, 0.9f), Rgb(0.95f, 0.8f, 0.35f)),
+                Resistances = Res(-10, 10, 5, -10, 25, -5), SpellColors = Colors(Rgb(0.55f, 0.68f, 0.85f), Rgb(0.82f, 0.85f, 0.9f), Rgb(0.95f, 0.8f, 0.35f)),
                 Signature = m => ShieldBash(m),
             },
             new HeroSpec
@@ -233,7 +233,7 @@ namespace Moba.EditorTools
                 Health = 590f, Damage = 34f, Range = 1f, AttacksPerSecond = 1.2f, Speed = 6.7f, Mana = 300f, Melee = true,
                 PassiveName = "Lone Prey", PassiveDescription = "Deal 15% more damage to targets with no allied hero within 7m of them.",
                 IsolationDamageBonus = 0.15f, IsolationRadius = 7f,
-                Affinities = Aff(0, -5, 10, -10, 25, 10), SpellColors = Colors(Rgb(0.85f, 0.2f, 0.35f), Rgb(0.32f, 0.1f, 0.2f), Rgb(1f, 0.55f, 0.65f)),
+                Resistances = Res(0, -5, 10, -10, 25, 10), SpellColors = Colors(Rgb(0.85f, 0.2f, 0.35f), Rgb(0.32f, 0.1f, 0.2f), Rgb(1f, 0.55f, 0.65f)),
                 Signature = m => Pounce(m),
             },
             new HeroSpec
@@ -243,7 +243,7 @@ namespace Moba.EditorTools
                 Health = 550f, Damage = 30f, Range = 6f, AttacksPerSecond = 1.2f, Speed = 6.8f, Mana = 320f,
                 PassiveName = "Tailwind", PassiveDescription = "Each spell you cast gives 25% movement speed for 2s (casting again refreshes it).",
                 TailwindSpeed = 0.25f, TailwindDuration = 2f,
-                Affinities = Aff(-10, 5, 5, 15, -10, 25), SpellColors = Colors(Rgb(0.4f, 0.85f, 0.8f), Rgb(0.8f, 0.97f, 0.95f), Rgb(0.7f, 0.75f, 0.78f)),
+                Resistances = Res(-10, 5, 5, 15, -10, 25), SpellColors = Colors(Rgb(0.4f, 0.85f, 0.8f), Rgb(0.8f, 0.97f, 0.95f), Rgb(0.7f, 0.75f, 0.78f)),
                 Signature = m => GaleShot(m),
             },
             new HeroSpec
@@ -253,7 +253,7 @@ namespace Moba.EditorTools
                 Health = 680f, Damage = 35f, Range = 1f, AttacksPerSecond = 1.15f, Speed = 6.6f, Mana = 300f, Melee = true,
                 PassiveName = "Kindled Blade", PassiveDescription = "Each attack builds Heat (up to 5, +4% attack speed each). At 5, your next attack bursts for 50 fire damage around the target and burns.",
                 HeatMaxStacks = 5, HeatAttackSpeed = 0.04f, HeatBurstDamage = 50f, PassiveMaterial = m => m.Explosion,
-                Affinities = Aff(25, -20, -5, 5, 10, -10), SpellColors = Colors(Rgb(0.9f, 0.25f, 0.15f), Rgb(1f, 0.55f, 0.15f), Rgb(1f, 0.82f, 0.3f)),
+                Resistances = Res(25, -20, -5, 5, 10, -10), SpellColors = Colors(Rgb(0.9f, 0.25f, 0.15f), Rgb(1f, 0.55f, 0.15f), Rgb(1f, 0.82f, 0.3f)),
                 Signature = m => SearingStrike(m),
             },
             new HeroSpec
@@ -263,7 +263,7 @@ namespace Moba.EditorTools
                 Health = 540f, Damage = 26f, Range = 6f, AttacksPerSecond = 1f, Speed = 6.4f, Mana = 400f,
                 PassiveName = "Chilling Touch", PassiveDescription = "Your spell hits slow enemies by 20% for 1.5s. Slowed enemies take 10% more damage from you.",
                 SpellSlow = 0.2f, SpellSlowSeconds = 1.5f, SlowedDamageBonus = 0.1f,
-                Affinities = Aff(-20, 25, 5, 0, -10, 10), SpellColors = Colors(Rgb(0.15f, 0.45f, 0.95f), Rgb(0.45f, 0.8f, 1f), Rgb(0.95f, 0.98f, 1f)),
+                Resistances = Res(-20, 25, 5, 0, -10, 10), SpellColors = Colors(Rgb(0.15f, 0.45f, 0.95f), Rgb(0.45f, 0.8f, 1f), Rgb(0.95f, 0.98f, 1f)),
                 Signature = m => IceLance(m),
             },
             new HeroSpec
@@ -273,7 +273,7 @@ namespace Moba.EditorTools
                 Health = 580f, Damage = 25f, Range = 5.5f, AttacksPerSecond = 1f, Speed = 6.5f, Mana = 420f,
                 PassiveName = "Verdant Bond", PassiveDescription = "Your spell hits heal the nearest allied hero (within 8m) for 15% of the damage dealt.",
                 AllyHealFraction = 0.15f,
-                Affinities = Aff(-15, -5, 25, -10, 0, 10), SpellColors = Colors(Rgb(0.35f, 0.75f, 0.25f), Rgb(0.65f, 0.9f, 0.4f), Rgb(1f, 0.8f, 0.9f)),
+                Resistances = Res(-15, -5, 25, -10, 0, 10), SpellColors = Colors(Rgb(0.35f, 0.75f, 0.25f), Rgb(0.65f, 0.9f, 0.4f), Rgb(1f, 0.8f, 0.9f)),
                 Signature = m => MendingSeed(m),
             },
             new HeroSpec
@@ -283,7 +283,7 @@ namespace Moba.EditorTools
                 Health = 550f, Damage = 27f, Range = 6f, AttacksPerSecond = 1.1f, Speed = 6.5f, Mana = 380f,
                 PassiveName = "Static Charge", PassiveDescription = "Every 4th spell you cast is charged: its first hit jumps to 1 more enemy within 5m for 50% damage.",
                 ChargeEvery = 4, ChargeJumps = 1, PassiveMaterial = m => m.Lightning,
-                Affinities = Aff(0, -5, -15, 25, -10, 15), SpellColors = Colors(Rgb(0.6f, 0.35f, 1f), Rgb(0.65f, 0.85f, 1f), Rgb(0.95f, 0.95f, 1f)),
+                Resistances = Res(0, -5, -15, 25, -10, 15), SpellColors = Colors(Rgb(0.6f, 0.35f, 1f), Rgb(0.65f, 0.85f, 1f), Rgb(0.95f, 0.95f, 1f)),
                 Signature = m => ArcBolt(m),
             },
         };
@@ -879,7 +879,7 @@ namespace Moba.EditorTools
                 def.allyHealFraction = spec.AllyHealFraction;
                 def.chargeEvery = spec.ChargeEvery;
                 def.chargeJumps = spec.ChargeJumps;
-                def.affinities = spec.Affinities;
+                def.resistances = spec.Resistances;
                 def.spellColors = spec.SpellColors ?? Colors(spec.Color, spec.Color, Color.white);
                 def.signature = spec.Signature?.Invoke(m);
                 def.ascension = spec.Ascension?.Invoke(m) ?? new AscensionTree();

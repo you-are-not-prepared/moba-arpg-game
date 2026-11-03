@@ -1,6 +1,7 @@
 using Moba.Abilities;
 using Moba.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.AI;
 
 namespace Moba
@@ -21,9 +22,9 @@ namespace Moba
         public HeroController prefab;
 
         [Header("Damage types")]
-        [Tooltip("Affinity per type, in DamageTypes.All order (Fire, Frost, Nature, Lightning, Physical, Air): 0.25 = the " +
-                 "hero's spells of that type deal 25% more damage. The highest one is the hero's base damage type.")]
-        public float[] affinities = new float[DamageTypes.Count];
+        [Tooltip("Resistance per type, in DamageTypes.All order (Fire, Frost, Nature, Lightning, Physical, Air): 0.25 = the " +
+                 "hero takes 25% less damage of that type, -0.1 = 10% more. The highest one is the hero's base damage type.")]
+        [FormerlySerializedAs("affinities")] public float[] resistances = new float[DamageTypes.Count];
         [Tooltip("The hero's spell colours (main, secondary, highlight).")]
         public Color[] spellColors = { Color.white, Color.white, Color.white };
 
@@ -84,27 +85,27 @@ namespace Moba
             }
         }
 
-        // The type with the highest affinity (None if the hero has none above 0).
+        // The type with the highest resistance (None if the hero has none above 0).
         public DamageType BaseDamageType
         {
             get
             {
                 DamageType best = DamageType.None;
                 float bestValue = 0f;
-                for (int i = 0; i < DamageTypes.Count && affinities != null && i < affinities.Length; i++)
+                for (int i = 0; i < DamageTypes.Count && resistances != null && i < resistances.Length; i++)
                 {
-                    if (affinities[i] <= bestValue) continue;
-                    bestValue = affinities[i];
+                    if (resistances[i] <= bestValue) continue;
+                    bestValue = resistances[i];
                     best = DamageTypes.All[i];
                 }
                 return best;
             }
         }
 
-        public float Affinity(DamageType type)
+        public float Resistance(DamageType type)
         {
             int i = DamageTypes.Index(type);
-            return i >= 0 && affinities != null && i < affinities.Length ? affinities[i] : 0f;
+            return i >= 0 && resistances != null && i < resistances.Length ? resistances[i] : 0f;
         }
 
         // Applies the damage types, the passive and the signature spell to a freshly spawned hero.
@@ -113,8 +114,8 @@ namespace Moba
             hero.definition = this;
             AbilityCaster caster = hero.Abilities;
             hero.Unit.baseDamageType = BaseDamageType;
-            caster.affinities = new float[DamageTypes.Count];
-            if (affinities != null) System.Array.Copy(affinities, caster.affinities, Mathf.Min(affinities.Length, DamageTypes.Count));
+            hero.Unit.resistances = new float[DamageTypes.Count];
+            if (resistances != null) System.Array.Copy(resistances, hero.Unit.resistances, Mathf.Min(resistances.Length, DamageTypes.Count));
             caster.passiveExtraProjectiles = extraProjectiles;
             caster.cooldownMultiplier = cooldownMultiplier;
             if (hero.TryGetComponent(out Inventory inventory)) inventory.SetStatMultiplier(itemStatMultiplier);

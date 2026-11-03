@@ -3,16 +3,16 @@ using UnityEngine.UIElements;
 
 namespace Moba.UI
 {
-    // A hero's six affinities as a radar hexagon (Fire at the top, then clockwise in DamageTypes.All order), with
+    // A hero's six resistances as a radar hexagon (Fire at the top, then clockwise in DamageTypes.All order), with
     // each type's dot and value around it. The dashed ring is 0%; the centre is MinValue, the outer edge MaxValue.
-    public class AffinityHexagon : VisualElement
+    public class ResistanceHexagon : VisualElement
     {
         const float MinValue = -0.3f;
         const float MaxValue = 0.3f;
         // Wide enough for the side labels ("Physical -10%") to fit beside the hexagon.
         const float Width = 330f;
-        const float Height = 250f;
-        const float Radius = 74f;
+        const float Height = 222f;
+        const float Radius = 66f;
         const float DotRadius = 7f;
         const float LabelRadius = Radius + 22f;
 
@@ -23,7 +23,7 @@ namespace Moba.UI
         float[] _values = new float[DamageTypes.Count];
         Color _color = Color.white;
 
-        public AffinityHexagon()
+        public ResistanceHexagon()
         {
             pickingMode = PickingMode.Ignore;
             style.width = Width;
@@ -32,7 +32,7 @@ namespace Moba.UI
             for (int i = 0; i < DamageTypes.Count; i++)
             {
                 var label = new Label { pickingMode = PickingMode.Ignore };
-                label.AddToClassList("affinity-hex__label");
+                label.AddToClassList("resistance-hex__label");
                 label.style.color = DamageTypes.ColorOf(DamageTypes.All[i]);
                 _labels[i] = label;
                 Add(label);
@@ -42,8 +42,8 @@ namespace Moba.UI
         public void SetHero(HeroDefinition hero)
         {
             _values = new float[DamageTypes.Count];
-            if (hero?.affinities != null)
-                for (int i = 0; i < DamageTypes.Count && i < hero.affinities.Length; i++) _values[i] = hero.affinities[i];
+            if (hero?.resistances != null)
+                for (int i = 0; i < DamageTypes.Count && i < hero.resistances.Length; i++) _values[i] = hero.resistances[i];
             _color = DamageTypes.ColorOf(hero != null ? hero.BaseDamageType : DamageType.None);
 
             Vector2 center = new(Width * 0.5f, Height * 0.5f);

@@ -122,6 +122,14 @@
     color: var(--xp);
 }
 
+.floating-text--damage {
+    font-size: 26px;
+}
+
+.floating-text--taken {
+    font-size: 22px;
+}
+
 /* ---------- Top stats ---------- */
 
 .top-bar {
