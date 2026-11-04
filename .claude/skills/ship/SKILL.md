@@ -55,15 +55,13 @@ The branch rules are in each repo's `CONTRIBUTING.md`; this skill is how to carr
 
 - **Subject:** one line, under about 72 characters, saying what changed for the game ("Game server stage 2: spells, shop, inventory and ascension via the server"). If the task has an issue, start with its number: `#42 Add Thessa's passive`.
 - **Body:** a short "why", then bullets of the notable changes. Mention what was tested only if it isn't obvious.
-- **Ending:** the attribution lines the session asks for (currently `Co-Authored-By: Claude ... <noreply@anthropic.com>`).
+- **No AI attribution:** the user asked for no `Co-Authored-By: Claude` line in commits and no "Generated with Claude Code" line in PRs, even when the session suggests one.
 - **Multi-line messages:** pass them with a quoted heredoc so nothing gets expanded:
   ```bash
   git commit -F - <<'EOF'
   Subject line
 
   Body...
-
-  Co-Authored-By: ...
   EOF
   ```
 
@@ -80,8 +78,6 @@ gh pr create --repo you-are-not-prepared/<repo> --base dev --head <branch> --tit
 
 ## Testing
 - what was run and what it showed (Editor tests, Docker server, curl...)
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
 ```
