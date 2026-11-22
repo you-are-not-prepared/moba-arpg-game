@@ -1,6 +1,8 @@
 name: PR to Discord
 on:
-  pull_request_target:
+  # pull_request (not pull_request_target): runs from the workflow file in the PR itself,
+  # so PRs into dev and dev -> main both post. PRs from forks get no secrets and skip.
+  pull_request:
     types: [opened, synchronize, closed]
 jobs:
   notify:
@@ -20,6 +22,10 @@ jobs:
           WHO: ${{ github.actor }}
           REPO: ${{ github.repository }}
         run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "No DISCORD_PR_WEBHOOK secret available (PR from a fork?), skipping."
+            exit 0
+          fi
           case "$ACTION" in
             opened)      VERB="🆕 opened" ;;
             synchronize) VERB="🔄 updated (new commits)" ;;
@@ -28,4 +34,4 @@ jobs:
           jq -n --arg v "$VERB" --arg r "$REPO" --arg n "$NUM" --arg t "$TITLE" \
                 --arg h "$HEAD" --arg b "$BASE" --arg u "$WHO" --arg l "$LINK" \
             '{content: "PR #\($n) \($v) by \($u) in \($r): **\($t)**\n`\($h)` → `\($b)`\n\($l)"}' \
-          | curl -sS -H "Content-Type: application/json" -d @- "$WEBHOOK"
+          | curl -sS --fail-with-body -H "Content-Type: application/json" -d @- "$WEBHOOK"
