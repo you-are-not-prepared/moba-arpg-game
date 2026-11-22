@@ -1,0 +1,31 @@
+name: PR to Discord
+on:
+  pull_request_target:
+    types: [opened, synchronize, closed]
+jobs:
+  notify:
+    # skip PRs that were closed without merging
+    if: github.event.action != 'closed' || github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_PR_WEBHOOK }}
+          ACTION: ${{ github.event.action }}
+          NUM: ${{ github.event.pull_request.number }}
+          TITLE: ${{ github.event.pull_request.title }}
+          LINK: ${{ github.event.pull_request.html_url }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          WHO: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+        run: |
+          case "$ACTION" in
+            opened)      VERB="🆕 opened" ;;
+            synchronize) VERB="🔄 updated (new commits)" ;;
+            closed)      VERB="✅ merged" ;;
+          esac
+          jq -n --arg v "$VERB" --arg r "$REPO" --arg n "$NUM" --arg t "$TITLE" \
+                --arg h "$HEAD" --arg b "$BASE" --arg u "$WHO" --arg l "$LINK" \
+            '{content: "PR #\($n) \($v) by \($u) in \($r): **\($t)**\n`\($h)` → `\($b)`\n\($l)"}' \
+          | curl -sS -H "Content-Type: application/json" -d @- "$WEBHOOK"
