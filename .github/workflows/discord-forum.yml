@@ -1,0 +1,187 @@
+name: Discord forum posts
+
+# Every issue gets its own post in the Discord forum channel. Later events
+# (closed, reopened) and PRs for that issue are posted into the same post.
+# A PR finds its issue from the issue number its title starts with ("#52 ...").
+# The post id is kept in a comment the workflow leaves on the issue.
+#
+# Needs: secret DISCORD_FORUM_WEBHOOK (the forum channel's webhook URL),
+# variables DISCORD_SERVER_ID and DISCORD_FORUM_TAGS (JSON: tag name -> tag id).
+# Issue events always run the copy of this file on main; PR events run the
+# copy in the PR. workflow_dispatch creates posts for open issues that have none.
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  # pull_request (not pull_request_target): PRs from forks get no secrets and skip.
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: discord-forum-${{ github.event.issue.number || github.event.pull_request.number || 'backfill' }}
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_FORUM_WEBHOOK }}
+          SERVER_ID: ${{ vars.DISCORD_SERVER_ID }}
+          TAGS: ${{ vars.DISCORD_FORUM_TAGS }}
+        with:
+          script: |
+            const { WEBHOOK, SERVER_ID } = process.env;
+            if (!WEBHOOK) {
+              core.notice('No DISCORD_FORUM_WEBHOOK secret available (PR from a fork?), skipping.');
+              return;
+            }
+            const TAGS = JSON.parse(process.env.TAGS || '{}');
+            const { owner, repo } = context.repo;
+            const repoTag = repo.replace(/^moba-arpg-/, '');            // game, backend, discord-bot, ideas
+            const AREAS = ['heroes', 'spells', 'mods', 'maps'];
+            const MILESTONE_TAGS = { 'Version 1.0 - MVP': 'v1.0 MVP' }; // milestone title -> tag name
+            const MARK = /<!-- discord-thread:(\d+) -->/;
+            const COLOR = { open: 0x2ea043, done: 0x8250df, cancelled: 0x6e7781, pr: 0x0969da };
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            const cut = (s, n) => (s && s.length > n ? s.slice(0, n - 1) + '…' : s || '');
+
+            async function discord(query, payload) {
+              for (let attempt = 0; attempt < 3; attempt++) {
+                const res = await fetch(`${WEBHOOK}?${query}`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ allowed_mentions: { parse: [] }, ...payload }),
+                });
+                if (res.status === 429) {                               // rate limited: wait and retry
+                  const body = await res.json().catch(() => ({}));
+                  await sleep(((body.retry_after ?? 1) + 0.5) * 1000);
+                  continue;
+                }
+                if (!res.ok) throw new Error(`Discord ${res.status}: ${await res.text()}`);
+                return res.status === 204 ? null : res.json();
+              }
+              throw new Error('Discord kept rate limiting, giving up.');
+            }
+
+            // Tags for a new post, at most 5: type, repo, area, other labels, milestone.
+            function tagsFor(issue) {
+              const labels = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
+              const names = [
+                issue.type?.name,
+                repoTag,
+                ...labels.filter(l => AREAS.includes(l)),
+                ...labels.filter(l => !AREAS.includes(l)),
+                MILESTONE_TAGS[issue.milestone?.title] ?? issue.milestone?.title,
+              ];
+              return [...new Set(names.filter(n => n && TAGS[n]).map(n => TAGS[n]))].slice(0, 5);
+            }
+
+            async function findThread(number) {
+              const comments = await github.paginate(github.rest.issues.listComments,
+                { owner, repo, issue_number: number, per_page: 100 });
+              for (const c of comments) {
+                const m = c.body?.match(MARK);
+                if (m) return m[1];
+              }
+              return null;
+            }
+
+            async function createPost(issue) {
+              const body = (issue.body || '').replace(/<!--[\s\S]*?-->/g, '').trim();
+              const msg = await discord('wait=true', {
+                thread_name: cut(`#${issue.number} ${issue.title}`, 100),
+                applied_tags: tagsFor(issue),
+                embeds: [{
+                  title: cut(`#${issue.number} ${issue.title}`, 256),
+                  url: issue.html_url,
+                  description: cut(body, 1500) || '_No description._',
+                  color: COLOR.open,
+                  fields: [
+                    { name: 'Repo', value: repo, inline: true },
+                    { name: 'Opened by', value: issue.user.login, inline: true },
+                    ...(issue.milestone ? [{ name: 'Milestone', value: issue.milestone.title, inline: true }] : []),
+                  ],
+                }],
+              });
+              const thread = msg.channel_id;
+              const link = SERVER_ID ? `https://discord.com/channels/${SERVER_ID}/${thread}` : 'the Discord forum';
+              await github.rest.issues.createComment({ owner, repo, issue_number: issue.number,
+                body: `💬 Discussion on Discord: ${link}\n\n<!-- discord-thread:${thread} -->` });
+              core.info(`Created post ${thread} for #${issue.number}`);
+              return thread;
+            }
+
+            async function threadFor(number) {
+              const existing = await findThread(number);
+              if (existing) return existing;
+              const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number: number });
+              if (issue.pull_request) return null;                       // the number belongs to a PR, not an issue
+              return createPost(issue);
+            }
+
+            const say = (thread, text, color) =>
+              discord(`thread_id=${thread}`, { embeds: [{ description: text, color }] });
+
+            const { eventName, payload } = context;
+
+            if (eventName === 'issues') {
+              const n = payload.issue.number;
+              if (payload.action === 'opened') {
+                await sleep(15000);  // labels, type and milestone are often added right after opening
+                if (!(await findThread(n))) {
+                  const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number: n });
+                  await createPost(issue);
+                }
+                return;
+              }
+              const thread = await threadFor(n);
+              if (payload.action === 'closed') {
+                const notPlanned = payload.issue.state_reason === 'not_planned';
+                await say(thread, notPlanned ? `🚫 Closed as not planned by ${context.actor}`
+                                             : `✅ Closed as completed by ${context.actor}`,
+                          notPlanned ? COLOR.cancelled : COLOR.done);
+              } else if (payload.action === 'reopened') {
+                await say(thread, `🔄 Reopened by ${context.actor}`, COLOR.open);
+              }
+              return;
+            }
+
+            if (eventName === 'pull_request') {
+              const pr = payload.pull_request;
+              const m = pr.title.match(/^#(\d+)\b/);
+              if (!m) { core.notice(`PR #${pr.number} title doesn't start with an issue number, skipping.`); return; }
+              const thread = await threadFor(Number(m[1]));
+              if (!thread) { core.notice(`#${m[1]} is not an issue, skipping.`); return; }
+              const ref = `[PR #${pr.number}](${pr.html_url})`;
+              const branches = `\`${pr.head.ref}\` → \`${pr.base.ref}\``;
+              let text;
+              switch (payload.action) {
+                case 'opened':      text = `🆕 ${ref} opened by ${pr.user.login}: **${pr.title}**\n${branches}`; break;
+                case 'reopened':    text = `🔄 ${ref} reopened by ${context.actor}`; break;
+                case 'synchronize': text = `⬆️ New commits pushed to ${ref}`; break;
+                case 'closed':
+                  if (!pr.merged) { text = `❌ ${ref} closed without merging`; break; }
+                  text = `✅ ${ref} merged into \`${pr.base.ref}\`` +
+                         (pr.base.ref === 'dev' ? ' · ready for QA' : pr.base.ref === 'main' ? ' · released to main' : '');
+                  break;
+              }
+              if (text) await say(thread, text, COLOR.pr);
+              return;
+            }
+
+            if (eventName === 'workflow_dispatch') {
+              const issues = await github.paginate(github.rest.issues.listForRepo,
+                { owner, repo, state: 'open', per_page: 100 });
+              for (const issue of issues.filter(i => !i.pull_request).reverse()) {
+                if (await findThread(issue.number)) continue;
+                await createPost(issue);
+                await sleep(2500);                                      // stay well under Discord's rate limit
+              }
+            }
