@@ -5,10 +5,16 @@ name: Discord forum posts
 # A PR finds its issue from the issue number its title starts with ("#52 ...").
 # The post id is kept in a comment the workflow leaves on the issue.
 #
-# Needs: secret DISCORD_FORUM_WEBHOOK (the forum channel's webhook URL),
-# variables DISCORD_SERVER_ID and DISCORD_FORUM_TAGS (JSON: tag name -> tag id).
+# Each post carries a status tag (Open, Closed or Cancelled) that follows the
+# issue. A webhook can't change tags after creating a post, so the Discord bot
+# updates it when the issue is closed or reopened.
+#
+# Needs: secrets DISCORD_FORUM_WEBHOOK (the forum channel's webhook URL) and
+# DISCORD_BOT_TOKEN (bot with Manage Threads, for the status tag), variables
+# DISCORD_SERVER_ID and DISCORD_FORUM_TAGS (JSON: tag name -> tag id).
 # Issue events always run the copy of this file on main; PR events run the
-# copy in the PR. workflow_dispatch creates posts for open issues that have none.
+# copy in the PR. workflow_dispatch creates posts for open issues that have
+# none and fixes the status tag on every existing post.
 
 on:
   issues:
@@ -33,11 +39,12 @@ jobs:
       - uses: actions/github-script@v7
         env:
           WEBHOOK: ${{ secrets.DISCORD_FORUM_WEBHOOK }}
+          BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           SERVER_ID: ${{ vars.DISCORD_SERVER_ID }}
           TAGS: ${{ vars.DISCORD_FORUM_TAGS }}
         with:
           script: |
-            const { WEBHOOK, SERVER_ID } = process.env;
+            const { WEBHOOK, BOT_TOKEN, SERVER_ID } = process.env;
             if (!WEBHOOK) {
               core.notice('No DISCORD_FORUM_WEBHOOK secret available (PR from a fork?), skipping.');
               return;
@@ -70,10 +77,15 @@ jobs:
               throw new Error('Discord kept rate limiting, giving up.');
             }
 
-            // Tags for a new post, at most 5: type, repo, area, other labels, milestone.
+            const STATUS_TAGS = ['Open', 'Closed', 'Cancelled'];
+            const statusOf = issue => issue.state !== 'closed' ? 'Open'
+                                    : issue.state_reason === 'not_planned' ? 'Cancelled' : 'Closed';
+
+            // Tags for a new post, at most 5: status, type, repo, area, other labels, milestone.
             function tagsFor(issue) {
               const labels = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
               const names = [
+                statusOf(issue),
                 issue.type?.name,
                 repoTag,
                 ...labels.filter(l => AREAS.includes(l)),
@@ -129,6 +141,45 @@ jobs:
             const say = (thread, text, color) =>
               discord(`thread_id=${thread}`, { embeds: [{ description: text, color }] });
 
+            // The bot (not the webhook) can change a post's tags. Discord rejects
+            // requests without a "DiscordBot (url, version)" User-Agent.
+            async function bot(method, path, payload) {
+              for (let attempt = 0; attempt < 3; attempt++) {
+                const res = await fetch(`https://discord.com/api/v10${path}`, {
+                  method,
+                  headers: {
+                    Authorization: `Bot ${BOT_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'User-Agent': `DiscordBot (https://github.com/${owner}/${repo}, 1.0)`,
+                  },
+                  body: payload ? JSON.stringify(payload) : undefined,
+                });
+                if (res.status === 429) {
+                  const body = await res.json().catch(() => ({}));
+                  await sleep(((body.retry_after ?? 1) + 0.5) * 1000);
+                  continue;
+                }
+                if (!res.ok) throw new Error(`Discord bot ${method} ${path} ${res.status}: ${await res.text()}`);
+                return res.json();
+              }
+              throw new Error('Discord kept rate limiting the bot, giving up.');
+            }
+
+            // Put the issue's status tag first and keep the other tags (at most 5 in total).
+            // archived: false, because Discord archives quiet posts and won't edit them otherwise.
+            async function setStatus(thread, issue) {
+              if (!BOT_TOKEN) { core.notice('No DISCORD_BOT_TOKEN secret, status tag not updated.'); return; }
+              const status = TAGS[statusOf(issue)];
+              if (!status) { core.notice(`No tag id for ${statusOf(issue)}, status tag not updated.`); return; }
+              const post = await bot('GET', `/channels/${thread}`);
+              const statusIds = STATUS_TAGS.map(n => TAGS[n]).filter(Boolean);
+              const current = post.applied_tags || [];
+              const tags = [status, ...current.filter(t => !statusIds.includes(t))].slice(0, 5);
+              if (tags.length === current.length && tags.every((t, i) => t === current[i]) && !post.thread_metadata?.archived) return;
+              await bot('PATCH', `/channels/${thread}`, { applied_tags: tags, archived: false });
+              core.info(`#${issue.number}: status tag ${statusOf(issue)}`);
+            }
+
             const { eventName, payload } = context;
 
             if (eventName === 'issues') {
@@ -150,6 +201,7 @@ jobs:
               } else if (payload.action === 'reopened') {
                 await say(thread, `🔄 Reopened by ${context.actor}`, COLOR.open);
               }
+              await setStatus(thread, payload.issue);
               return;
             }
 
@@ -178,10 +230,15 @@ jobs:
 
             if (eventName === 'workflow_dispatch') {
               const issues = await github.paginate(github.rest.issues.listForRepo,
-                { owner, repo, state: 'open', per_page: 100 });
+                { owner, repo, state: 'all', per_page: 100 });
               for (const issue of issues.filter(i => !i.pull_request).reverse()) {
-                if (await findThread(issue.number)) continue;
-                await createPost(issue);
-                await sleep(2500);                                      // stay well under Discord's rate limit
+                const thread = await findThread(issue.number);
+                if (thread) {
+                  await setStatus(thread, issue);                       // existing post: fix its status tag
+                  await sleep(1000);
+                } else if (issue.state === 'open') {
+                  await createPost(issue);                              // open issue without a post: create one
+                  await sleep(2500);                                    // stay well under Discord's rate limit
+                }
               }
             }
